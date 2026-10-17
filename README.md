@@ -142,6 +142,23 @@ az containerapp env certificate list --name peroche-now-env --resource-group rg-
 
 Le certificat géré est gratuit et renouvelé automatiquement, tant que le site répond sur le domaine.
 
+## Qualité du code (Sonar)
+
+Les règles Sonar (`SonarAnalyzer.CSharp`, les mêmes que SonarQube et SonarLint) s'appliquent à chaque compilation, et tout avertissement fait échouer le build (sauf les alertes de vulnérabilité NuGet, qui restent des avertissements). Une exception justifiée se déclare avec `[SuppressMessage(..., Justification = "...")]`.
+
+Le job **Analyse SonarCloud** du workflow CI/CD envoie en plus l'analyse et la couverture des tests à [SonarCloud](https://sonarcloud.io). Il est ignoré tant que le secret `SONAR_TOKEN` n'existe pas. Pour l'activer :
+
+1. Sur sonarcloud.io, se connecter avec GitHub, importer l'organisation `Velskudd` puis le dépôt `peroche.now` (gratuit pour un dépôt public).
+2. Dans le projet SonarCloud, *Administration* → *Analysis Method* : **désactiver l'analyse automatique** (elle entre en conflit avec l'analyse par la CI).
+3. *My Account* → *Security* : générer un jeton.
+4. Dans GitHub, *Settings* → *Secrets and variables* → *Actions* :
+
+| Type | Nom | Valeur |
+| --- | --- | --- |
+| Secret | `SONAR_TOKEN` | le jeton généré |
+| Variable | `SONAR_ORGANISATION` | la clé de l'organisation, si elle diffère de `velskudd` |
+| Variable | `SONAR_PROJET` | la clé du projet, si elle diffère de `Velskudd_peroche.now` |
+
 ## Coûts et limites gratuites
 
 - **Container Apps** (consommation) : le site s'arrête sans visiteur. Chaque mois, les 180 000 premières vCPU-secondes, 360 000 Gio-secondes et 2 millions de requêtes sont gratuites ([tarifs](https://azure.microsoft.com/pricing/details/container-apps/)). Le premier visiteur après une pause attend le démarrage.

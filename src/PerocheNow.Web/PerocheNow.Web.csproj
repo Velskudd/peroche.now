@@ -12,4 +12,9 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- La base SQLite locale change à chaque écriture : « dotnet watch » ne doit pas y réagir. -->
+    <Watch Remove="perochenow-dev.db*" />
+  </ItemGroup>
+
 </Project>

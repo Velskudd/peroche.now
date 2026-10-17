@@ -15,7 +15,7 @@ public sealed class StatutDuMomentCasDUsageTests
         using var banc = new Banc();
         using var portee = banc.NouvellePortee();
 
-        var id = await banc.Mediateur(portee).EnvoyerAsync(Commande("Une", "Deux"));
+        var id = await Banc.Mediateur(portee).EnvoyerAsync(Commande("Une", "Deux"));
 
         var statut = Assert.IsType<StatutDuMoment>(banc.Statuts.Statut);
         Assert.Equal(id, statut.Id);
@@ -30,7 +30,7 @@ public sealed class StatutDuMomentCasDUsageTests
         using var banc = new Banc();
         using var portee = banc.NouvellePortee();
 
-        var id = await banc.Mediateur(portee).EnvoyerAsync(Commande("Une"));
+        var id = await Banc.Mediateur(portee).EnvoyerAsync(Commande("Une"));
 
         Assert.Equal(1, banc.UniteDeTravail.Enregistrements);
         var trace = Assert.Single(banc.Traces.Traces);
@@ -48,7 +48,7 @@ public sealed class StatutDuMomentCasDUsageTests
         banc.Statuts.Statut = existant;
         using var portee = banc.NouvellePortee();
 
-        var id = await banc.Mediateur(portee).EnvoyerAsync(
+        var id = await Banc.Mediateur(portee).EnvoyerAsync(
             new DefinirStatutDuMoment("Après", ["Seule ligne"], Objectif: null, DateObjectif: null));
 
         Assert.Equal(existant.Id, id);
@@ -65,7 +65,7 @@ public sealed class StatutDuMomentCasDUsageTests
         using var portee = banc.NouvellePortee();
 
         await Assert.ThrowsAsync<RegleMetierException>(() =>
-            banc.Mediateur(portee).EnvoyerAsync(Commande("1", "2", "3", "4")));
+            Banc.Mediateur(portee).EnvoyerAsync(Commande("1", "2", "3", "4")));
 
         Assert.Equal(0, banc.UniteDeTravail.Enregistrements);
         Assert.Empty(banc.Traces.Traces);
@@ -77,7 +77,7 @@ public sealed class StatutDuMomentCasDUsageTests
         using var banc = new Banc();
         using var portee = banc.NouvellePortee();
 
-        var statut = await banc.Mediateur(portee).EnvoyerAsync(new ObtenirStatutDuMoment());
+        var statut = await Banc.Mediateur(portee).EnvoyerAsync(new ObtenirStatutDuMoment());
 
         Assert.Null(statut);
     }
@@ -92,7 +92,7 @@ public sealed class StatutDuMomentCasDUsageTests
         banc.Statuts.Statut = statut;
         using var portee = banc.NouvellePortee();
 
-        var dto = await banc.Mediateur(portee).EnvoyerAsync(new ObtenirStatutDuMoment());
+        var dto = await Banc.Mediateur(portee).EnvoyerAsync(new ObtenirStatutDuMoment());
 
         Assert.NotNull(dto);
         Assert.Equal("Accroche", dto.Accroche);
@@ -119,7 +119,7 @@ public sealed class StatutDuMomentCasDUsageTests
         using var banc = new Banc();
         using var portee = banc.NouvellePortee();
 
-        await banc.Mediateur(portee).EnvoyerAsync(StatutInitial.Commande);
+        await Banc.Mediateur(portee).EnvoyerAsync(StatutInitial.Commande);
 
         Assert.NotNull(banc.Statuts.Statut);
     }
