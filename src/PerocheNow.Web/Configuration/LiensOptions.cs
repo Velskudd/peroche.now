@@ -17,6 +17,9 @@ public sealed class LiensOptions
     /// <summary>Le dossier partenaire (PDF ou page). Tant qu'il est vide, le bouton n'apparaît pas.</summary>
     public string? DossierPartenaire { get; init; }
 
+    /// <summary>L'adresse e-mail de contact pour les partenariats (Trinity Management). Vide : pas de lien mailto.</summary>
+    public string? ContactPartenariats { get; init; }
+
     /// <summary>Les réseaux renseignés, dans l'ordre d'affichage du pied de page.</summary>
     public IEnumerable<(string Nom, string Adresse)> Reseaux()
     {

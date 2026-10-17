@@ -28,6 +28,11 @@ internal sealed class StatutDuMomentConfiguration : IEntityTypeConfiguration<Sta
             lignes.Property(l => l.Texte)
                 .HasMaxLength(StatutDuMoment.LongueurMaxLigne)
                 .IsRequired();
+            // Stockée en clair (« ProjetEnCours », « Contenus »…) pour rester lisible en base.
+            lignes.Property(l => l.Rubrique)
+                .HasConversion<string>()
+                .HasMaxLength(30)
+                .IsRequired();
         });
 
         // La collection est exposée en lecture seule : EF passe par le champ privé _lignes.

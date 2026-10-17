@@ -1,4 +1,4 @@
-@inject IOptions<LiensOptions> Liens
+@inject NavigationManager Navigation
 
 <header class="entete conteneur">
     <a class="entete__marque" href="/" aria-label="peroche.now, accueil">
@@ -7,14 +7,23 @@
     </a>
 
     <nav class="entete__nav" aria-label="Navigation principale">
-        <a href="/#projets">Projets</a>
-        <a href="/#contenus">Contenus</a>
-        <a href="/#partenaires">Partenaires</a>
-        <a href="/#a-propos">À propos</a>
+        @foreach (var destination in PlanDuSite.Menu)
+        {
+            @if (PlanDuSite.EstCourante(destination, cheminCourant))
+            {
+                <a href="@destination.Adresse" aria-current="page">@destination.Libelle</a>
+            }
+            else
+            {
+                <a href="@destination.Adresse">@destination.Libelle</a>
+            }
+        }
     </nav>
-
-    @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
-    {
-        <a class="entete__twitch" href="@Liens.Value.Twitch">Mes lives sur Twitch</a>
-    }
 </header>
+
+@code {
+    private string cheminCourant = string.Empty;
+
+    protected override void OnInitialized() =>
+        cheminCourant = Navigation.ToBaseRelativePath(Navigation.Uri);
+}

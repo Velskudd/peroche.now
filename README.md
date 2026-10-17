@@ -52,7 +52,8 @@ dotnet test PerocheNow.slnx
 | `ConnectionStrings:PerocheNow` | Chaîne de connexion. En production, fournie par la Container App (secret). |
 | `BaseDeDonnees:Fournisseur` | `SqlServer` (défaut) ou `Sqlite`. |
 | `Liens:Twitch`, `Liens:YouTube`, `Liens:Instagram`, `Liens:Facebook`, `Liens:TikTok` | Réseaux affichés. Un lien vide n'apparaît pas. |
-| `Liens:DossierPartenaire` | Fait apparaître le bouton « Découvrir le dossier partenaire ». |
+| `Liens:DossierPartenaire` | Fait apparaître le bouton « Télécharger le dossier partenaire ». |
+| `Liens:ContactPartenariats` | L'e-mail de Trinity Management pour les partenariats (page Partenaires et pied de page). |
 
 Pour ajouter un réseau, il suffit de renseigner son adresse dans `src/PerocheNow.Web/appsettings.json`.
 
@@ -150,17 +151,22 @@ Le certificat géré est gratuit et renouvelé automatiquement, tant que le site
 
 ## Migrations
 
-Tant qu'aucune migration n'existe, le schéma est créé directement à partir du modèle. Pour passer aux migrations (avant d'avoir des données à garder) :
+Le schéma de la base est géré par les migrations EF Core (`src/PerocheNow.Infrastructure/Persistance/Migrations`), appliquées au démarrage sur SQL Server. En local, SQLite crée le schéma directement à partir du modèle.
+
+Après une modification du modèle (entité, configuration), générer la migration :
+
+- **Sans rien installer** : GitHub → *Actions* → **Migration EF Core** → *Run workflow*, avec un nom (ex. `AjoutRubriqueAuxLignes`). Le workflow génère la migration et la pousse sur `main` ; relancer ensuite **CI/CD** pour déployer.
+- **En local** :
 
 ```bash
 dotnet tool install --global dotnet-ef
-dotnet ef migrations add Initial \
+dotnet ef migrations add NomDeLaMigration \
   --project src/PerocheNow.Infrastructure \
-  --startup-project src/PerocheNow.Infrastructure \
+  --startup-project src/PerocheNow.Web \
   --output-dir Persistance/Migrations
 ```
 
-Les migrations sont appliquées au démarrage. Une base déjà créée sans migration doit être vidée une fois (supprimer ses tables) pour que la migration initiale s'applique.
+Les toutes premières versions du site créaient le schéma sans migration. Au premier démarrage avec migrations, ces tables (qui ne contenaient que le statut initial) sont supprimées puis recréées par les migrations.
 
 ## Crédits
 

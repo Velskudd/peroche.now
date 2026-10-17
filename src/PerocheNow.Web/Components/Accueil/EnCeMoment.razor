@@ -15,21 +15,33 @@
 
         @if (statut.Lignes.Count > 0)
         {
-            <div class="maintenant__lignes">
+            <ul class="maintenant__lignes" aria-label="Ce que je fais en ce moment">
                 @foreach (var ligne in statut.Lignes)
                 {
-                    <p>@ligne</p>
+                    <li>
+                        @if (PlanDuSite.Pour(ligne.Rubrique) is { } destination)
+                        {
+                            <a class="porte" href="@destination.Adresse">
+                                <span class="porte__nom">@destination.Libelle</span>
+                                <span>@ligne.Texte</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <span>@ligne.Texte</span>
+                        }
+                    </li>
                 }
-            </div>
+            </ul>
         }
 
         @if (statut.ProchainObjectif is { } objectif)
         {
-            <p class="objectif">
+            <a class="objectif" href="@PlanDuSite.ProjetEnCours.Adresse">
                 <span class="objectif__etiquette">Prochain objectif</span>
                 <span class="objectif__libelle">@objectif.Libelle</span>
                 <span class="objectif__date">@DateObjectif(objectif)</span>
-            </p>
+            </a>
         }
     </div>
 

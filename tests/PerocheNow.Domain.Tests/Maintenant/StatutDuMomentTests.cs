@@ -86,6 +86,36 @@ public sealed class StatutDuMomentTests
     }
 
     [Fact]
+    public void Une_ligne_sans_rubrique_ne_mene_nulle_part()
+    {
+        var statut = StatutDuMoment.Creer("Accroche", Lundi);
+
+        statut.RemplacerLignes(["Texte seul"], Mardi);
+
+        Assert.Equal(Rubrique.Aucune, Assert.Single(statut.Lignes).Rubrique);
+    }
+
+    [Fact]
+    public void Chaque_ligne_garde_sa_rubrique()
+    {
+        var statut = StatutDuMoment.Creer("Accroche", Lundi);
+
+        statut.RemplacerLignes([("Sur iRacing", Rubrique.ProjetEnCours), ("Hors piste", Rubrique.HorsPiste)], Mardi);
+
+        var lignes = statut.Lignes.OrderBy(l => l.Ordre).ToList();
+        Assert.Equal(Rubrique.ProjetEnCours, lignes[0].Rubrique);
+        Assert.Equal(Rubrique.HorsPiste, lignes[1].Rubrique);
+    }
+
+    [Fact]
+    public void Une_rubrique_inconnue_est_refusee()
+    {
+        var statut = StatutDuMoment.Creer("Accroche", Lundi);
+
+        Assert.Throws<RegleMetierException>(() => statut.RemplacerLignes([("Texte", (Rubrique)42)], Mardi));
+    }
+
+    [Fact]
     public void RemplacerLignes_refuse_plus_de_trois_lignes()
     {
         var statut = StatutDuMoment.Creer("Accroche", Lundi);

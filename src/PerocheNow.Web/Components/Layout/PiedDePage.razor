@@ -1,21 +1,43 @@
 @inject IOptions<LiensOptions> Liens
 
-<footer id="a-propos" class="pied">
+<footer class="pied">
     <div class="pied__interieur conteneur">
-        <p class="pied__signature">
-            <svg width="28" height="28" aria-hidden="true"><use href="#ap15" width="28" height="28"></use></svg>
-            <span>Alexandre Peroche, numéro 15. Ce site se construit en public, au fil des projets.</span>
-        </p>
+        <div class="pied__signature">
+            <svg width="32" height="32" aria-hidden="true"><use href="#ap15" width="32" height="32"></use></svg>
+            <p>Alexandre Peroche, numéro 15. Ce site se construit en public, au fil des projets.</p>
+        </div>
+
+        <nav class="pied__colonne" aria-label="Le site">
+            <span class="pied__titre">Le site</span>
+            @foreach (var destination in PlanDuSite.Menu)
+            {
+                <a href="@destination.Adresse">@destination.Libelle</a>
+            }
+        </nav>
 
         @if (reseaux.Count > 0)
         {
-            <nav class="pied__reseaux" aria-label="Réseaux">
+            <nav class="pied__colonne" aria-label="Réseaux">
+                <span class="pied__titre">Me suivre</span>
                 @foreach (var (nom, adresse) in reseaux)
                 {
                     <a href="@adresse">@nom</a>
                 }
             </nav>
         }
+
+        <div class="pied__colonne">
+            <span class="pied__titre">Partenariats</span>
+            <span class="pied__discret">Gérés par Trinity Management</span>
+            @if (!string.IsNullOrWhiteSpace(Liens.Value.ContactPartenariats))
+            {
+                <a href="mailto:@Liens.Value.ContactPartenariats">@Liens.Value.ContactPartenariats</a>
+            }
+            else
+            {
+                <a href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a>
+            }
+        </div>
 
         <p class="pied__credits">
             Tracé du circuit : <a href="https://www.openstreetmap.org/copyright">© les contributeurs d'OpenStreetMap</a>

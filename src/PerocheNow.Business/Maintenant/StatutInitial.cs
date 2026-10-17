@@ -1,3 +1,5 @@
+using PerocheNow.Domain.Maintenant;
+
 namespace PerocheNow.Business.Maintenant;
 
 /// <summary>
@@ -10,16 +12,16 @@ public static class StatutInitial
         Accroche: "Je prépare ma première semaine sur la Nordschleife.",
         Lignes:
         [
-            "Sur iRacing, je roule en NEC en Porsche Cup pour enchaîner les tours de Nordschleife.",
-            "Sur Twitch, au moins deux lives par semaine, redécoupés en clips chaque jour.",
-            "Hors piste, je termine Dragon Quest VII Reimagined.",
+            new("Sur iRacing, je roule en NEC en Porsche Cup pour enchaîner les tours de Nordschleife.", Rubrique.ProjetEnCours),
+            new("Sur Twitch, au moins deux lives par semaine, redécoupés en clips chaque jour.", Rubrique.Contenus),
+            new("Hors piste, je termine Dragon Quest VII Reimagined.", Rubrique.HorsPiste),
         ],
         Objectif: "Test Week Nordschleife",
         DateObjectif: null);
 
     public static StatutDuMomentDto CommeStatutDeSecours(DateTimeOffset maintenant) => new(
         Commande.Accroche,
-        Commande.Lignes,
+        Commande.Lignes.Select(l => new LigneDuMomentDto(l.Texte, l.Rubrique)).ToList(),
         Commande.Objectif is { } libelle ? new ObjectifDto(libelle, Commande.DateObjectif) : null,
         maintenant);
 }

@@ -1,16 +1,9 @@
-@inject IOptions<LiensOptions> Liens
-
-<section id="partenaires" class="partenaires conteneur" aria-labelledby="partenaires-titre">
+<section class="partenaires conteneur" aria-labelledby="partenaires-titre">
     <div class="partenaires__interieur">
         <div class="partenaires__texte">
             <h2 id="partenaires-titre" class="partenaires__titre">Embarquer dès le départ.</h2>
             <p>Je n'ai pas encore de palmarès. J'ai une trajectoire, une communauté qui la suit et trois saisons devant moi jusqu'aux 24 Heures du Nürburgring. Les partenaires qui montent maintenant font partie de l'histoire.</p>
-            <p class="partenaires__gestion">Les partenariats sont gérés par Trinity Management.</p>
         </div>
-
-        @if (!string.IsNullOrWhiteSpace(Liens.Value.DossierPartenaire))
-        {
-            <a class="bouton-objectif" href="@Liens.Value.DossierPartenaire">Découvrir le dossier partenaire</a>
-        }
+        <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a>
     </div>
 </section>

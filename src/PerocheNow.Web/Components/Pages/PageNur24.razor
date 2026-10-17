@@ -1,0 +1,111 @@
+@page "/nur24"
+@inject IOptions<LiensOptions> Liens
+
+<PageTitle>NUR24, de la Test Week aux 24 Heures du Nürburgring | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="NUR24 : le projet d'Alexandre Peroche, de la Test Week sur la Nordschleife aux 24 Heures du Nürburgring en 2029. Où il en est, la route, d'où il part." />
+</HeadContent>
+
+<section class="nur-tete conteneur" aria-labelledby="nur24">
+    <div class="nur-tete__texte">
+        <p class="projet__contexte">Le projet en cours, depuis 2026</p>
+        <h1 id="nur24" class="projet__nom nur-tete__nom">NUR24</h1>
+        <p class="projet__promesse">De la Test Week aux 24 Heures du Nürburgring, en trois saisons.</p>
+        <p class="nur-tete__intro">La Nordschleife, 20,8 kilomètres et plus de 150 virages. Je ne viens pas du karting de compétition : j'y arrive par la simulation, étape par étape, et je raconte chacune d'elles.</p>
+    </div>
+    <TraceNordschleife Legende="Nordschleife et circuit Grand Prix, la configuration des 24 Heures." />
+</section>
+
+<section class="bande" aria-labelledby="ou-jen-suis">
+    <div class="bande__interieur conteneur ou-jen-suis">
+        <h2 id="ou-jen-suis" class="titre-section ou-jen-suis__titre">Où j'en suis</h2>
+        <div class="ou-jen-suis__texte">
+            <p class="ou-jen-suis__phrase">Je suis engagé pour une Test Week sur la Nordschleife. D'ici là, je la parcours chaque semaine en simulation.</p>
+            <p class="objectif objectif--statique">
+                <span class="objectif__etiquette">Prochaine étape</span>
+                <span class="objectif__libelle">Test Week Nordschleife</span>
+                <span class="objectif__date">Date à confirmer</span>
+            </p>
+        </div>
+        <figure class="ou-jen-suis__photo">
+            <picture>
+                <source type="image/webp" srcset="@Assets["images/showroom.webp"]" />
+                <img src="@Assets["images/showroom.jpg"]" width="498" height="665" loading="lazy"
+                     alt="Alexandre en combinaison, mains jointes, dans un showroom" />
+            </picture>
+        </figure>
+    </div>
+</section>
+
+<section class="route conteneur" aria-labelledby="la-route">
+    <h2 id="la-route" class="titre-section">La route jusqu'en 2029</h2>
+    <ol class="route__etapes">
+        <li class="route__etape route__etape--atteinte">
+            <span class="route__barre" aria-hidden="true"></span>
+            <span class="route__annee">2026</span>
+            <span class="route__titre">Préparation</span>
+            <span>Test Week sur la Nordschleife, tours coachés, sessions Tourist Drive et kilomètres en simulation.</span>
+            <span class="route__repere">Vous êtes ici</span>
+        </li>
+        <li class="route__etape">
+            <span class="route__barre" aria-hidden="true"></span>
+            <span class="route__annee">2027</span>
+            <span class="route__titre">Premières courses en RCN</span>
+            <span>La seconde partie de la saison RCN, pour apprendre la course sur la Nordschleife.</span>
+        </li>
+        <li class="route__etape">
+            <span class="route__barre" aria-hidden="true"></span>
+            <span class="route__annee">2028</span>
+            <span class="route__titre">Saison RCN complète</span>
+            <span>Toute la saison RCN, et au moins une manche de NLS pour franchir le palier suivant.</span>
+        </li>
+        <li class="route__etape route__etape--but">
+            <span class="route__barre" aria-hidden="true"></span>
+            <span class="route__annee">2029</span>
+            <span class="route__titre">Les 24 Heures du Nürburgring</span>
+            <span>Toutes les manches NLS qui précèdent la course, puis le départ des 24 Heures.</span>
+            <span class="route__repere">Objectif</span>
+        </li>
+    </ol>
+</section>
+
+<section class="parcours conteneur" aria-labelledby="parcours">
+    <div class="parcours__interieur">
+        <div class="parcours__tete">
+            <h2 id="parcours" class="titre-section">D'où je pars</h2>
+            <p>Un parcours atypique, que chacun peut suivre et dans lequel on peut se reconnaître.</p>
+        </div>
+        <ol class="parcours__etapes">
+            <li>Karting de location</li>
+            <li>Simulation</li>
+            <li>Courses d'endurance de 24 heures en ligne</li>
+            <li>Tourist Drives sur la Nordschleife</li>
+            <li>Tours coachés</li>
+            <li class="parcours__actuelle">Test Week</li>
+        </ol>
+    </div>
+</section>
+
+<section class="carnet conteneur" aria-labelledby="carnet">
+    <div class="section-tete">
+        <h2 id="carnet" class="titre-section">Le carnet de route</h2>
+        <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tout le carnet de route</a>
+    </div>
+    <p class="chantier">
+        Un Reel par semaine sur l'avancement du projet. Ils apparaîtront ici dès que la brique « Contenus » sera en place.
+        @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
+        {
+            <text>En attendant, ils sont sur <a href="@Liens.Value.Instagram">Instagram</a>.</text>
+        }
+    </p>
+</section>
+
+<section class="partenaires conteneur" aria-labelledby="partenaires-nur">
+    <div class="partenaires__interieur">
+        <div class="partenaires__texte">
+            <h2 id="partenaires-nur" class="partenaires__titre">Votre logo sur la voiture, dès 2027.</h2>
+            <p>Le projet cherche de vrais partenaires commerciaux, pas du mécénat : une image de pilote construite en public, une communauté qui suit chaque étape et trois saisons de visibilité.</p>
+        </div>
+        <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a>
+    </div>
+</section>

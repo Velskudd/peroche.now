@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PerocheNow.Business;
 using PerocheNow.Business.Maintenant;
 using PerocheNow.Business.Mediateur;
+using PerocheNow.Domain.Maintenant;
 using PerocheNow.Infrastructure.Persistance;
 
 namespace PerocheNow.Infrastructure.Tests;
@@ -74,7 +75,9 @@ public sealed class PersistanceTests : IAsyncLifetime
 
         Assert.NotNull(statut);
         Assert.Equal(StatutInitial.Commande.Accroche, statut.Accroche);
-        Assert.Equal(StatutInitial.Commande.Lignes, statut.Lignes);
+        Assert.Equal(
+            StatutInitial.Commande.Lignes.Select(l => new LigneDuMomentDto(l.Texte, l.Rubrique)),
+            statut.Lignes);
         Assert.Equal(StatutInitial.Commande.Objectif, statut.ProchainObjectif?.Libelle);
         Assert.Null(statut.ProchainObjectif?.DateCible);
 
@@ -99,7 +102,7 @@ public sealed class PersistanceTests : IAsyncLifetime
         await DansUnePorteeAsync(sp => sp.GetRequiredService<IMediateur>().EnvoyerAsync(
             new DefinirStatutDuMoment(
                 "Je reviens de la Test Week.",
-                ["Débrief des données", "Montage du vlog"],
+                [new LigneSaisie("Débrief des données", Rubrique.ProjetEnCours), new LigneSaisie("Montage du vlog", Rubrique.Contenus)],
                 "RCN 2027",
                 new DateOnly(2027, 4, 10))));
 
@@ -107,7 +110,11 @@ public sealed class PersistanceTests : IAsyncLifetime
 
         Assert.NotNull(statut);
         Assert.Equal("Je reviens de la Test Week.", statut.Accroche);
-        string[] lignesAttendues = ["Débrief des données", "Montage du vlog"];
+        LigneDuMomentDto[] lignesAttendues =
+        [
+            new("Débrief des données", Rubrique.ProjetEnCours),
+            new("Montage du vlog", Rubrique.Contenus),
+        ];
         Assert.Equal(lignesAttendues, statut.Lignes);
         Assert.Equal(new ObjectifDto("RCN 2027", new DateOnly(2027, 4, 10)), statut.ProchainObjectif);
 
@@ -144,5 +151,6 @@ public sealed class PersistanceTests : IAsyncLifetime
         Assert.Contains("CREATE TABLE [TraceAudit]", script);
         Assert.Contains("[ObjectifLibelle] nvarchar(80)", script);
         Assert.Contains("[Accroche] nvarchar(140) NOT NULL", script);
+        Assert.Contains("[Rubrique] nvarchar(30) NOT NULL", script);
     }
 }
