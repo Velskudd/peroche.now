@@ -1,0 +1,30 @@
+@inject IOptions<LiensOptions> Liens
+
+<footer id="a-propos" class="pied">
+    <div class="pied__interieur conteneur">
+        <p class="pied__signature">
+            <svg width="28" height="28" aria-hidden="true"><use href="#ap15" width="28" height="28"></use></svg>
+            <span>Alexandre Peroche, numéro 15. Ce site se construit en public, au fil des projets.</span>
+        </p>
+
+        @if (reseaux.Count > 0)
+        {
+            <nav class="pied__reseaux" aria-label="Réseaux">
+                @foreach (var (nom, adresse) in reseaux)
+                {
+                    <a href="@adresse">@nom</a>
+                }
+            </nav>
+        }
+
+        <p class="pied__credits">
+            Tracé du circuit : <a href="https://www.openstreetmap.org/copyright">© les contributeurs d'OpenStreetMap</a>
+        </p>
+    </div>
+</footer>
+
+@code {
+    private List<(string Nom, string Adresse)> reseaux = [];
+
+    protected override void OnInitialized() => reseaux = Liens.Value.Reseaux().ToList();
+}

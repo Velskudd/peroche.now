@@ -1,0 +1,20 @@
+@inject IOptions<LiensOptions> Liens
+
+<header class="entete conteneur">
+    <a class="entete__marque" href="/" aria-label="peroche.now, accueil">
+        <svg width="34" height="34" aria-hidden="true"><use href="#ap15" width="34" height="34"></use></svg>
+        <span class="entete__nom">peroche.now</span>
+    </a>
+
+    <nav class="entete__nav" aria-label="Navigation principale">
+        <a href="/#projets">Projets</a>
+        <a href="/#contenus">Contenus</a>
+        <a href="/#partenaires">Partenaires</a>
+        <a href="/#a-propos">À propos</a>
+    </nav>
+
+    @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
+    {
+        <a class="entete__twitch" href="@Liens.Value.Twitch">Mes lives sur Twitch</a>
+    }
+</header>

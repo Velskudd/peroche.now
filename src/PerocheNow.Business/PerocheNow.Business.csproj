@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\PerocheNow.Domain\PerocheNow.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Injection de dépendances et journalisation, fournies par le framework partagé ASP.NET Core. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PerocheNow.Business.Tests" />
+  </ItemGroup>
+
+</Project>

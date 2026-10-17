@@ -1,0 +1,22 @@
+# Compilation
+bin/
+obj/
+publish/
+*.user
+*.suo
+
+# Bases locales SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Éditeurs
+.vs/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Résultats de tests
+TestResults/
+coverage*/

@@ -1,0 +1,44 @@
+using PerocheNow.Business.Mediateur;
+using PerocheNow.Business.Ports;
+using PerocheNow.Domain.Maintenant;
+
+namespace PerocheNow.Business.Maintenant;
+
+/// <summary>
+/// Remplace ce qu'Alexandre fait en ce moment. Crée le statut s'il n'existe pas encore.
+/// Renvoie l'identifiant du statut.
+/// </summary>
+public sealed record DefinirStatutDuMoment(
+    string Accroche,
+    IReadOnlyList<string> Lignes,
+    string? Objectif,
+    DateOnly? DateObjectif) : ICommande<Guid>;
+
+public sealed class DefinirStatutDuMomentGestionnaire(
+    IStatutDuMomentRepository statuts,
+    IHorloge horloge) : IGestionnaire<DefinirStatutDuMoment, Guid>
+{
+    public async Task<Guid> TraiterAsync(DefinirStatutDuMoment requete, CancellationToken annulation)
+    {
+        var instant = horloge.Instant;
+        var statut = await statuts.ObtenirAsync(annulation);
+
+        if (statut is null)
+        {
+            statut = StatutDuMoment.Creer(requete.Accroche, instant);
+            statuts.Ajouter(statut);
+        }
+        else
+        {
+            statut.ModifierAccroche(requete.Accroche, instant);
+        }
+
+        statut.RemplacerLignes(requete.Lignes, instant);
+        statut.DefinirProchainObjectif(
+            string.IsNullOrWhiteSpace(requete.Objectif) ? null : new Objectif(requete.Objectif, requete.DateObjectif),
+            instant);
+
+        // L'enregistrement est fait par le pipeline (ComportementUniteDeTravail), avec la trace d'audit.
+        return statut.Id;
+    }
+}

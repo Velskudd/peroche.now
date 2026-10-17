@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PerocheNow.Business/PerocheNow.Business.csproj" />
+    <Project Path="src/PerocheNow.Domain/PerocheNow.Domain.csproj" />
+    <Project Path="src/PerocheNow.Infrastructure/PerocheNow.Infrastructure.csproj" />
+    <Project Path="src/PerocheNow.Web/PerocheNow.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PerocheNow.Business.Tests/PerocheNow.Business.Tests.csproj" />
+    <Project Path="tests/PerocheNow.Domain.Tests/PerocheNow.Domain.Tests.csproj" />
+    <Project Path="tests/PerocheNow.Infrastructure.Tests/PerocheNow.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

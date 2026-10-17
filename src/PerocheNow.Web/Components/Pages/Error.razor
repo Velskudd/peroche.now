@@ -1,0 +1,23 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>Erreur | peroche.now</PageTitle>
+
+<section class="page-simple conteneur">
+    <h1>Quelque chose a lâché.</h1>
+    <p>La page n'a pas pu s'afficher. Réessayez dans un instant.</p>
+    <p><a href="/">Revenir à l'accueil</a></p>
+    @if (!string.IsNullOrEmpty(reference))
+    {
+        <p class="reference">Référence de l'incident : <code>@reference</code></p>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext? Contexte { get; set; }
+
+    private string? reference;
+
+    protected override void OnInitialized() =>
+        reference = Activity.Current?.Id ?? Contexte?.TraceIdentifier;
+}
