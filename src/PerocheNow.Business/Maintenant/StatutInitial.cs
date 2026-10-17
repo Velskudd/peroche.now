@@ -9,7 +9,7 @@ namespace PerocheNow.Business.Maintenant;
 public static class StatutInitial
 {
     public static DefinirStatutDuMoment Commande { get; } = new(
-        Accroche: "Je prépare ma 1ère course sur la Nordschleife",
+        Accroche: "Je prépare ma 1re course sur la Nordschleife",
         Lignes:
         [
             new("Sur iRacing, je roule en NEC en Porsche Cup pour enchaîner les tours de Nordschleife.", Rubrique.ProjetEnCours),
