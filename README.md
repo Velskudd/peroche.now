@@ -76,7 +76,9 @@ Dans [Azure Cloud Shell](https://shell.azure.com) (Bash) :
 
 ```bash
 GROUPE=rg-peroche-now
-DEPOT=Velskudd/peroche.now
+# Sujet OIDC au format « immuable » de GitHub (depuis avril 2026) : propriétaire@id/dépôt@id.
+# Les deux identifiants s'obtiennent avec : gh api repos/Velskudd/peroche.now --jq '.owner.id, .id'
+SUJET_OIDC="repo:Velskudd@20286630/peroche.now@1423298996:environment:production"
 ABONNEMENT=$(az account show --query id -o tsv)
 
 az provider register --namespace Microsoft.App
@@ -91,14 +93,17 @@ az role assignment create --assignee $APP_ID --role Contributor \
 az ad app federated-credential create --id $APP_ID --parameters "{
   \"name\": \"github-production\",
   \"issuer\": \"https://token.actions.githubusercontent.com\",
-  \"subject\": \"repo:$DEPOT:environment:production\",
+  \"subject\": \"$SUJET_OIDC\",
   \"audiences\": [\"api://AzureADTokenExchange\"]
 }"
 
 echo "AZURE_CLIENT_ID=$APP_ID"
 echo "AZURE_TENANT_ID=$(az account show --query tenantId -o tsv)"
 echo "AZURE_SUBSCRIPTION_ID=$ABONNEMENT"
+echo "SQL_MOT_DE_PASSE=Pn15-$(openssl rand -hex 10)-Aa"
 ```
+
+Si GitHub Actions échoue avec `AADSTS700213: No matching federated identity record`, le sujet ne correspond pas : l'erreur affiche le sujet exact envoyé par GitHub, à reporter avec `az ad app federated-credential update` ([procédure Microsoft](https://learn.microsoft.com/entra/workload-id/workload-identities-github-immutable-subjects)).
 
 Dans GitHub, *Settings* → *Secrets and variables* → *Actions* :
 
@@ -107,7 +112,7 @@ Dans GitHub, *Settings* → *Secrets and variables* → *Actions* :
 | Secret | `AZURE_CLIENT_ID` | affiché ci-dessus |
 | Secret | `AZURE_TENANT_ID` | affiché ci-dessus |
 | Secret | `AZURE_SUBSCRIPTION_ID` | affiché ci-dessus |
-| Secret | `SQL_MOT_DE_PASSE` | un mot de passe fort (au moins 12 caractères, majuscules, minuscules, chiffres et symboles) |
+| Secret | `SQL_MOT_DE_PASSE` | la valeur générée ci-dessus (sans `!` : Bash l'interprète) |
 | Variable | `AZURE_RESOURCE_GROUP` | `rg-peroche-now` |
 | Variable | `AZURE_CONTAINERAPP` | `peroche-now` |
 
