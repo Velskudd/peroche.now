@@ -44,24 +44,34 @@ public sealed class StatutDuMoment : Entite
     }
 
     /// <summary>
-    /// Remplace toutes les lignes complémentaires. L'ordre de la liste devient l'ordre d'affichage.
+    /// Remplace toutes les lignes complémentaires, sans rubrique. L'ordre de la liste devient l'ordre d'affichage.
     /// </summary>
     public void RemplacerLignes(IEnumerable<string> textes, DateTimeOffset maintenant)
+        => RemplacerLignes(textes.Select(t => (t, Rubrique.Aucune)), maintenant);
+
+    /// <summary>
+    /// Remplace toutes les lignes complémentaires, chacune avec la rubrique vers laquelle elle mène.
+    /// L'ordre de la liste devient l'ordre d'affichage.
+    /// </summary>
+    public void RemplacerLignes(IEnumerable<(string Texte, Rubrique Rubrique)> lignes, DateTimeOffset maintenant)
     {
-        var nettoyees = textes
-            .Where(t => !string.IsNullOrWhiteSpace(t))
-            .Select(t => t.Trim())
+        var nettoyees = lignes
+            .Where(l => !string.IsNullOrWhiteSpace(l.Texte))
+            .Select(l => (Texte: l.Texte.Trim(), l.Rubrique))
             .ToList();
 
         if (nettoyees.Count > NombreMaxLignes)
             throw new RegleMetierException($"Pas plus de {NombreMaxLignes} lignes : l'accueil doit rester lisible d'un coup d'œil.");
 
-        if (nettoyees.Any(t => t.Length > LongueurMaxLigne))
+        if (nettoyees.Any(l => l.Texte.Length > LongueurMaxLigne))
             throw new RegleMetierException($"Une ligne ne doit pas dépasser {LongueurMaxLigne} caractères.");
+
+        if (nettoyees.Any(l => !Enum.IsDefined(l.Rubrique)))
+            throw new RegleMetierException("Une ligne mène vers une rubrique inconnue.");
 
         _lignes.Clear();
         for (var i = 0; i < nettoyees.Count; i++)
-            _lignes.Add(new LigneDuMoment(i + 1, nettoyees[i]));
+            _lignes.Add(new LigneDuMoment(i + 1, nettoyees[i].Texte, nettoyees[i].Rubrique));
 
         MisAJourLe = maintenant;
     }

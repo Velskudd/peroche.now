@@ -1,0 +1,49 @@
+name: Migration EF Core
+
+# Génère une migration EF Core à partir du modèle et la pousse sur main.
+# Utile quand on ne peut pas lancer « dotnet ef » en local. Le déploiement suit au prochain passage de CI/CD.
+on:
+  workflow_dispatch:
+    inputs:
+      nom:
+        description: "Nom de la migration (ex. AjoutRubriqueAuxLignes)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  generer:
+    name: Générer la migration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Installer dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version "10.0.*"
+
+      - name: Restaurer
+        run: dotnet restore PerocheNow.slnx
+
+      - name: Générer
+        env:
+          NOM: ${{ inputs.nom }}
+        run: |
+          dotnet ef migrations add "$NOM" \
+            --project src/PerocheNow.Infrastructure \
+            --startup-project src/PerocheNow.Web \
+            --output-dir Persistance/Migrations
+
+      - name: Pousser sur main
+        env:
+          NOM: ${{ inputs.nom }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/PerocheNow.Infrastructure/Persistance/Migrations
+          git commit -m "Migration EF Core : $NOM"
+          git push

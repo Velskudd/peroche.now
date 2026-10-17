@@ -1,0 +1,16 @@
+name: Sync SonarCloud issues
+on:
+  workflow_dispatch:          # manual "Run workflow" button
+  schedule:
+    - cron: "0 6 * * 1"       # every Monday 06:00 UTC
+permissions:
+  issues: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: bash scripts/sonar-to-github.sh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GH_TOKEN: ${{ github.token }}

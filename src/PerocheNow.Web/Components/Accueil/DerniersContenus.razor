@@ -1,12 +1,9 @@
-@inject IOptions<LiensOptions> Liens
-
-<section id="contenus" class="contenus conteneur" aria-labelledby="contenus-titre">
-    <h2 id="contenus-titre" class="contenus__titre">Derniers contenus</h2>
-    <p class="contenus__chantier">
+<section class="contenus conteneur" aria-labelledby="contenus-titre">
+    <div class="section-tete">
+        <h2 id="contenus-titre" class="titre-section">Derniers contenus</h2>
+        <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tous les contenus</a>
+    </div>
+    <p class="chantier">
         C'est la prochaine brique du site : mes dernières vidéos YouTube et publications Instagram apparaîtront ici d'elles-mêmes.
-        @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
-        {
-            <text>En attendant, tout passe en direct sur <a href="@Liens.Value.Twitch">Twitch</a>.</text>
-        }
     </p>
 </section>

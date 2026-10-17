@@ -7,7 +7,10 @@ namespace PerocheNow.Business.Tests.Maintenant;
 public sealed class StatutDuMomentCasDUsageTests
 {
     private static DefinirStatutDuMoment Commande(params string[] lignes) =>
-        new("Je prépare ma première semaine sur la Nordschleife.", lignes, "Test Week Nordschleife", null);
+        new("Je prépare ma première semaine sur la Nordschleife.",
+            lignes.Select(l => new LigneSaisie(l)).ToList(),
+            "Test Week Nordschleife",
+            null);
 
     [Fact]
     public async Task Definir_cree_le_statut_quand_il_n_existe_pas()
@@ -49,11 +52,12 @@ public sealed class StatutDuMomentCasDUsageTests
         using var portee = banc.NouvellePortee();
 
         var id = await Banc.Mediateur(portee).EnvoyerAsync(
-            new DefinirStatutDuMoment("Après", ["Seule ligne"], Objectif: null, DateObjectif: null));
+            new DefinirStatutDuMoment("Après", [new LigneSaisie("Seule ligne", Rubrique.Contenus)], Objectif: null, DateObjectif: null));
 
         Assert.Equal(existant.Id, id);
         Assert.Same(existant, banc.Statuts.Statut);
         Assert.Equal("Après", existant.Accroche);
+        Assert.Equal(Rubrique.Contenus, Assert.Single(existant.Lignes).Rubrique);
         Assert.Null(existant.ProchainObjectif);
         Assert.Equal(Banc.Instant, existant.MisAJourLe);
     }
@@ -87,7 +91,9 @@ public sealed class StatutDuMomentCasDUsageTests
     {
         using var banc = new Banc();
         var statut = StatutDuMoment.Creer("Accroche", Banc.Instant);
-        statut.RemplacerLignes(["Première", "Deuxième", "Troisième"], Banc.Instant);
+        statut.RemplacerLignes(
+            [("Première", Rubrique.ProjetEnCours), ("Deuxième", Rubrique.Aucune), ("Troisième", Rubrique.HorsPiste)],
+            Banc.Instant);
         statut.DefinirProchainObjectif(new Objectif("Test Week Nordschleife", new DateOnly(2027, 3, 15)), Banc.Instant);
         banc.Statuts.Statut = statut;
         using var portee = banc.NouvellePortee();
@@ -96,7 +102,12 @@ public sealed class StatutDuMomentCasDUsageTests
 
         Assert.NotNull(dto);
         Assert.Equal("Accroche", dto.Accroche);
-        string[] lignesAttendues = ["Première", "Deuxième", "Troisième"];
+        LigneDuMomentDto[] lignesAttendues =
+        [
+            new("Première", Rubrique.ProjetEnCours),
+            new("Deuxième", Rubrique.Aucune),
+            new("Troisième", Rubrique.HorsPiste),
+        ];
         Assert.Equal(lignesAttendues, dto.Lignes);
         Assert.Equal(new ObjectifDto("Test Week Nordschleife", new DateOnly(2027, 3, 15)), dto.ProchainObjectif);
         Assert.Equal(0, banc.UniteDeTravail.Enregistrements);
@@ -109,7 +120,9 @@ public sealed class StatutDuMomentCasDUsageTests
         var secours = StatutInitial.CommeStatutDeSecours(Banc.Instant);
 
         Assert.Equal(StatutInitial.Commande.Accroche, secours.Accroche);
-        Assert.Equal(StatutInitial.Commande.Lignes, secours.Lignes);
+        Assert.Equal(
+            StatutInitial.Commande.Lignes.Select(l => new LigneDuMomentDto(l.Texte, l.Rubrique)),
+            secours.Lignes);
         Assert.Equal(StatutInitial.Commande.Objectif, secours.ProchainObjectif?.Libelle);
     }
 

@@ -10,9 +10,12 @@ namespace PerocheNow.Business.Maintenant;
 /// </summary>
 public sealed record DefinirStatutDuMoment(
     string Accroche,
-    IReadOnlyList<string> Lignes,
+    IReadOnlyList<LigneSaisie> Lignes,
     string? Objectif,
     DateOnly? DateObjectif) : ICommande<Guid>;
+
+/// <summary>Une ligne du moment telle qu'on la saisit : son texte et la rubrique vers laquelle elle mène.</summary>
+public sealed record LigneSaisie(string Texte, Rubrique Rubrique = Rubrique.Aucune);
 
 public sealed class DefinirStatutDuMomentGestionnaire(
     IStatutDuMomentRepository statuts,
@@ -33,7 +36,7 @@ public sealed class DefinirStatutDuMomentGestionnaire(
             statut.ModifierAccroche(requete.Accroche, instant);
         }
 
-        statut.RemplacerLignes(requete.Lignes, instant);
+        statut.RemplacerLignes(requete.Lignes.Select(l => (l.Texte, l.Rubrique)), instant);
         statut.DefinirProchainObjectif(
             string.IsNullOrWhiteSpace(requete.Objectif) ? null : new Objectif(requete.Objectif, requete.DateObjectif),
             instant);

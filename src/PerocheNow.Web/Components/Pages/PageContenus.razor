@@ -1,0 +1,45 @@
+@page "/contenus"
+@inject IOptions<LiensOptions> Liens
+
+<PageTitle>Contenus | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="Les vidéos YouTube et Reels Instagram d'Alexandre Peroche, rangés par projet : NUR24 et tout ce qui se passe à côté de la piste." />
+</HeadContent>
+
+<section class="page-tete conteneur" aria-labelledby="contenus-titre">
+    <h1 id="contenus-titre" class="page-tete__titre">Contenus</h1>
+    <p class="page-tete__intro">
+        Mes vidéos YouTube et mes Reels Instagram, repris automatiquement et rangés par projet.
+        @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
+        {
+            <text>Les lives, eux, se passent sur <a href="@Liens.Value.Twitch">Twitch</a>.</text>
+        }
+    </p>
+</section>
+
+<section class="conteneur page-corps" aria-label="En construction">
+    <div class="chantier chantier--encadre">
+        <p>C'est la prochaine brique du site. Ici arriveront d'eux-mêmes, dès leur publication :</p>
+        <ul>
+            <li>les vidéos YouTube, des rediffusions de course aux vlogs ;</li>
+            <li>les Reels Instagram, dont le carnet de route hebdomadaire de NUR24 ;</li>
+            <li>un tri par projet (NUR24, à côté de la piste) et par format.</li>
+        </ul>
+        @if (reseaux.Count > 0)
+        {
+            <p class="chantier__reseaux">
+                En attendant :
+                @foreach (var (nom, adresse) in reseaux)
+                {
+                    <a href="@adresse">@nom</a>
+                }
+            </p>
+        }
+    </div>
+</section>
+
+@code {
+    private List<(string Nom, string Adresse)> reseaux = [];
+
+    protected override void OnInitialized() => reseaux = Liens.Value.Reseaux().ToList();
+}

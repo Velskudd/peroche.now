@@ -5,6 +5,15 @@
     <ProjectReference Include="..\PerocheNow.Infrastructure\PerocheNow.Infrastructure.csproj" />
   </ItemGroup>
 
+  <!-- Pour les outils « dotnet ef » (génération des migrations) : en Debug seulement,
+       pour ne pas embarquer Roslyn et consorts dans l'image publiée en Release. -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>

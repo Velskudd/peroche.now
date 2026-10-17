@@ -1,0 +1,8 @@
+# Les actions GitHub sont épinglées par SHA de commit : Dependabot propose les mises à jour
+# (nouveau SHA + commentaire de version) au lieu de laisser une étiquette bouger toute seule.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
