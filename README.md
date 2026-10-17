@@ -187,5 +187,5 @@ Les toutes premières versions du site créaient le schéma sans migration. Au p
 
 ## Crédits
 
-- Polices : [Chakra Petch](https://fonts.google.com/specimen/Chakra+Petch) et [Manrope](https://fonts.google.com/specimen/Manrope), licence SIL Open Font License, servies depuis le site.
+- Police : [Archivo](https://fonts.google.com/specimen/Archivo) en version variable (graisse et largeur), licence SIL Open Font License, servie depuis le site. Les titres sont élargis à 125 %.
 - Tracé du Nürburgring : © les contributeurs d'[OpenStreetMap](https://www.openstreetmap.org/copyright), licence ODbL.
