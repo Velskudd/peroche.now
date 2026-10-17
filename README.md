@@ -100,7 +100,6 @@ az ad app federated-credential create --id $APP_ID --parameters "{
 echo "AZURE_CLIENT_ID=$APP_ID"
 echo "AZURE_TENANT_ID=$(az account show --query tenantId -o tsv)"
 echo "AZURE_SUBSCRIPTION_ID=$ABONNEMENT"
-echo "SQL_MOT_DE_PASSE=Pn15-$(openssl rand -hex 10)-Aa"
 ```
 
 Si GitHub Actions échoue avec `AADSTS700213: No matching federated identity record`, le sujet ne correspond pas : l'erreur affiche le sujet exact envoyé par GitHub, à reporter avec `az ad app federated-credential update` ([procédure Microsoft](https://learn.microsoft.com/entra/workload-id/workload-identities-github-immutable-subjects)).
@@ -112,9 +111,10 @@ Dans GitHub, *Settings* → *Secrets and variables* → *Actions* :
 | Secret | `AZURE_CLIENT_ID` | affiché ci-dessus |
 | Secret | `AZURE_TENANT_ID` | affiché ci-dessus |
 | Secret | `AZURE_SUBSCRIPTION_ID` | affiché ci-dessus |
-| Secret | `SQL_MOT_DE_PASSE` | la valeur générée ci-dessus (sans `!` : Bash l'interprète) |
 | Variable | `AZURE_RESOURCE_GROUP` | `rg-peroche-now` |
 | Variable | `AZURE_CONTAINERAPP` | `peroche-now` |
+
+La base n'a pas de mot de passe : le serveur SQL n'accepte que l'authentification Microsoft Entra, et son seul administrateur est l'identité managée de la Container App. Pour s'y connecter soi-même (SSMS, Azure Data Studio), remplacer temporairement l'administrateur Entra du serveur par son propre compte dans le portail, puis relancer le workflow **Infrastructure** pour le rétablir.
 
 Puis lancer le workflow **Infrastructure** (*Actions* → *Infrastructure* → *Run workflow*). Il affiche à la fin l'adresse provisoire du site (`…azurecontainerapps.io`), l'IP de l'environnement et l'identifiant de vérification du domaine. Les pushs suivants sur `main` déploient automatiquement.
 

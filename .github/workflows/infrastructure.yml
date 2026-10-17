@@ -26,7 +26,6 @@ jobs:
         env:
           GROUPE: ${{ vars.AZURE_RESOURCE_GROUP }}
           NOM_APP: ${{ vars.AZURE_CONTAINERAPP || 'peroche-now' }}
-          MOT_DE_PASSE_SQL: ${{ secrets.SQL_MOT_DE_PASSE }}
           JETON_GHCR: ${{ secrets.GHCR_JETON_LECTURE }}
           DOMAINE: ${{ vars.DOMAINE }}
           ID_CERTIFICAT: ${{ vars.ID_CERTIFICAT }}
@@ -39,7 +38,6 @@ jobs:
             --parameters \
               nomApp="$NOM_APP" \
               image="$image" \
-              motDePasseSql="$MOT_DE_PASSE_SQL" \
               utilisateurGhcr="${GITHUB_REPOSITORY_OWNER,,}" \
               jetonGhcr="$JETON_GHCR" \
               domainePersonnalise="$DOMAINE" \

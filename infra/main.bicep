@@ -10,13 +10,6 @@ param nomApp string = 'peroche-now'
 @description('Image du site, par exemple ghcr.io/velskudd/peroche-now:latest.')
 param image string
 
-@description('Identifiant administrateur du serveur SQL.')
-param adminSql string = 'perochenow'
-
-@secure()
-@description('Mot de passe administrateur du serveur SQL.')
-param motDePasseSql string
-
 @description('Délai avant mise en pause de la base, en minutes. 60 par défaut ; 15 consomme moins de quota gratuit.')
 @minValue(15)
 param delaiPauseMinutes int = 60
@@ -35,20 +28,42 @@ param domainePersonnalise string = ''
 param idCertificat string = ''
 
 var suffixe = uniqueString(resourceGroup().id)
+var nomServeurSql = '${nomApp}-sql-${suffixe}'
 var nomBase = 'perochenow'
 var registrePrive = !empty(jetonGhcr)
 var avecDomaine = !empty(domainePersonnalise) && !empty(idCertificat)
 
 // ---------- Base de données ----------
 
+// Aucun mot de passe : seule l'identité managée de la Container App peut se connecter (administrateur Microsoft Entra).
 resource serveurSql 'Microsoft.Sql/servers@2023-08-01-preview' = {
-  name: '${nomApp}-sql-${suffixe}'
+  name: nomServeurSql
   location: emplacement
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
-    administratorLogin: adminSql
-    administratorLoginPassword: motDePasseSql
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Enabled'
+    // Pris en compte à la création du serveur ; sur un serveur existant, l'administrateur est mis à jour
+    // mais l'authentification Entra seule passe par la ressource « entraUniquement » ci-dessous.
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      principalType: 'Application'
+      login: app.name
+      sid: app.identity.principalId
+      tenantId: subscription().tenantId
+      azureADOnlyAuthentication: true
+    }
+  }
+}
+
+// Désactive l'authentification SQL (identifiant + mot de passe) sur un serveur créé avant ce changement.
+resource entraUniquement 'Microsoft.Sql/servers/azureADOnlyAuthentications@2023-08-01-preview' = {
+  parent: serveurSql
+  name: 'Default'
+  properties: {
+    azureADOnlyAuthentication: true
   }
 }
 
@@ -84,7 +99,9 @@ resource base 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
   }
 }
 
-var chaineDeConnexion = 'Server=tcp:${serveurSql.properties.fullyQualifiedDomainName},1433;Initial Catalog=${nomBase};User ID=${adminSql};Password=${motDePasseSql};Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;'
+// Nom d'hôte calculé plutôt que lu sur le serveur : le serveur dépend de l'identité de l'app, l'inverse créerait un cycle.
+// Pas de secret : l'app s'authentifie avec son identité managée.
+var chaineDeConnexion = 'Server=tcp:${nomServeurSql}${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${nomBase};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;'
 
 // ---------- Hébergement ----------
 
@@ -104,6 +121,10 @@ resource environnement 'Microsoft.App/managedEnvironments@2024-03-01' = {
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
   name: nomApp
   location: emplacement
+  // Identité utilisée pour se connecter à la base sans mot de passe.
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     environmentId: environnement.id
     workloadProfileName: 'Consumption'
@@ -124,22 +145,14 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             ]
           : []
       }
-      secrets: concat(
-        [
-          {
-            name: 'chaine-sql'
-            value: chaineDeConnexion
-          }
-        ],
-        registrePrive
-          ? [
-              {
-                name: 'jeton-ghcr'
-                value: jetonGhcr
-              }
-            ]
-          : []
-      )
+      secrets: registrePrive
+        ? [
+            {
+              name: 'jeton-ghcr'
+              value: jetonGhcr
+            }
+          ]
+        : []
       registries: registrePrive
         ? [
             {
@@ -162,7 +175,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           env: [
             {
               name: 'ConnectionStrings__PerocheNow'
-              secretRef: 'chaine-sql'
+              value: chaineDeConnexion
             }
             {
               name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
