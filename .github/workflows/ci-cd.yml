@@ -70,8 +70,7 @@ jobs:
   deployer:
     name: Déployer sur Azure
     needs: image
-    # Ne s'active qu'une fois l'infrastructure créée (variable AZURE_RESOURCE_GROUP renseignée).
-    if: vars.AZURE_RESOURCE_GROUP != ''
+    # Les variables et secrets Azure peuvent être définis au niveau du dépôt ou de l'environnement « production ».
     runs-on: ubuntu-latest
     environment: production
     permissions:
