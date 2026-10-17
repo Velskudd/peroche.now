@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PerocheNow.Business.Mediateur;
 
 /// <summary>Toute demande envoyée au médiateur, qui attend une réponse de type <typeparamref name="TReponse"/>.</summary>
+[SuppressMessage("Major Code Smell", "S2326:Unused type parameters should be removed",
+    Justification = "Type fantôme : il permet au médiateur d'inférer le type de réponse de chaque requête.")]
 public interface IRequete<TReponse>;
 
 /// <summary>Demande en lecture seule. N'est jamais auditée.</summary>

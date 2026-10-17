@@ -10,31 +10,31 @@ namespace PerocheNow.Business.Mediateur;
 public sealed class Mediateur(IServiceProvider services) : IMediateur
 {
     // Une enveloppe typée par type de requête, créée une seule fois puis réutilisée.
-    private static readonly ConcurrentDictionary<Type, EnveloppeBase> Enveloppes = new();
+    private static readonly ConcurrentDictionary<Type, IEnveloppe> Enveloppes = new();
 
     public Task<TReponse> EnvoyerAsync<TReponse>(IRequete<TReponse> requete, CancellationToken annulation = default)
     {
         ArgumentNullException.ThrowIfNull(requete);
 
-        var enveloppe = (Enveloppe<TReponse>)Enveloppes.GetOrAdd(
+        var enveloppe = (IEnveloppe<TReponse>)Enveloppes.GetOrAdd(
             requete.GetType(),
-            typeRequete => (EnveloppeBase)Activator.CreateInstance(
+            typeRequete => (IEnveloppe)Activator.CreateInstance(
                 typeof(EnveloppeRequete<,>).MakeGenericType(typeRequete, typeof(TReponse)))!);
 
         return enveloppe.TraiterAsync(requete, services, annulation);
     }
 
-    private abstract class EnveloppeBase;
+    private interface IEnveloppe;
 
-    private abstract class Enveloppe<TReponse> : EnveloppeBase
+    private interface IEnveloppe<TReponse> : IEnveloppe
     {
-        public abstract Task<TReponse> TraiterAsync(IRequete<TReponse> requete, IServiceProvider services, CancellationToken annulation);
+        Task<TReponse> TraiterAsync(IRequete<TReponse> requete, IServiceProvider services, CancellationToken annulation);
     }
 
-    private sealed class EnveloppeRequete<TRequete, TReponse> : Enveloppe<TReponse>
+    private sealed class EnveloppeRequete<TRequete, TReponse> : IEnveloppe<TReponse>
         where TRequete : IRequete<TReponse>
     {
-        public override Task<TReponse> TraiterAsync(IRequete<TReponse> requete, IServiceProvider services, CancellationToken annulation)
+        public Task<TReponse> TraiterAsync(IRequete<TReponse> requete, IServiceProvider services, CancellationToken annulation)
         {
             var requeteTypee = (TRequete)requete;
 

@@ -71,7 +71,7 @@ internal sealed class Banc : IDisposable
         _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
     }
 
-    public IMediateur Mediateur(IServiceScope portee) => portee.ServiceProvider.GetRequiredService<IMediateur>();
+    public static IMediateur Mediateur(IServiceScope portee) => portee.ServiceProvider.GetRequiredService<IMediateur>();
 
     public IServiceScope NouvellePortee() => _fournisseur.CreateScope();
 

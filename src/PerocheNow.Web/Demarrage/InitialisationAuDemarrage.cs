@@ -10,15 +10,16 @@ namespace PerocheNow.Web.Demarrage;
 public sealed class InitialisationAuDemarrage(IServiceProvider services, ILogger<InitialisationAuDemarrage> journal)
     : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken arret)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            await services.InitialiserBaseAsync(arret);
+            await services.InitialiserBaseAsync(stoppingToken);
             journal.LogInformation("Base prête.");
         }
-        catch (OperationCanceledException) when (arret.IsCancellationRequested)
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
+            // Arrêt normal du site pendant la préparation : rien à signaler.
         }
         catch (Exception erreur)
         {

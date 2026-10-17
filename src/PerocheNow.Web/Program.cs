@@ -47,4 +47,4 @@ app.MapStaticAssets();
 app.MapHealthChecks("/sante");
 app.MapRazorComponents<App>();
 
-app.Run();
+await app.RunAsync();

@@ -7,5 +7,17 @@
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Tout avertissement (Sonar compris) bloque la compilation. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Sauf les alertes de vulnérabilité NuGet : une nouvelle alerte publiée ne doit pas bloquer un déploiement sans rapport. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
   </PropertyGroup>
+
+  <!-- Règles Sonar (mêmes règles que SonarQube / SonarLint), appliquées à chaque build. -->
+  <ItemGroup>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
