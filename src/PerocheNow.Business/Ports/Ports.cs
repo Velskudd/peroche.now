@@ -36,3 +36,12 @@ public interface IUtilisateurCourant
 {
     string Nom { get; }
 }
+
+/// <summary>La plateforme de diffusion (Twitch) : le direct en cours, ou <c>null</c> hors direct.</summary>
+public interface ISourceDuDirect
+{
+    Task<DirectEnCours?> ObtenirAsync(CancellationToken annulation);
+}
+
+/// <summary>Un direct en cours, tel que la plateforme le décrit.</summary>
+public sealed record DirectEnCours(string Titre, string? Jeu, DateTimeOffset DebutLe);

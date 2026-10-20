@@ -6,6 +6,7 @@ using PerocheNow.Infrastructure;
 using PerocheNow.Web.Components;
 using PerocheNow.Web.Configuration;
 using PerocheNow.Web.Demarrage;
+using PerocheNow.Web.Direct;
 using PerocheNow.Web.Maintenant;
 using PerocheNow.Web.Securite;
 
@@ -25,6 +26,7 @@ builder.Services.AddRazorComponents();
 builder.Services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<LecteurDuMoment>();
+builder.Services.AddScoped<LecteurDuDirect>();
 builder.Services.Configure<LiensOptions>(builder.Configuration.GetSection(LiensOptions.Section));
 builder.Services.AddHostedService<InitialisationAuDemarrage>();
 

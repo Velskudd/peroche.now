@@ -45,6 +45,13 @@ internal sealed class UtilisateurFixe(string nom) : IUtilisateurCourant
     public string Nom { get; } = nom;
 }
 
+internal sealed class FauxDirect : ISourceDuDirect
+{
+    public DirectEnCours? Direct { get; set; }
+
+    public Task<DirectEnCours?> ObtenirAsync(CancellationToken annulation) => Task.FromResult(Direct);
+}
+
 /// <summary>La couche Business complète, branchée sur les doublures.</summary>
 internal sealed class Banc : IDisposable
 {
@@ -56,6 +63,7 @@ internal sealed class Banc : IDisposable
     public FaussesTraces Traces { get; } = new();
     public FausseUniteDeTravail UniteDeTravail { get; } = new();
     public HorlogeFixe Horloge { get; } = new(Instant);
+    public FauxDirect Direct { get; } = new();
 
     public Banc(Action<IServiceCollection>? configurer = null)
     {
@@ -66,6 +74,7 @@ internal sealed class Banc : IDisposable
         services.AddSingleton<IUniteDeTravail>(UniteDeTravail);
         services.AddSingleton<IHorloge>(Horloge);
         services.AddSingleton<IUtilisateurCourant>(new UtilisateurFixe("alexandre"));
+        services.AddSingleton<ISourceDuDirect>(Direct);
         configurer?.Invoke(services);
 
         _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });

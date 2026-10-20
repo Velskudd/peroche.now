@@ -34,10 +34,18 @@ param domainePersonnalise string = ''
 @description('Identifiant du certificat géré lié au domaine. Vide tant que le domaine n\'est pas configuré.')
 param idCertificat string = ''
 
+@description('Identifiant client de l\'application Twitch (pastille « En direct »). Vide : pastille désactivée.')
+param twitchIdentifiantClient string = ''
+
+@secure()
+@description('Secret client de l\'application Twitch. Vide : pastille désactivée.')
+param twitchSecretClient string = ''
+
 var suffixe = uniqueString(resourceGroup().id)
 var nomBase = 'perochenow'
 var registrePrive = !empty(jetonGhcr)
 var avecDomaine = !empty(domainePersonnalise) && !empty(idCertificat)
+var avecTwitch = !empty(twitchIdentifiantClient) && !empty(twitchSecretClient)
 
 // ---------- Base de données ----------
 
@@ -138,6 +146,14 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
                 value: jetonGhcr
               }
             ]
+          : [],
+        avecTwitch
+          ? [
+              {
+                name: 'twitch-secret'
+                value: twitchSecretClient
+              }
+            ]
           : []
       )
       registries: registrePrive
@@ -159,16 +175,30 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json('0.25')
             memory: '0.5Gi'
           }
-          env: [
-            {
-              name: 'ConnectionStrings__PerocheNow'
-              secretRef: 'chaine-sql'
-            }
-            {
-              name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
-              value: 'true'
-            }
-          ]
+          env: concat(
+            [
+              {
+                name: 'ConnectionStrings__PerocheNow'
+                secretRef: 'chaine-sql'
+              }
+              {
+                name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
+                value: 'true'
+              }
+            ],
+            avecTwitch
+              ? [
+                  {
+                    name: 'Twitch__IdentifiantClient'
+                    value: twitchIdentifiantClient
+                  }
+                  {
+                    name: 'Twitch__SecretClient'
+                    secretRef: 'twitch-secret'
+                  }
+                ]
+              : []
+          )
           probes: [
             {
               // /sante ne touche pas la base : les sondes ne la réveillent pas.

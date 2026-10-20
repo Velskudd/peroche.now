@@ -51,9 +51,10 @@ dotnet test PerocheNow.slnx
 | --- | --- |
 | `ConnectionStrings:PerocheNow` | Chaîne de connexion. En production, fournie par la Container App (secret). |
 | `BaseDeDonnees:Fournisseur` | `SqlServer` (défaut) ou `Sqlite`. |
-| `Liens:Twitch`, `Liens:YouTube`, `Liens:Instagram`, `Liens:Facebook`, `Liens:TikTok` | Réseaux affichés. Un lien vide n'apparaît pas. |
+| `Liens:Twitch`, `Liens:YouTube`, `Liens:Threads`, `Liens:Instagram`, `Liens:TikTok`, `Liens:Facebook` | Réseaux affichés (pied de page, page `/liens`). Un lien vide n'apparaît pas. |
 | `Liens:DossierPartenaire` | Fait apparaître le bouton « Télécharger le dossier partenaire ». |
 | `Liens:ContactPartenariats` | L'e-mail de Trinity Management pour les partenariats (page Partenaires et pied de page). |
+| `Twitch:IdentifiantClient`, `Twitch:SecretClient` | Application Twitch de la pastille « En direct ». Vides : pastille désactivée. En production, fournis par la Container App. |
 
 Pour ajouter un réseau, il suffit de renseigner son adresse dans `src/PerocheNow.Web/appsettings.json`.
 
@@ -142,6 +143,17 @@ az containerapp env certificate list --name peroche-now-env --resource-group rg-
 3. Enregistrer les variables GitHub `DOMAINE` = `peroche.now` et `ID_CERTIFICAT` = l'identifiant affiché, pour que le prochain passage du workflow **Infrastructure** conserve la liaison.
 
 Le certificat géré est gratuit et renouvelé automatiquement, tant que le site répond sur le domaine.
+
+### 4. La pastille « En direct » (Twitch)
+
+Le site interroge l'API Helix de Twitch (une fois par minute au plus) pour savoir si un live est en cours.
+
+1. Sur [dev.twitch.tv/console](https://dev.twitch.tv/console), **Register Your Application** : nom `peroche.now`,
+   OAuth Redirect URL `http://localhost`, catégorie *Website Integration*, client *Confidential*.
+   Twitch demande que la double authentification soit active sur le compte.
+2. Noter le **Client ID** et générer un **Client Secret**.
+3. Dans GitHub, environnement `production`, créer les secrets `TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET`.
+4. Relancer le workflow **Infrastructure** : la Container App reçoit les deux valeurs et la pastille s'active.
 
 ## Qualité du code (Sonar)
 

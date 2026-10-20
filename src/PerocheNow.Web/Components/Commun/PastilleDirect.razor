@@ -1,0 +1,21 @@
+@inject LecteurDuDirect Lecteur
+@inject IOptions<LiensOptions> Liens
+
+@* Affichée seulement pendant un direct Twitch ; sinon rien n'est rendu. *@
+@if (direct is not null && !string.IsNullOrWhiteSpace(Liens.Value.Twitch))
+{
+    <a class="pastille-direct" href="@Liens.Value.Twitch">
+        <span class="pastille-direct__point" aria-hidden="true"></span>
+        <span>En direct sur Twitch</span>
+        @if (!string.IsNullOrWhiteSpace(direct.Titre))
+        {
+            <span class="visuellement-masque"> : @direct.Titre</span>
+        }
+    </a>
+}
+
+@code {
+    private DirectEnCours? direct;
+
+    protected override async Task OnInitializedAsync() => direct = await Lecteur.LireAsync();
+}

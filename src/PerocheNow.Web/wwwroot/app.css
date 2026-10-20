@@ -208,6 +208,8 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 }
 
 .entete__marque {
+  /* Pousse le menu (et la pastille « En direct ») à droite, qu'il y ait une pastille ou non. */
+  margin-right: auto;
   display: flex; align-items: center; gap: 12px;
   color: var(--argent); text-decoration: none;
 }
@@ -221,6 +223,23 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
   text-decoration: underline; text-decoration-color: var(--argent);
   text-decoration-thickness: 2px; text-underline-offset: 9px;
 }
+
+/* Pastille « En direct », affichée seulement pendant un live Twitch (en-tête et page de liens). */
+.pastille-direct {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid var(--ardoise); border-radius: 999px;
+  font-size: 14px; font-weight: 600; color: var(--blanc); text-decoration: none;
+}
+.pastille-direct:hover { color: var(--blanc); border-color: var(--argent); }
+.pastille-direct:focus-visible { border-radius: 999px; }
+.pastille-direct__point {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--blanc);
+  animation: pastille-pulsation 2s ease-in-out infinite;
+}
+@keyframes pastille-pulsation { 50% { opacity: 0.3; } }
+.liens .pastille-direct { align-self: center; }
 
 /* ---------- Accueil : maintenant ---------- */
 
@@ -590,4 +609,5 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .trace { animation: none; stroke-dasharray: none; }
+  .pastille-direct__point { animation: none; }
 }

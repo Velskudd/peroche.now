@@ -4,13 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using PerocheNow.Business.Ports;
 using PerocheNow.Infrastructure.Persistance;
 using PerocheNow.Infrastructure.Systeme;
+using PerocheNow.Infrastructure.Twitch;
 
 namespace PerocheNow.Infrastructure;
 
 public static class EnregistrementInfrastructure
 {
     /// <summary>
-    /// Branche les adaptateurs : base de données, repositories, horloge et utilisateur courant.
+    /// Branche les adaptateurs : base de données, repositories, horloge, utilisateur courant et direct Twitch.
     /// <para>
     /// Configuration attendue : <c>ConnectionStrings:PerocheNow</c> et <c>BaseDeDonnees:Fournisseur</c>
     /// (<c>SqlServer</c> par défaut, <c>Sqlite</c> pour travailler en local sans serveur).
@@ -35,6 +36,7 @@ public static class EnregistrementInfrastructure
         services.AddScoped<ITraceAuditRepository, TraceAuditRepository>();
         services.AddSingleton<IHorloge, HorlogeSysteme>();
         services.AddSingleton<IUtilisateurCourant, UtilisateurSysteme>();
+        services.AjouterDirectTwitch(configuration);
 
         return services;
     }
