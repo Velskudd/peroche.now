@@ -52,7 +52,7 @@ public sealed class SourceDuDirectTwitchTests
         var appel = Assert.Single(twitch.AppelsFlux);
         Assert.Equal("?user_login=ap15fr", appel.Query);
         Assert.Equal("identifiant", appel.IdentifiantClient);
-        Assert.Equal("jeton-1", appel.Jeton);
+        Assert.Equal("jeton-1", appel.JetonPresente);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public sealed class SourceDuDirectTwitchTests
         await Source(twitch).ObtenirAsync(CancellationToken.None);
 
         Assert.Equal(2, twitch.DemandesDeJeton);
-        Assert.Equal(new[] { "jeton-1", "jeton-2" }, twitch.AppelsFlux.Select(a => a.Jeton).ToArray());
+        Assert.Equal(new[] { "jeton-1", "jeton-2" }, twitch.AppelsFlux.Select(a => a.JetonPresente).ToArray());
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public sealed class SourceDuDirectTwitchTests
     private static SourceDuDirectTwitch Source(FauxTwitch twitch, JetonTwitch? jeton = null) =>
         new(new FabriqueDeClients(twitch), jeton ?? Jeton(twitch), Parametres);
 
-    private sealed record AppelFlux(string Query, string IdentifiantClient, string Jeton);
+    private sealed record AppelFlux(string Query, string IdentifiantClient, string JetonPresente);
 
     /// <summary>Simule l'API Twitch : un jeton numéroté par demande, et la liste des directs.</summary>
     private sealed class FauxTwitch : HttpMessageHandler
@@ -115,17 +115,17 @@ public sealed class SourceDuDirectTwitchTests
         public List<AppelFlux> AppelsFlux { get; } = [];
         public int DemandesDeJeton { get; private set; }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage requete, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var adresse = requete.RequestUri!;
+            var adresse = request.RequestUri!;
             if (adresse.Host == HoteJeton)
             {
                 DemandesDeJeton++;
                 return Task.FromResult(Json($$"""{"access_token":"jeton-{{DemandesDeJeton}}","expires_in":5000000,"token_type":"bearer"}"""));
             }
 
-            var identifiant = requete.Headers.TryGetValues("Client-Id", out var valeurs) ? valeurs.Single() : string.Empty;
-            AppelsFlux.Add(new AppelFlux(adresse.Query, identifiant, requete.Headers.Authorization?.Parameter ?? string.Empty));
+            var identifiant = request.Headers.TryGetValues("Client-Id", out var valeurs) ? valeurs.Single() : string.Empty;
+            AppelsFlux.Add(new AppelFlux(adresse.Query, identifiant, request.Headers.Authorization?.Parameter ?? string.Empty));
 
             var statut = StatutsFlux.Count > 0 ? StatutsFlux.Dequeue() : HttpStatusCode.OK;
             return Task.FromResult(statut == HttpStatusCode.OK ? Json(CorpsFlux) : new HttpResponseMessage(statut));
