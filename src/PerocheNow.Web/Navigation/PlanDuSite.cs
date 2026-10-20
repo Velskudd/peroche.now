@@ -20,6 +20,9 @@ public static class PlanDuSite
     public static readonly Destination HorsPiste = new("À côté de la piste", "/contenus");
     public static readonly Destination Partenaires = new("Partenaires", "/partenaires");
 
+    /// <summary>La page de liens à mettre en bio des réseaux. Hors menu : elle a sa propre mise en page.</summary>
+    public static readonly Destination Liens = new("Liens", "/liens");
+
     // Tableau nommé : Split('?', '#') appellerait Split(char, int count), « # » devenant le nombre 35.
     private static readonly char[] FinDuChemin = ['?', '#'];
 

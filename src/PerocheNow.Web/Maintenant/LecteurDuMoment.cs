@@ -23,13 +23,20 @@ public sealed class LecteurDuMoment(
     private static readonly TimeSpan DureeCache = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan AttenteMaximale = TimeSpan.FromSeconds(12);
 
-    public async Task<StatutDuMomentDto> LireAsync(CancellationToken annulation = default)
+    public Task<StatutDuMomentDto> LireAsync(CancellationToken annulation = default) =>
+        LireAsync(AttenteMaximale, annulation);
+
+    /// <summary>
+    /// Même lecture, avec une attente plus courte pour les pages qui doivent s'afficher tout de suite
+    /// (la page de liens, ouverte depuis une bio) : au-delà, statut de secours.
+    /// </summary>
+    public async Task<StatutDuMomentDto> LireAsync(TimeSpan attenteMaximale, CancellationToken annulation = default)
     {
         if (cache.TryGetValue(CleCache, out StatutDuMomentDto? enCache) && enCache is not null)
             return enCache;
 
         using var delai = CancellationTokenSource.CreateLinkedTokenSource(annulation);
-        delai.CancelAfter(AttenteMaximale);
+        delai.CancelAfter(attenteMaximale);
 
         try
         {

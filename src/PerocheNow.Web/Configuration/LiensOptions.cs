@@ -11,6 +11,7 @@ public sealed class LiensOptions
     public string? Twitch { get; init; }
     public string? YouTube { get; init; }
     public string? Instagram { get; init; }
+    public string? Threads { get; init; }
     public string? Facebook { get; init; }
     public string? TikTok { get; init; }
 
@@ -20,16 +21,17 @@ public sealed class LiensOptions
     /// <summary>L'adresse e-mail de contact pour les partenariats (Trinity Management). Vide : pas de lien mailto.</summary>
     public string? ContactPartenariats { get; init; }
 
-    /// <summary>Les réseaux renseignés, dans l'ordre d'affichage du pied de page.</summary>
+    /// <summary>Les réseaux renseignés, dans l'ordre d'affichage du pied de page et de la page de liens.</summary>
     public IEnumerable<(string Nom, string Adresse)> Reseaux()
     {
         (string Nom, string? Adresse)[] tous =
         [
             ("Twitch", Twitch),
             ("YouTube", YouTube),
+            ("Threads", Threads),
             ("Instagram", Instagram),
-            ("Facebook", Facebook),
             ("TikTok", TikTok),
+            ("Facebook", Facebook),
         ];
 
         return tous

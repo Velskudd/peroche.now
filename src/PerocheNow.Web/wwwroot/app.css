@@ -110,7 +110,8 @@ a:focus-visible { outline: 2px solid var(--argent); outline-offset: 3px; border-
 /* Le vibreur : bande de bordure de piste, posée au-dessus des titres de section. */
 .titre-section::before,
 .projet__contexte::before,
-.partenaires--clair .partenaires__titre::before {
+.partenaires--clair .partenaires__titre::before,
+.liens__carte::before {
   content: "";
   display: block;
   width: 48px; height: 6px;
@@ -496,6 +497,83 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
   font-size: 13px; color: var(--gris-discret);
 }
 .pied__credits a { color: var(--gris); }
+
+/* ---------- Page liens (bio des réseaux) : une colonne de boutons, comme un agrégateur ---------- */
+
+.liens { max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
+
+.liens__tete { position: relative; }
+.liens__tete picture { display: block; background: var(--surface); }
+.liens__photo { width: 100%; height: 420px; object-fit: cover; object-position: 50% 30%; }
+.liens__tete::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(17, 19, 21, 0) 40%, rgba(17, 19, 21, 0.75) 75%, var(--fond) 100%);
+}
+.liens__identite {
+  position: absolute; z-index: 1; left: 0; right: 0; bottom: 0;
+  padding: 0 20px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-align: center;
+}
+.liens__nom {
+  margin: 0;
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 700;
+  font-size: 28px; line-height: 1.05; letter-spacing: -0.01em;
+  color: var(--blanc);
+}
+.liens__devise { margin: 0; font-size: 15px; color: var(--gris); }
+
+.liens__corps { padding: 20px 20px 0; display: flex; flex-direction: column; gap: 14px; }
+
+.liens__carte {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 22px 20px 20px;
+  border: 1px solid var(--trait); border-radius: 16px;
+  background: var(--surface); color: var(--argent); text-decoration: none;
+}
+.liens__carte::before { margin-bottom: 0; }
+.liens__carte:hover { color: var(--argent); border-color: var(--ardoise); }
+.liens__carte:hover .liens__vers { text-decoration-color: var(--argent); }
+.liens__etiquette { font-size: 14px; color: var(--gris); }
+.liens__accroche {
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600;
+  font-size: 23px; line-height: 1.15;
+  color: var(--blanc);
+}
+.liens__objectif { display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
+.liens__objectif .objectif__etiquette { font-size: 14px; }
+.liens__vers {
+  margin-top: 4px;
+  font-weight: 600; color: var(--blanc);
+  text-decoration: underline; text-decoration-color: var(--ardoise); text-underline-offset: 5px;
+}
+
+.liens__groupe { margin: 18px 0 2px; font-size: 15px; font-weight: 600; color: var(--gris); text-align: center; }
+
+.liens__boutons { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.liens__bouton {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 58px; padding: 10px 20px;
+  border: 1px solid var(--trait); border-radius: 14px;
+  background: var(--surface); color: var(--blanc);
+  font-size: 17px; font-weight: 600; text-align: center; text-decoration: none;
+}
+.liens__bouton:hover { color: var(--blanc); background: #22272C; border-color: var(--ardoise); }
+.liens__bouton--projet { background: var(--marine); border-color: #1C2A3E; }
+.liens__bouton--projet:hover { background: #0F1E33; border-color: var(--ardoise); }
+.liens__bouton--objectif { background: var(--or); border-color: var(--or); color: var(--fond); font-weight: 700; }
+.liens__bouton--objectif:hover { background: #ECBA62; border-color: #ECBA62; color: var(--fond); }
+.liens__carte:focus-visible,
+.liens__bouton:focus-visible { outline-offset: 3px; border-radius: 14px; }
+.liens__bouton--objectif:focus-visible { outline-color: var(--or); }
+
+.liens__pied { margin-top: 28px; display: flex; justify-content: center; }
+.liens__pied a {
+  display: inline-flex; align-items: center; gap: 10px;
+  color: var(--gris); text-decoration: none;
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600;
+}
+.liens__pied a:hover { color: var(--blanc); }
 
 /* ---------- Pages simples (introuvable, erreur) ---------- */
 

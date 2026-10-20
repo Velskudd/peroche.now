@@ -1,0 +1,78 @@
+@page "/liens"
+@layout LayoutLiens
+@inject LecteurDuMoment Lecteur
+@inject IOptions<LiensOptions> Liens
+
+<PageTitle>Alexandre Peroche, tous mes liens | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="Tous les liens d'Alexandre Peroche : ce qu'il fait en ce moment, ses réseaux, le projet NUR24 jusqu'aux 24 Heures du Nürburgring." />
+</HeadContent>
+
+<header class="liens__tete">
+    <picture>
+        <source type="image/webp" srcset="@Assets["images/volant-regard.webp"]" />
+        <img class="liens__photo" src="@Assets["images/volant-regard.jpg"]" width="665" height="831"
+             alt="Alexandre au volant, en combinaison de course" fetchpriority="high" />
+    </picture>
+    <div class="liens__identite">
+        <svg width="30" height="30" aria-hidden="true"><use href="#ap15" width="30" height="30"></use></svg>
+        <h1 class="liens__nom">Alexandre Peroche</h1>
+        <p class="liens__devise">Essayer, c'est déjà réussir.</p>
+    </div>
+</header>
+
+<div class="liens__corps">
+    @if (statut is not null)
+    {
+        <a class="liens__carte" href="@PlanDuSite.Maintenant.Adresse">
+            <span class="liens__etiquette">En ce moment</span>
+            <span class="liens__accroche">@statut.Accroche</span>
+            @if (statut.ProchainObjectif is { } objectif)
+            {
+                <span class="liens__objectif">
+                    <span class="objectif__etiquette">Prochain objectif</span>
+                    <span>@objectif.Libelle</span>
+                </span>
+            }
+            <span class="liens__vers">Tout suivre sur peroche.now</span>
+        </a>
+    }
+
+    @if (reseaux.Count > 0)
+    {
+        <h2 class="liens__groupe">Me suivre partout</h2>
+        <ul class="liens__boutons">
+            @foreach (var (nom, adresse) in reseaux)
+            {
+                <li><a class="liens__bouton" href="@adresse">@nom</a></li>
+            }
+        </ul>
+    }
+
+    <h2 class="liens__groupe">Le projet NUR24</h2>
+    <ul class="liens__boutons">
+        <li><a class="liens__bouton liens__bouton--projet" href="@PlanDuSite.ProjetEnCours.Adresse">De la Test Week aux 24 Heures</a></li>
+        <li><a class="liens__bouton liens__bouton--objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a></li>
+    </ul>
+
+    <footer class="liens__pied">
+        <a href="@PlanDuSite.Maintenant.Adresse">
+            <svg width="22" height="22" aria-hidden="true"><use href="#ap15" width="22" height="22"></use></svg>
+            <span>peroche.now</span>
+        </a>
+    </footer>
+</div>
+
+@code {
+    /// <summary>Ouverte depuis une bio, la page n'attend pas le réveil de la base : statut de secours au-delà.</summary>
+    private static readonly TimeSpan AttenteCourte = TimeSpan.FromSeconds(3);
+
+    private StatutDuMomentDto? statut;
+    private List<(string Nom, string Adresse)> reseaux = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        reseaux = Liens.Value.Reseaux().ToList();
+        statut = await Lecteur.LireAsync(AttenteCourte);
+    }
+}
