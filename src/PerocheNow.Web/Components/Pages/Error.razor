@@ -3,21 +3,21 @@
 
 <PageTitle>Erreur | peroche.now</PageTitle>
 
-<section class="page-simple conteneur">
+<section class="simple-page container">
     <h1>Quelque chose a lâché.</h1>
     <p>La page n'a pas pu s'afficher. Réessayez dans un instant.</p>
     <p><a href="/">Revenir à l'accueil</a></p>
-    @if (!string.IsNullOrEmpty(reference))
+    @if (!string.IsNullOrEmpty(requestId))
     {
-        <p class="reference">Référence de l'incident : <code>@reference</code></p>
+        <p class="reference">Référence de l'incident : <code>@requestId</code></p>
     }
 </section>
 
 @code {
-    [CascadingParameter] private HttpContext? Contexte { get; set; }
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
 
-    private string? reference;
+    private string? requestId;
 
     protected override void OnInitialized() =>
-        reference = Activity.Current?.Id ?? Contexte?.TraceIdentifier;
+        requestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
 }

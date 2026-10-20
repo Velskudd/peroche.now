@@ -1,0 +1,76 @@
+@inject CurrentStatusReader Reader
+@inject IClock Clock
+@inject IOptions<LinksOptions> Links
+
+@if (status is null)
+{
+    return;
+}
+
+<section class="now container" aria-labelledby="now-title">
+    <div class="now__text">
+        <p class="now__time" data-paris-time data-suffix="@Suffix">@TimeLine</p>
+
+        <h1 id="now-title" class="now__headline">@status.Headline</h1>
+
+        @if (status.Lines.Count > 0)
+        {
+            <ul class="now__lines" aria-label="Ce que je fais en ce moment">
+                @foreach (var line in status.Lines)
+                {
+                    <li>
+                        @if (SiteMap.For(line.Section) is { } destination)
+                        {
+                            <a class="gateway" href="@destination.Url">
+                                <span class="gateway__name">@destination.Label</span>
+                                <span>@line.Text</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <span>@line.Text</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (status.NextGoal is { } goal)
+        {
+            <a class="goal" href="@SiteMap.CurrentProject.Url">
+                <span class="goal__tag">Prochain objectif</span>
+                <span class="goal__label">@goal.Label</span>
+                <span class="goal__date">@GoalDate(goal)</span>
+            </a>
+        }
+    </div>
+
+    <figure class="now__photo">
+        @if (string.IsNullOrWhiteSpace(Links.Value.Instagram))
+        {
+            <Photo />
+        }
+        else
+        {
+            <a href="@Links.Value.Instagram" aria-label="Voir mes photos sur Instagram"><Photo /></a>
+        }
+    </figure>
+</section>
+
+@code {
+    private const string Place = "en Bretagne";
+    private static readonly string Suffix = $" {Place}. Voici ce que je fais.";
+    private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
+
+    private CurrentStatusDto? status;
+
+    private string TimeLine =>
+        ParisTime.Format(Clock.Now) is { } time
+            ? time + Suffix
+            : $"En ce moment, {Place}. Voici ce que je fais.";
+
+    protected override async Task OnInitializedAsync() => status = await Reader.ReadAsync();
+
+    private static string GoalDate(GoalDto goal) =>
+        goal.TargetDate is { } date ? date.ToString("d MMMM yyyy", French) : "Date à confirmer";
+}

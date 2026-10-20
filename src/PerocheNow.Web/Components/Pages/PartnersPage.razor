@@ -1,0 +1,108 @@
+@page "/partenaires"
+@inject IOptions<LinksOptions> Links
+
+<PageTitle>Devenir partenaire de NUR24 | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="Embarquer dès le départ : devenez partenaire de NUR24, trois saisons jusqu'aux 24 Heures du Nürburgring. Partenariats gérés par Trinity Management." />
+</HeadContent>
+
+<section class="partners-hero container" aria-labelledby="get-on-board">
+    <div class="partners-hero__text">
+        <h1 id="get-on-board" class="partners-hero__title">Embarquer dès le départ.</h1>
+        <p>Je n'ai pas encore de palmarès. J'ai une trajectoire, une communauté qui la suit et trois saisons devant moi jusqu'aux 24 Heures du Nürburgring. NUR24 cherche de vrais partenaires commerciaux, pas du mécénat : les marques qui montent maintenant font partie de l'histoire.</p>
+        @if (hasPartnerKit || hasContact)
+        {
+            <div class="actions">
+                @if (hasPartnerKit)
+                {
+                    <a class="goal-button" href="@Links.Value.PartnerKit">Télécharger le dossier partenaire</a>
+                }
+                @if (hasContact)
+                {
+                    <a class="more-link" href="mailto:@Links.Value.PartnershipContact">Écrire à Trinity Management</a>
+                }
+            </div>
+        }
+    </div>
+    <figure class="partners-hero__photo">
+        <picture>
+            <source type="image/webp" srcset="@Assets["images/helmet-arms-crossed.webp"]" />
+            <img src="@Assets["images/helmet-arms-crossed.jpg"]" width="532" height="665"
+                 alt="Alexandre casqué, en combinaison, bras croisés" fetchpriority="high" />
+        </picture>
+    </figure>
+</section>
+
+<section class="band light" aria-labelledby="why-now">
+    <div class="band__inner container">
+        <h2 id="why-now" class="section-title">Pourquoi maintenant</h2>
+        <div class="three-columns">
+            <div class="argument">
+                <h3 class="argument__title">Une trajectoire, pas un palmarès</h3>
+                <p>Karting de location, simulation, Tourist Drives, puis la Nordschleife. Un parcours que chacun peut suivre, et dans lequel on peut se reconnaître.</p>
+                <a class="more-link" href="@SiteMap.CurrentProject.Url">D'où je pars</a>
+            </div>
+            <div class="argument">
+                <h3 class="argument__title">Trois saisons de visibilité</h3>
+                <p>2027 en RCN, 2028 en RCN et NLS, 2029 jusqu'aux 24 Heures du Nürburgring. Chaque saison est une nouvelle étape, racontée de l'intérieur.</p>
+                <a class="more-link" href="@SiteMap.CurrentProject.Url">La route jusqu'en 2029</a>
+            </div>
+            <div class="argument">
+                <h3 class="argument__title">Une communauté qui suit chaque étape</h3>
+                <p>Au moins deux lives Twitch par semaine, des clips chaque jour sur toutes les plateformes et un Reel hebdomadaire sur l'avancement du projet.</p>
+                <a class="more-link" href="@SiteMap.Content.Url">Voir les contenus</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="visibility container" aria-labelledby="visibility">
+    <h2 id="visibility" class="section-title">Où votre marque apparaît</h2>
+    <ul class="three-columns visibility__list">
+        <li>
+            <span class="visibility__title">Sur la voiture et la combinaison</span>
+            <span>En course, en roulage et sur chaque photo du projet.</span>
+        </li>
+        <li>
+            <span class="visibility__title">Dans les lives et les contenus</span>
+            <span>Sur l'habillage des lives Twitch et dans les vidéos et Reels du projet.</span>
+        </li>
+        <li>
+            <span class="visibility__title">Ici, sur peroche.now</span>
+            <span>Parmi les partenaires du projet en cours.</span>
+        </li>
+    </ul>
+    <p class="visibility__note">
+        Bientôt, un configurateur vous montrera votre logo sur la livrée, en temps réel.
+        @if (hasPartnerKit)
+        {
+            <text>Les formules détaillées sont dans le dossier partenaire.</text>
+        }
+    </p>
+</section>
+
+<section class="partners container" aria-labelledby="contact">
+    <div class="partners__inner">
+        <div class="partners__text">
+            <h2 id="contact" class="partners__title">Parlons-en.</h2>
+            <p>Les partenariats sont gérés par Trinity Management, qui vous répond et prépare la proposition avec vous.</p>
+            @if (hasContact)
+            {
+                <a class="contact__address" href="mailto:@Links.Value.PartnershipContact">@Links.Value.PartnershipContact</a>
+            }
+            else
+            {
+                <p class="visibility__note">L'adresse de contact sera publiée ici très bientôt.</p>
+            }
+        </div>
+        @if (hasPartnerKit)
+        {
+            <a class="goal-button" href="@Links.Value.PartnerKit">Télécharger le dossier partenaire</a>
+        }
+    </div>
+</section>
+
+@code {
+    private bool hasPartnerKit => !string.IsNullOrWhiteSpace(Links.Value.PartnerKit);
+    private bool hasContact => !string.IsNullOrWhiteSpace(Links.Value.PartnershipContact);
+}

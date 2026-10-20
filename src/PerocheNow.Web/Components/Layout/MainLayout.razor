@@ -1,19 +1,19 @@
 ﻿@inherits LayoutComponentBase
 
-<a class="lien-evitement" href="#contenu">Aller au contenu</a>
-<SymboleAp15 />
+<a class="skip-link" href="#content">Aller au contenu</a>
+<Ap15Symbol />
 
 <div class="page">
-    <svg class="page__cercles" aria-hidden="true" viewBox="0 0 1200 1200">
+    <svg class="page__circles" aria-hidden="true" viewBox="0 0 1200 1200">
         <circle cx="600" cy="600" r="560" fill="none" stroke="currentColor" stroke-width="2"></circle>
         <circle cx="600" cy="600" r="402" fill="none" stroke="currentColor" stroke-width="2"></circle>
     </svg>
 
-    <EnTete />
+    <SiteHeader />
 
-    <main id="contenu" tabindex="-1">
+    <main id="content" tabindex="-1">
         @Body
     </main>
 
-    <PiedDePage />
+    <SiteFooter />
 </div>

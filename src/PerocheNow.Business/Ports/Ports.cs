@@ -1,5 +1,5 @@
 using PerocheNow.Domain.Audit;
-using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Status;
 
 namespace PerocheNow.Business.Ports;
 
@@ -7,32 +7,32 @@ namespace PerocheNow.Business.Ports;
 // Leurs implémentations vivent dans l'Infrastructure, qui dépend de Business et jamais l'inverse.
 
 /// <summary>Accès au statut du moment. Il n'en existe qu'un seul à la fois.</summary>
-public interface IStatutDuMomentRepository
+public interface ICurrentStatusRepository
 {
-    Task<StatutDuMoment?> ObtenirAsync(CancellationToken annulation);
-    void Ajouter(StatutDuMoment statut);
+    Task<CurrentStatus?> GetAsync(CancellationToken cancellationToken);
+    void Add(CurrentStatus status);
 }
 
 /// <summary>Stockage des traces d'audit.</summary>
-public interface ITraceAuditRepository
+public interface IAuditEntryRepository
 {
-    void Ajouter(TraceAudit trace);
+    void Add(AuditEntry entry);
 }
 
 /// <summary>Valide en une fois toutes les modifications en attente.</summary>
-public interface IUniteDeTravail
+public interface IUnitOfWork
 {
-    Task EnregistrerAsync(CancellationToken annulation);
+    Task SaveAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>L'heure courante, isolée pour pouvoir la maîtriser dans les tests.</summary>
-public interface IHorloge
+public interface IClock
 {
-    DateTimeOffset Instant { get; }
+    DateTimeOffset Now { get; }
 }
 
 /// <summary>Qui agit. Renverra l'utilisateur connecté quand le service de rôles sera en place.</summary>
-public interface IUtilisateurCourant
+public interface ICurrentUser
 {
-    string Nom { get; }
+    string Name { get; }
 }

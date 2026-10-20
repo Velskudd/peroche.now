@@ -1,0 +1,52 @@
+@inject IOptions<LinksOptions> Links
+
+<footer class="site-footer">
+    <div class="site-footer__inner container">
+        <div class="site-footer__signature">
+            <svg width="32" height="32" aria-hidden="true"><use href="#ap15" width="32" height="32"></use></svg>
+            <p>Alexandre Peroche, numéro 15. Ce site se construit en public, au fil des projets.</p>
+        </div>
+
+        <nav class="site-footer__column" aria-label="Le site">
+            <span class="site-footer__title">Le site</span>
+            @foreach (var destination in SiteMap.Menu)
+            {
+                <a href="@destination.Url">@destination.Label</a>
+            }
+        </nav>
+
+        @if (networks.Count > 0)
+        {
+            <nav class="site-footer__column" aria-label="Réseaux">
+                <span class="site-footer__title">Me suivre</span>
+                @foreach (var (name, url) in networks)
+                {
+                    <a href="@url">@name</a>
+                }
+            </nav>
+        }
+
+        <div class="site-footer__column">
+            <span class="site-footer__title">Partenariats</span>
+            <span class="site-footer__muted">Gérés par Trinity Management</span>
+            @if (!string.IsNullOrWhiteSpace(Links.Value.PartnershipContact))
+            {
+                <a href="mailto:@Links.Value.PartnershipContact">@Links.Value.PartnershipContact</a>
+            }
+            else
+            {
+                <a href="@SiteMap.Partners.Url">Devenir partenaire</a>
+            }
+        </div>
+
+        <p class="site-footer__credits">
+            Tracé du circuit : <a href="https://www.openstreetmap.org/copyright">© les contributeurs d'OpenStreetMap</a>
+        </p>
+    </div>
+</footer>
+
+@code {
+    private List<(string Name, string Url)> networks = [];
+
+    protected override void OnInitialized() => networks = Links.Value.SocialNetworks().ToList();
+}

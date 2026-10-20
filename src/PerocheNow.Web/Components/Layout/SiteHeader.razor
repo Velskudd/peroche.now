@@ -1,0 +1,29 @@
+@inject NavigationManager Navigation
+
+<header class="site-header container">
+    <a class="site-header__brand" href="/" aria-label="peroche.now, accueil">
+        <svg width="34" height="34" aria-hidden="true"><use href="#ap15" width="34" height="34"></use></svg>
+        <span class="site-header__name">peroche.now</span>
+    </a>
+
+    <nav class="site-header__nav" aria-label="Navigation principale">
+        @foreach (var destination in SiteMap.Menu)
+        {
+            @if (SiteMap.IsCurrent(destination, currentPath))
+            {
+                <a href="@destination.Url" aria-current="page">@destination.Label</a>
+            }
+            else
+            {
+                <a href="@destination.Url">@destination.Label</a>
+            }
+        }
+    </nav>
+</header>
+
+@code {
+    private string currentPath = string.Empty;
+
+    protected override void OnInitialized() =>
+        currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+}

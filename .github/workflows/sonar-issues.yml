@@ -1,8 +1,8 @@
 name: Sync SonarCloud issues
 on:
-  workflow_dispatch:          # manual "Run workflow" button
+  workflow_dispatch:          # bouton « Run workflow » manuel
   schedule:
-    - cron: "0 6 * * 1"       # every Monday 06:00 UTC
+    - cron: "0 6 * * 1"       # chaque lundi à 06:00 UTC
 permissions:
   issues: write
 jobs:

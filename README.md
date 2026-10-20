@@ -22,14 +22,18 @@ Les dépendances vont toujours vers le centre : l'Infrastructure implémente les
 
 ### Le médiateur
 
-Une requête est soit une **consultation** (`IConsultation<T>`, lecture), soit une **commande** (`ICommande<T>`, écriture). Le médiateur trouve son gestionnaire (`IGestionnaire<TRequete, TReponse>`) et l'enveloppe dans les **comportements** enregistrés, du plus extérieur au plus intérieur :
+Une requête est soit une **consultation** (`IQuery<T>`, lecture), soit une **commande** (`ICommand<T>`, écriture). Le médiateur (`IMediator`) trouve son gestionnaire (`IHandler<TRequest, TResponse>`) et l'enveloppe dans les **comportements** enregistrés (`IPipelineBehavior<TRequest, TResponse>`), du plus extérieur au plus intérieur :
 
-1. `ComportementUniteDeTravail` enregistre tout en une fois après une commande réussie.
-2. `ComportementAudit` ajoute une trace (`TraceAudit`) pour chaque commande réussie.
+1. `UnitOfWorkBehavior` enregistre tout en une fois après une commande réussie.
+2. `AuditBehavior` ajoute une trace (`AuditEntry`) pour chaque commande réussie.
 
 Les gestionnaires n'appellent donc jamais `SaveChanges` : si une règle métier échoue, rien n'est écrit, ni la modification ni la trace.
 
-Ajouter un cas d'usage : un `record` qui implémente `ICommande<T>` ou `IConsultation<T>` et une classe `IGestionnaire<,>` dans `PerocheNow.Business`. L'enregistrement est automatique.
+Ajouter un cas d'usage : un `record` qui implémente `ICommand<T>` ou `IQuery<T>` et une classe `IHandler<,>` dans `PerocheNow.Business`. L'enregistrement est automatique.
+
+### Conventions
+
+Le code est en anglais (noms de types, membres, fichiers, dossiers, classes CSS, schéma de la base) ; les commentaires sont en français. Les textes affichés aux visiteurs et les adresses publiques du site (`/nur24`, `/contenus`, `/partenaires`, `/sante`) restent en français.
 
 ## Travailler en local
 
@@ -50,10 +54,10 @@ dotnet test PerocheNow.slnx
 | Clé | Rôle |
 | --- | --- |
 | `ConnectionStrings:PerocheNow` | Chaîne de connexion. En production, fournie par la Container App (secret). |
-| `BaseDeDonnees:Fournisseur` | `SqlServer` (défaut) ou `Sqlite`. |
-| `Liens:Twitch`, `Liens:YouTube`, `Liens:Instagram`, `Liens:Facebook`, `Liens:TikTok` | Réseaux affichés. Un lien vide n'apparaît pas. |
-| `Liens:DossierPartenaire` | Fait apparaître le bouton « Télécharger le dossier partenaire ». |
-| `Liens:ContactPartenariats` | L'e-mail de Trinity Management pour les partenariats (page Partenaires et pied de page). |
+| `Database:Provider` | `SqlServer` (défaut) ou `Sqlite`. |
+| `Links:Twitch`, `Links:YouTube`, `Links:Instagram`, `Links:Facebook`, `Links:TikTok` | Réseaux affichés. Un lien vide n'apparaît pas. |
+| `Links:PartnerKit` | Fait apparaître le bouton « Télécharger le dossier partenaire ». |
+| `Links:PartnershipContact` | L'e-mail de Trinity Management pour les partenariats (page Partenaires et pied de page). |
 
 Pour ajouter un réseau, il suffit de renseigner son adresse dans `src/PerocheNow.Web/appsettings.json`.
 
@@ -163,24 +167,24 @@ Le job **Analyse SonarCloud** du workflow CI/CD envoie en plus l'analyse et la c
 ## Coûts et limites gratuites
 
 - **Container Apps** (consommation) : le site s'arrête sans visiteur. Chaque mois, les 180 000 premières vCPU-secondes, 360 000 Gio-secondes et 2 millions de requêtes sont gratuites ([tarifs](https://azure.microsoft.com/pricing/details/container-apps/)). Le premier visiteur après une pause attend le démarrage.
-- **Azure SQL Database, offre gratuite** : 100 000 vCore-secondes et 32 Go par base et par mois ([documentation](https://learn.microsoft.com/azure/azure-sql/database/free-offer)). La base se met en pause après `delaiPauseMinutes` d'inactivité (60 par défaut, 15 au minimum). Si le quota du mois est épuisé, elle reste en pause jusqu'au mois suivant : aucune facture, et l'accueil affiche alors le statut de secours (`StatutInitial`).
+- **Azure SQL Database, offre gratuite** : 100 000 vCore-secondes et 32 Go par base et par mois ([documentation](https://learn.microsoft.com/azure/azure-sql/database/free-offer)). La base se met en pause après `delaiPauseMinutes` d'inactivité (60 par défaut, 15 au minimum). Si le quota du mois est épuisé, elle reste en pause jusqu'au mois suivant : aucune facture, et l'accueil affiche alors le statut de secours (`InitialStatus`).
 - Surveiller la métrique *Free amount remaining* de la base dans le portail Azure.
 
 ## Migrations
 
-Le schéma de la base est géré par les migrations EF Core (`src/PerocheNow.Infrastructure/Persistance/Migrations`), appliquées au démarrage sur SQL Server. En local, SQLite crée le schéma directement à partir du modèle.
+Le schéma de la base est géré par les migrations EF Core (`src/PerocheNow.Infrastructure/Persistence/Migrations`), appliquées au démarrage sur SQL Server. En local, SQLite crée le schéma directement à partir du modèle.
 
 Après une modification du modèle (entité, configuration), générer la migration :
 
-- **Sans rien installer** : GitHub → *Actions* → **Migration EF Core** → *Run workflow*, avec un nom (ex. `AjoutRubriqueAuxLignes`). Le workflow génère la migration et la pousse sur `main` ; relancer ensuite **CI/CD** pour déployer.
+- **Sans rien installer** : GitHub → *Actions* → **Migration EF Core** → *Run workflow*, avec un nom en anglais (ex. `AddSectionToLines`). Le workflow génère la migration et la pousse sur `main` ; relancer ensuite **CI/CD** pour déployer.
 - **En local** :
 
 ```bash
 dotnet tool install --global dotnet-ef
-dotnet ef migrations add NomDeLaMigration \
+dotnet ef migrations add MigrationName \
   --project src/PerocheNow.Infrastructure \
   --startup-project src/PerocheNow.Web \
-  --output-dir Persistance/Migrations
+  --output-dir Persistence/Migrations
 ```
 
 Les toutes premières versions du site créaient le schéma sans migration. Au premier démarrage avec migrations, ces tables (qui ne contenaient que le statut initial) sont supprimées puis recréées par les migrations.

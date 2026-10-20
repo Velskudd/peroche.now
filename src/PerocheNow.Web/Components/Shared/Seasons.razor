@@ -1,0 +1,33 @@
+@inject IClock Clock
+
+@* Les quatre saisons de NUR24 ; les années atteintes sont pleines, l'objectif est en or. *@
+<ol class="seasons" aria-label="Les saisons de NUR24">
+    @foreach (var season in All)
+    {
+        <li class="@Classes(season)">
+            <span class="season__bar" aria-hidden="true"></span>
+            <span class="season__year">@season.Year</span>
+            <span class="season__stage">@season.Stage</span>
+        </li>
+    }
+</ol>
+
+@code {
+    private sealed record Season(int Year, string Stage, bool IsTheGoal = false);
+
+    private static readonly Season[] All =
+    [
+        new(2026, "Préparation"),
+        new(2027, "RCN"),
+        new(2028, "RCN et NLS"),
+        new(2029, "24 Heures", IsTheGoal: true),
+    ];
+
+    private string Classes(Season season)
+    {
+        var classes = "season";
+        if (season.Year <= Clock.Now.Year) classes += " season--reached";
+        if (season.IsTheGoal) classes += " season--goal";
+        return classes;
+    }
+}

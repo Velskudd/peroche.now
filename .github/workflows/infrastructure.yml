@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deployer:
+  deploy:
     name: Déployer infra/main.bicep
     runs-on: ubuntu-latest
     environment: production
@@ -23,25 +23,27 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Déployer
+        # Les noms des secrets et variables GitHub (SQL_MOT_DE_PASSE, GHCR_JETON_LECTURE, DOMAINE, ID_CERTIFICAT)
+        # restent ceux déclarés dans les réglages du dépôt.
         env:
-          GROUPE: ${{ vars.AZURE_RESOURCE_GROUP }}
-          NOM_APP: ${{ vars.AZURE_CONTAINERAPP || 'peroche-now' }}
-          MOT_DE_PASSE_SQL: ${{ secrets.SQL_MOT_DE_PASSE }}
-          JETON_GHCR: ${{ secrets.GHCR_JETON_LECTURE }}
-          DOMAINE: ${{ vars.DOMAINE }}
-          ID_CERTIFICAT: ${{ vars.ID_CERTIFICAT }}
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          APP_NAME: ${{ vars.AZURE_CONTAINERAPP || 'peroche-now' }}
+          SQL_PASSWORD: ${{ secrets.SQL_MOT_DE_PASSE }}
+          GHCR_TOKEN: ${{ secrets.GHCR_JETON_LECTURE }}
+          CUSTOM_DOMAIN: ${{ vars.DOMAINE }}
+          CERTIFICATE_ID: ${{ vars.ID_CERTIFICAT }}
         run: |
           image="ghcr.io/${GITHUB_REPOSITORY,,}:latest"
           az deployment group create \
-            --resource-group "$GROUPE" \
+            --resource-group "$RESOURCE_GROUP" \
             --name "peroche-now-${GITHUB_RUN_NUMBER}" \
             --template-file infra/main.bicep \
             --parameters \
-              nomApp="$NOM_APP" \
+              appName="$APP_NAME" \
               image="$image" \
-              motDePasseSql="$MOT_DE_PASSE_SQL" \
-              utilisateurGhcr="${GITHUB_REPOSITORY_OWNER,,}" \
-              jetonGhcr="$JETON_GHCR" \
-              domainePersonnalise="$DOMAINE" \
-              idCertificat="$ID_CERTIFICAT" \
+              sqlAdminPassword="$SQL_PASSWORD" \
+              ghcrUser="${GITHUB_REPOSITORY_OWNER,,}" \
+              ghcrToken="$GHCR_TOKEN" \
+              customDomain="$CUSTOM_DOMAIN" \
+              certificateId="$CERTIFICATE_ID" \
             --query "properties.outputs" -o json

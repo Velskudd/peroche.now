@@ -1,79 +1,79 @@
 using Microsoft.Extensions.DependencyInjection;
 using PerocheNow.Business.Ports;
-using IMediateur = PerocheNow.Business.Mediateur.IMediateur;
 using PerocheNow.Domain.Audit;
-using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Status;
+using IMediator = PerocheNow.Business.Mediation.IMediator;
 
 namespace PerocheNow.Business.Tests;
 
 // Doublures des ports : elles remplacent l'Infrastructure pour tester la couche Business seule.
 
-internal sealed class FauxStatuts : IStatutDuMomentRepository
+internal sealed class FakeStatuses : ICurrentStatusRepository
 {
-    public StatutDuMoment? Statut { get; set; }
+    public CurrentStatus? Status { get; set; }
 
-    public Task<StatutDuMoment?> ObtenirAsync(CancellationToken annulation) => Task.FromResult(Statut);
+    public Task<CurrentStatus?> GetAsync(CancellationToken cancellationToken) => Task.FromResult(Status);
 
-    public void Ajouter(StatutDuMoment statut) => Statut = statut;
+    public void Add(CurrentStatus status) => Status = status;
 }
 
-internal sealed class FaussesTraces : ITraceAuditRepository
+internal sealed class FakeAuditEntries : IAuditEntryRepository
 {
-    public List<TraceAudit> Traces { get; } = [];
+    public List<AuditEntry> Entries { get; } = [];
 
-    public void Ajouter(TraceAudit trace) => Traces.Add(trace);
+    public void Add(AuditEntry entry) => Entries.Add(entry);
 }
 
-internal sealed class FausseUniteDeTravail : IUniteDeTravail
+internal sealed class FakeUnitOfWork : IUnitOfWork
 {
-    public int Enregistrements { get; private set; }
+    public int SaveCount { get; private set; }
 
-    public Task EnregistrerAsync(CancellationToken annulation)
+    public Task SaveAsync(CancellationToken cancellationToken)
     {
-        Enregistrements++;
+        SaveCount++;
         return Task.CompletedTask;
     }
 }
 
-internal sealed class HorlogeFixe(DateTimeOffset instant) : IHorloge
+internal sealed class FixedClock(DateTimeOffset now) : IClock
 {
-    public DateTimeOffset Instant { get; set; } = instant;
+    public DateTimeOffset Now { get; set; } = now;
 }
 
-internal sealed class UtilisateurFixe(string nom) : IUtilisateurCourant
+internal sealed class FixedUser(string name) : ICurrentUser
 {
-    public string Nom { get; } = nom;
+    public string Name { get; } = name;
 }
 
 /// <summary>La couche Business complète, branchée sur les doublures.</summary>
-internal sealed class Banc : IDisposable
+internal sealed class TestBench : IDisposable
 {
-    public static readonly DateTimeOffset Instant = new(2026, 10, 17, 11, 32, 0, TimeSpan.Zero);
+    public static readonly DateTimeOffset Now = new(2026, 10, 17, 11, 32, 0, TimeSpan.Zero);
 
-    private readonly ServiceProvider _fournisseur;
+    private readonly ServiceProvider _provider;
 
-    public FauxStatuts Statuts { get; } = new();
-    public FaussesTraces Traces { get; } = new();
-    public FausseUniteDeTravail UniteDeTravail { get; } = new();
-    public HorlogeFixe Horloge { get; } = new(Instant);
+    public FakeStatuses Statuses { get; } = new();
+    public FakeAuditEntries AuditEntries { get; } = new();
+    public FakeUnitOfWork UnitOfWork { get; } = new();
+    public FixedClock Clock { get; } = new(Now);
 
-    public Banc(Action<IServiceCollection>? configurer = null)
+    public TestBench(Action<IServiceCollection>? configure = null)
     {
         var services = new ServiceCollection();
-        services.AjouterBusiness();
-        services.AddSingleton<IStatutDuMomentRepository>(Statuts);
-        services.AddSingleton<ITraceAuditRepository>(Traces);
-        services.AddSingleton<IUniteDeTravail>(UniteDeTravail);
-        services.AddSingleton<IHorloge>(Horloge);
-        services.AddSingleton<IUtilisateurCourant>(new UtilisateurFixe("alexandre"));
-        configurer?.Invoke(services);
+        services.AddBusiness();
+        services.AddSingleton<ICurrentStatusRepository>(Statuses);
+        services.AddSingleton<IAuditEntryRepository>(AuditEntries);
+        services.AddSingleton<IUnitOfWork>(UnitOfWork);
+        services.AddSingleton<IClock>(Clock);
+        services.AddSingleton<ICurrentUser>(new FixedUser("alexandre"));
+        configure?.Invoke(services);
 
-        _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+        _provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
     }
 
-    public static IMediateur Mediateur(IServiceScope portee) => portee.ServiceProvider.GetRequiredService<IMediateur>();
+    public static IMediator Mediator(IServiceScope scope) => scope.ServiceProvider.GetRequiredService<IMediator>();
 
-    public IServiceScope NouvellePortee() => _fournisseur.CreateScope();
+    public IServiceScope NewScope() => _provider.CreateScope();
 
-    public void Dispose() => _fournisseur.Dispose();
+    public void Dispose() => _provider.Dispose();
 }

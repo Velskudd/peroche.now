@@ -2,59 +2,59 @@
 // Déployée par le workflow « Infrastructure » (.github/workflows/infrastructure.yml).
 
 @description('Région Azure. France Central par défaut.')
-param emplacement string = resourceGroup().location
+param location string = resourceGroup().location
 
 @description('Nom de la Container App (sert aussi de préfixe aux autres ressources).')
-param nomApp string = 'peroche-now'
+param appName string = 'peroche-now'
 
 @description('Image du site, par exemple ghcr.io/velskudd/peroche-now:latest.')
 param image string
 
 @description('Identifiant administrateur du serveur SQL.')
-param adminSql string = 'perochenow'
+param sqlAdminLogin string = 'perochenow'
 
 @secure()
 @description('Mot de passe administrateur du serveur SQL.')
-param motDePasseSql string
+param sqlAdminPassword string
 
 @description('Délai avant mise en pause de la base, en minutes. 60 par défaut ; 15 consomme moins de quota gratuit.')
 @minValue(15)
-param delaiPauseMinutes int = 60
+param autoPauseDelayMinutes int = 60
 
 @description('Utilisateur GitHub pour tirer une image privée de GHCR. Vide si le paquet est public.')
-param utilisateurGhcr string = ''
+param ghcrUser string = ''
 
 @secure()
 @description('Jeton GitHub (read:packages) pour une image privée. Vide si le paquet est public.')
-param jetonGhcr string = ''
+param ghcrToken string = ''
 
 @description('Domaine personnalisé déjà lié (ex. peroche.now). Vide tant que le domaine n\'est pas configuré.')
-param domainePersonnalise string = ''
+param customDomain string = ''
 
 @description('Identifiant du certificat géré lié au domaine. Vide tant que le domaine n\'est pas configuré.')
-param idCertificat string = ''
+param certificateId string = ''
 
-var suffixe = uniqueString(resourceGroup().id)
-var nomBase = 'perochenow'
-var registrePrive = !empty(jetonGhcr)
-var avecDomaine = !empty(domainePersonnalise) && !empty(idCertificat)
+var suffix = uniqueString(resourceGroup().id)
+var databaseName = 'perochenow'
+var usePrivateRegistry = !empty(ghcrToken)
+var hasCustomDomain = !empty(customDomain) && !empty(certificateId)
 
 // ---------- Base de données ----------
 
-resource serveurSql 'Microsoft.Sql/servers@2023-08-01-preview' = {
-  name: '${nomApp}-sql-${suffixe}'
-  location: emplacement
+resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
+  name: '${appName}-sql-${suffix}'
+  location: location
   properties: {
-    administratorLogin: adminSql
-    administratorLoginPassword: motDePasseSql
+    administratorLogin: sqlAdminLogin
+    administratorLoginPassword: sqlAdminPassword
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Enabled'
   }
 }
 
 // Les adresses sortantes d'une Container App de consommation ne sont pas fixes : on autorise les services Azure.
-resource accesServicesAzure 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
-  parent: serveurSql
+resource allowAzureServices 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
+  parent: sqlServer
   name: 'AllowAllWindowsAzureIps'
   properties: {
     startIpAddress: '0.0.0.0'
@@ -62,10 +62,10 @@ resource accesServicesAzure 'Microsoft.Sql/servers/firewallRules@2023-08-01-prev
   }
 }
 
-resource base 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
-  parent: serveurSql
-  name: nomBase
-  location: emplacement
+resource database 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
+  parent: sqlServer
+  name: databaseName
+  location: location
   sku: {
     name: 'GP_S_Gen5_2'
     tier: 'GeneralPurpose'
@@ -76,7 +76,7 @@ resource base 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
     // Offre gratuite : 100 000 vCore-secondes et 32 Go par mois ; la base se met en pause si le quota est épuisé.
     useFreeLimit: true
     freeLimitExhaustionBehavior: 'AutoPause'
-    autoPauseDelay: delaiPauseMinutes
+    autoPauseDelay: autoPauseDelayMinutes
     minCapacity: json('0.5')
     maxSizeBytes: 34359738368
     zoneRedundant: false
@@ -84,13 +84,13 @@ resource base 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
   }
 }
 
-var chaineDeConnexion = 'Server=tcp:${serveurSql.properties.fullyQualifiedDomainName},1433;Initial Catalog=${nomBase};User ID=${adminSql};Password=${motDePasseSql};Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;'
+var connectionString = 'Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${databaseName};User ID=${sqlAdminLogin};Password=${sqlAdminPassword};Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;'
 
 // ---------- Hébergement ----------
 
-resource environnement 'Microsoft.App/managedEnvironments@2024-03-01' = {
-  name: '${nomApp}-env'
-  location: emplacement
+resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+  name: '${appName}-env'
+  location: location
   properties: {
     workloadProfiles: [
       {
@@ -102,10 +102,10 @@ resource environnement 'Microsoft.App/managedEnvironments@2024-03-01' = {
 }
 
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
-  name: nomApp
-  location: emplacement
+  name: appName
+  location: location
   properties: {
-    environmentId: environnement.id
+    environmentId: managedEnvironment.id
     workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
@@ -114,11 +114,11 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
         targetPort: 8080
         transport: 'auto'
         allowInsecure: false
-        customDomains: avecDomaine
+        customDomains: hasCustomDomain
           ? [
               {
-                name: domainePersonnalise
-                certificateId: idCertificat
+                name: customDomain
+                certificateId: certificateId
                 bindingType: 'SniEnabled'
               }
             ]
@@ -127,25 +127,25 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
       secrets: concat(
         [
           {
-            name: 'chaine-sql'
-            value: chaineDeConnexion
+            name: 'sql-connection-string'
+            value: connectionString
           }
         ],
-        registrePrive
+        usePrivateRegistry
           ? [
               {
-                name: 'jeton-ghcr'
-                value: jetonGhcr
+                name: 'ghcr-token'
+                value: ghcrToken
               }
             ]
           : []
       )
-      registries: registrePrive
+      registries: usePrivateRegistry
         ? [
             {
               server: 'ghcr.io'
-              username: utilisateurGhcr
-              passwordSecretRef: 'jeton-ghcr'
+              username: ghcrUser
+              passwordSecretRef: 'ghcr-token'
             }
           ]
         : []
@@ -162,7 +162,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           env: [
             {
               name: 'ConnectionStrings__PerocheNow'
-              secretRef: 'chaine-sql'
+              secretRef: 'sql-connection-string'
             }
             {
               name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
@@ -210,7 +210,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
-output adresseParDefaut string = 'https://${app.properties.configuration.ingress.fqdn}'
-output ipStatique string = environnement.properties.staticIp
-output idVerificationDomaine string = app.properties.customDomainVerificationId
-output nomEnvironnement string = environnement.name
+output defaultUrl string = 'https://${app.properties.configuration.ingress.fqdn}'
+output staticIp string = managedEnvironment.properties.staticIp
+output domainVerificationId string = app.properties.customDomainVerificationId
+output environmentName string = managedEnvironment.name

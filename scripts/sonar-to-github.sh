@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Copy open SonarQube Cloud issues to GitHub Issues (skips ones already created).
-# Requires: gh (logged in with `gh auth login`), jq, curl.
-# Usage: SONAR_TOKEN=xxx ./sonar-to-github.sh [--dry-run]
+# Copie les problèmes ouverts de SonarQube Cloud en tickets GitHub (ignore ceux déjà créés).
+# Nécessite : gh (connecté avec `gh auth login`), jq, curl.
+# Utilisation : SONAR_TOKEN=xxx ./sonar-to-github.sh [--dry-run]
 set -euo pipefail
 
 SONAR_PROJECT="Velskudd_peroche.now"
@@ -11,11 +11,11 @@ DRY_RUN=false; [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
 AUTH=(); [[ -n "${SONAR_TOKEN:-}" ]] && AUTH=(-u "${SONAR_TOKEN}:")
 
-# Label (ignore error if it already exists)
+# Étiquette (l'erreur est ignorée si elle existe déjà)
 $DRY_RUN || gh label create "$LABEL" --repo "$GH_REPO" --color "F3702A" \
   --description "Imported from SonarQube Cloud" 2>/dev/null || true
 
-# Sonar keys already present in GitHub issues (for dedup)
+# Clés Sonar déjà présentes dans les tickets GitHub (pour éviter les doublons)
 EXISTING=$(gh issue list --repo "$GH_REPO" --label "$LABEL" --state all --limit 1000 \
   --json body --jq '.[].body' | grep -oE 'sonar-key: [A-Za-z0-9_-]+' || true)
 

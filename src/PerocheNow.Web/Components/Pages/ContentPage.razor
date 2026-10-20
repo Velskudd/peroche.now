@@ -1,0 +1,45 @@
+@page "/contenus"
+@inject IOptions<LinksOptions> Links
+
+<PageTitle>Contenus | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="Les vidéos YouTube et Reels Instagram d'Alexandre Peroche, rangés par projet : NUR24 et tout ce qui se passe à côté de la piste." />
+</HeadContent>
+
+<section class="page-head container" aria-labelledby="content-title">
+    <h1 id="content-title" class="page-head__title">Contenus</h1>
+    <p class="page-head__intro">
+        Mes vidéos YouTube et mes Reels Instagram, repris automatiquement et rangés par projet.
+        @if (!string.IsNullOrWhiteSpace(Links.Value.Twitch))
+        {
+            <text>Les lives, eux, se passent sur <a href="@Links.Value.Twitch">Twitch</a>.</text>
+        }
+    </p>
+</section>
+
+<section class="container page-body" aria-label="En construction">
+    <div class="upcoming upcoming--boxed">
+        <p>C'est la prochaine brique du site. Ici arriveront d'eux-mêmes, dès leur publication :</p>
+        <ul>
+            <li>les vidéos YouTube, des rediffusions de course aux vlogs ;</li>
+            <li>les Reels Instagram, dont le carnet de route hebdomadaire de NUR24 ;</li>
+            <li>un tri par projet (NUR24, à côté de la piste) et par format.</li>
+        </ul>
+        @if (networks.Count > 0)
+        {
+            <p class="upcoming__networks">
+                En attendant :
+                @foreach (var (name, url) in networks)
+                {
+                    <a href="@url">@name</a>
+                }
+            </p>
+        }
+    </div>
+</section>
+
+@code {
+    private List<(string Name, string Url)> networks = [];
+
+    protected override void OnInitialized() => networks = Links.Value.SocialNetworks().ToList();
+}

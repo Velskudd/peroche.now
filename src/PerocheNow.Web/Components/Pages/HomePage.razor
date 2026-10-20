@@ -1,0 +1,26 @@
+@page "/"
+
+<PageTitle>Alexandre Peroche, en ce moment | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="description" content="Ce que fait Alexandre Peroche en ce moment : NUR24, de la Test Week Nordschleife aux 24 Heures du Nürburgring, et tout ce qui se passe à côté de la piste." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Alexandre Peroche, en ce moment" />
+    <meta property="og:description" content="NUR24 : de la Test Week Nordschleife aux 24 Heures du Nürburgring, en trois saisons." />
+    <meta property="og:image" content="@OgImage" />
+    <meta property="og:locale" content="fr_FR" />
+</HeadContent>
+
+<RightNow />
+<CurrentProject />
+<LatestContent />
+<OffTrack />
+<Partners />
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string OgImage =>
+        HttpContext is null
+            ? "images/racing-suit-1040.jpg"
+            : $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/images/racing-suit-1040.jpg";
+}

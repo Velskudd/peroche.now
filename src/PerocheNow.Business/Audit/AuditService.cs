@@ -6,14 +6,14 @@ namespace PerocheNow.Business.Audit;
 /// <summary>Trace ce qui est fait sur les objets fonctionnels de l'application.</summary>
 public interface IAuditService
 {
-    void Tracer(string action, string? typeObjet = null, Guid? idObjet = null, string? details = null);
+    void Record(string action, string? objectType = null, Guid? objectId = null, string? details = null);
 }
 
 public sealed class AuditService(
-    ITraceAuditRepository traces,
-    IHorloge horloge,
-    IUtilisateurCourant utilisateur) : IAuditService
+    IAuditEntryRepository entries,
+    IClock clock,
+    ICurrentUser user) : IAuditService
 {
-    public void Tracer(string action, string? typeObjet = null, Guid? idObjet = null, string? details = null)
-        => traces.Ajouter(new TraceAudit(action, utilisateur.Nom, horloge.Instant, typeObjet, idObjet, details));
+    public void Record(string action, string? objectType = null, Guid? objectId = null, string? details = null)
+        => entries.Add(new AuditEntry(action, user.Name, clock.Now, objectType, objectId, details));
 }
