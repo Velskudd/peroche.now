@@ -41,11 +41,19 @@ param twitchIdentifiantClient string = ''
 @description('Secret client de l\'application Twitch. Vide : pastille désactivée.')
 param twitchSecretClient string = ''
 
+@description('Identifiant client de l\'application OAuth GitHub (connexion à l\'administration). Vide : administration fermée.')
+param adminGitHubIdentifiantClient string = ''
+
+@secure()
+@description('Secret client de l\'application OAuth GitHub. Vide : administration fermée.')
+param adminGitHubSecretClient string = ''
+
 var suffixe = uniqueString(resourceGroup().id)
 var nomBase = 'perochenow'
 var registrePrive = !empty(jetonGhcr)
 var avecDomaine = !empty(domainePersonnalise) && !empty(idCertificat)
 var avecTwitch = !empty(twitchIdentifiantClient) && !empty(twitchSecretClient)
+var avecAdmin = !empty(adminGitHubIdentifiantClient) && !empty(adminGitHubSecretClient)
 
 // ---------- Base de données ----------
 
@@ -154,6 +162,14 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
                 value: twitchSecretClient
               }
             ]
+          : [],
+        avecAdmin
+          ? [
+              {
+                name: 'github-secret'
+                value: adminGitHubSecretClient
+              }
+            ]
           : []
       )
       registries: registrePrive
@@ -195,6 +211,18 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
                   {
                     name: 'Twitch__SecretClient'
                     secretRef: 'twitch-secret'
+                  }
+                ]
+              : [],
+            avecAdmin
+              ? [
+                  {
+                    name: 'Admin__GitHub__IdentifiantClient'
+                    value: adminGitHubIdentifiantClient
+                  }
+                  {
+                    name: 'Admin__GitHub__SecretClient'
+                    secretRef: 'github-secret'
                   }
                 ]
               : []

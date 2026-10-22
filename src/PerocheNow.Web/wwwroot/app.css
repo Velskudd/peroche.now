@@ -594,6 +594,69 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 }
 .liens__pied a:hover { color: var(--blanc); }
 
+/* ---------- Administration ---------- */
+
+.admin-entete {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px 32px;
+  padding-top: 20px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--trait);
+}
+.admin-entete__session { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; font-size: 15px; }
+.admin-entete__session form { margin: 0; }
+.admin-entete__compte { color: var(--gris); }
+.admin-entete__deconnexion {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--argent);
+  text-decoration: underline; text-decoration-color: var(--ardoise); text-underline-offset: 4px;
+}
+.admin-entete__deconnexion:hover { color: #FFFFFF; text-decoration-color: var(--argent); }
+.admin-entete__deconnexion:focus-visible { outline: 2px solid var(--argent); outline-offset: 3px; border-radius: 2px; }
+
+.admin { padding-top: 40px; padding-bottom: 80px; max-width: 880px; margin-left: auto; margin-right: auto; }
+.admin__tete { margin-bottom: 28px; }
+.admin__titre {
+  margin: 0 0 10px;
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600;
+  font-size: clamp(30px, 4vw, 44px); line-height: 1.05; color: var(--blanc);
+}
+.admin__intro { margin: 0; color: var(--gris); }
+.admin__succes, .admin__erreur, .admin__erreurs {
+  margin: 0 0 24px; padding: 14px 18px;
+  border-radius: 8px; border: 1px solid var(--trait); background: var(--surface);
+}
+.admin__succes { border-color: var(--ardoise); color: var(--blanc); }
+.admin__erreur, .admin__erreurs { border-color: #C2766A; color: #F1C9C2; }
+.admin__erreurs ul, ul.admin__erreurs { margin: 0; padding-left: 1.2em; }
+
+.admin__formulaire { display: flex; flex-direction: column; gap: 28px; }
+.groupe { margin: 0; padding: 20px 20px 22px; border: 1px solid var(--trait); border-radius: 12px; display: flex; flex-direction: column; gap: 16px; }
+.groupe legend {
+  padding: 0 8px;
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600; font-size: 17px; color: var(--blanc);
+}
+.ligne-admin { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.ligne-admin .champ { flex: 1 1 360px; min-width: 0; }
+.ligne-admin .champ--court { flex: 0 1 220px; }
+
+.champ { display: flex; flex-direction: column; gap: 6px; }
+.champ label { font-size: 15px; font-weight: 600; color: var(--blanc); }
+.champ__aide { margin: 0; font-size: 14px; color: var(--gris); }
+.champ input, .champ textarea, .champ select {
+  width: 100%; min-height: 46px; padding: 10px 12px;
+  border: 1px solid var(--gris-discret); border-radius: 8px;
+  background: var(--fond); color: var(--blanc);
+  font: inherit; font-size: 16px;
+  color-scheme: dark;
+}
+.champ textarea { resize: vertical; line-height: 1.4; }
+.champ input:focus-visible, .champ textarea:focus-visible, .champ select:focus-visible {
+  outline: 2px solid var(--argent); outline-offset: 1px; border-color: var(--argent);
+}
+.champ .invalid { border-color: #C2766A; }
+.validation-message { font-size: 14px; color: #F1C9C2; }
+button.bouton-objectif { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+
 /* ---------- Pages simples (introuvable, erreur) ---------- */
 
 .page-simple { padding-top: clamp(48px, 8vw, 120px); padding-bottom: clamp(64px, 10vw, 160px); }

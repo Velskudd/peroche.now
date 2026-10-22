@@ -54,6 +54,8 @@ dotnet test PerocheNow.slnx
 | `Liens:Twitch`, `Liens:YouTube`, `Liens:Threads`, `Liens:Instagram`, `Liens:TikTok`, `Liens:Facebook` | Réseaux affichés (pied de page, page `/liens`). Un lien vide n'apparaît pas. |
 | `Liens:DossierPartenaire` | Fait apparaître le bouton « Télécharger le dossier partenaire ». |
 | `Liens:ContactPartenariats` | L'e-mail de Trinity Management pour les partenariats (page Partenaires et pied de page). |
+| `Admin:Administrateurs` | Identifiants numériques GitHub autorisés à administrer le site. |
+| `Admin:GitHub:IdentifiantClient`, `Admin:GitHub:SecretClient` | Application OAuth GitHub de la connexion à `/admin`. Vides : administration fermée. En production, fournis par la Container App. |
 | `Twitch:IdentifiantClient`, `Twitch:SecretClient` | Application Twitch de la pastille « En direct ». Vides : pastille désactivée. En production, fournis par la Container App. |
 
 Pour ajouter un réseau, il suffit de renseigner son adresse dans `src/PerocheNow.Web/appsettings.json`.
@@ -154,6 +156,20 @@ Le site interroge l'API Helix de Twitch (une fois par minute au plus) pour savoi
 2. Noter le **Client ID** et générer un **Client Secret**.
 3. Dans GitHub, environnement `production`, créer les secrets `TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET`.
 4. Relancer le workflow **Infrastructure** : la Container App reçoit les deux valeurs et la pastille s'active.
+
+### 5. L'administration (`/admin`)
+
+On s'y connecte avec GitHub ; seuls les identifiants listés dans `Admin:Administrateurs` ouvrent une session
+(l'identifiant numérique, pas le pseudo, qui peut changer de propriétaire).
+
+1. Sur GitHub : Settings › Developer settings › OAuth Apps › **New OAuth App**.
+   Homepage URL `https://peroche.now`, Authorization callback URL `https://peroche.now/connexion/github`.
+2. Noter le **Client ID** et générer un **Client secret**.
+3. Dans l'environnement `production`, créer les secrets `ADMIN_GITHUB_CLIENT_ID` et `ADMIN_GITHUB_CLIENT_SECRET`.
+4. Relancer le workflow **Infrastructure**, puis ouvrir `https://peroche.now/admin`.
+
+Les clés qui protègent le cookie de session vivent en mémoire : après une mise en veille du site, il faut se reconnecter.
+Pour travailler en local, créer une seconde application OAuth avec l'adresse de retour `http://localhost:<port>/connexion/github`.
 
 ## Qualité du code (Sonar)
 

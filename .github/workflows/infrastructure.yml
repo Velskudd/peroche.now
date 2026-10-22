@@ -32,6 +32,8 @@ jobs:
           ID_CERTIFICAT: ${{ vars.ID_CERTIFICAT }}
           TWITCH_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          ADMIN_GITHUB_ID: ${{ secrets.ADMIN_GITHUB_CLIENT_ID }}
+          ADMIN_GITHUB_SECRET: ${{ secrets.ADMIN_GITHUB_CLIENT_SECRET }}
         run: |
           image="ghcr.io/${GITHUB_REPOSITORY,,}:latest"
           az deployment group create \
@@ -48,4 +50,6 @@ jobs:
               idCertificat="$ID_CERTIFICAT" \
               twitchIdentifiantClient="$TWITCH_ID" \
               twitchSecretClient="$TWITCH_SECRET" \
+              adminGitHubIdentifiantClient="$ADMIN_GITHUB_ID" \
+              adminGitHubSecretClient="$ADMIN_GITHUB_SECRET" \
             --query "properties.outputs" -o json

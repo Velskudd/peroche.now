@@ -1,0 +1,33 @@
+@inherits LayoutComponentBase
+
+@* Mise en page de l'administration : sobre, sans menu public, avec la session en cours. *@
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<SymboleAp15 />
+
+<header class="admin-entete conteneur">
+    <a class="entete__marque" href="/admin">
+        <svg width="30" height="30" aria-hidden="true"><use href="#ap15" width="30" height="30"></use></svg>
+        <span class="entete__nom">Administration</span>
+    </a>
+
+    <div class="admin-entete__session">
+        @if (Contexte?.User.Identity?.Name is { Length: > 0 } nom)
+        {
+            <span class="admin-entete__compte">Connecté : @nom</span>
+        }
+        <a href="/">Voir le site</a>
+        <form method="post" action="/deconnexion">
+            <AntiforgeryToken />
+            <button type="submit" class="admin-entete__deconnexion">Se déconnecter</button>
+        </form>
+    </div>
+</header>
+
+<main id="contenu" class="admin conteneur" tabindex="-1">
+    @Body
+</main>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? Contexte { get; set; }
+}

@@ -1,0 +1,32 @@
+@page "/admin/refuse"
+@using PerocheNow.Web.Administration
+
+<PageTitle>Accès refusé | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<section class="page-simple conteneur" aria-labelledby="refus">
+    <h1 id="refus">@Titre</h1>
+    <p>@Explication</p>
+    <p><a class="vers" href="/">Retour à l'accueil</a></p>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "motif")]
+    private string? Motif { get; set; }
+
+    private string Titre => Motif switch
+    {
+        "configuration" => "Administration fermée",
+        "echec" => "Connexion interrompue",
+        _ => "Accès réservé",
+    };
+
+    private string Explication => Motif switch
+    {
+        "configuration" => "La connexion à l'administration n'est pas encore configurée.",
+        "echec" => "La connexion avec GitHub n'a pas abouti. Tu peux réessayer depuis la page d'administration.",
+        _ => "Ce compte n'a pas accès à l'administration du site.",
+    };
+}

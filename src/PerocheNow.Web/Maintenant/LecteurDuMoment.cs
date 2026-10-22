@@ -23,6 +23,9 @@ public sealed class LecteurDuMoment(
     private static readonly TimeSpan DureeCache = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan AttenteMaximale = TimeSpan.FromSeconds(12);
 
+    /// <summary>Oublie le statut gardé en mémoire : la prochaine lecture repart de la base (après une modification).</summary>
+    public void Oublier() => cache.Remove(CleCache);
+
     public Task<StatutDuMomentDto> LireAsync(CancellationToken annulation = default) =>
         LireAsync(AttenteMaximale, annulation);
 

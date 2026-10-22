@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using PerocheNow.Business;
 using PerocheNow.Infrastructure;
+using PerocheNow.Web.Administration;
 using PerocheNow.Web.Components;
 using PerocheNow.Web.Configuration;
 using PerocheNow.Web.Demarrage;
@@ -19,6 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Couches de l'oignon : Business (cas d'usage, médiateur, audit) puis Infrastructure (EF Core, horloge…).
 builder.Services.AjouterBusiness();
 builder.Services.AjouterInfrastructure(builder.Configuration);
+
+// Administration : connexion GitHub réservée aux comptes autorisés, actions tracées à leur nom.
+builder.AjouterAdministration();
 
 // Présentation.
 builder.Services.AddRazorComponents();
@@ -43,10 +47,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseEnTetesDeSecurite();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapHealthChecks("/sante");
+app.MapAdministration();
 app.MapRazorComponents<App>();
 
 await app.RunAsync();

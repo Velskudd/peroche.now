@@ -19,4 +19,14 @@ public static class HeureDeParis
         var jour = local.ToString("dddd d MMMM", Francais);
         return $"{char.ToUpper(jour[0], Francais)}{jour[1..]}, {local:HH} h {local:mm}";
     }
+
+    /// <summary>« 21 octobre 2026 à 20 h 45 », ou <c>null</c> si le fuseau de Paris est inconnu de la machine.</summary>
+    public static string? FormaterDate(DateTimeOffset instant)
+    {
+        if (Fuseau is null)
+            return null;
+
+        var local = TimeZoneInfo.ConvertTime(instant, Fuseau);
+        return $"{local.ToString("d MMMM yyyy", Francais)} à {local:HH} h {local:mm}";
+    }
 }

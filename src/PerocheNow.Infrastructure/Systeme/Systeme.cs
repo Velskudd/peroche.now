@@ -7,7 +7,7 @@ internal sealed class HorlogeSysteme : IHorloge
     public DateTimeOffset Instant => DateTimeOffset.UtcNow;
 }
 
-/// <summary>Auteur des actions tant qu'il n'y a pas d'authentification ni de service de rôles.</summary>
+/// <summary>Auteur par défaut des actions. Le site le remplace par la personne connectée à l'administration.</summary>
 internal sealed class UtilisateurSysteme : IUtilisateurCourant
 {
     public string Nom => "système";

@@ -1,0 +1,131 @@
+@page "/admin"
+@layout LayoutAdmin
+@attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
+@using Microsoft.AspNetCore.Authorization
+@using PerocheNow.Business.Mediateur
+@using PerocheNow.Domain.Commun
+@using PerocheNow.Domain.Maintenant
+@using PerocheNow.Web.Administration
+@inject IMediateur Mediateur
+@inject LecteurDuMoment Lecteur
+@inject NavigationManager Navigation
+
+<PageTitle>Administration | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<div class="admin__tete">
+    <h1 class="admin__titre">En ce moment</h1>
+    <p class="admin__intro">
+        Ce que l'accueil et la page de liens affichent en premier.
+        @if (misAJourLe is { } date && HeureDeParis.FormaterDate(date) is { } quand)
+        {
+            <text>Dernière mise à jour le @quand.</text>
+        }
+    </p>
+</div>
+
+@if (Enregistre == 1 && erreur is null)
+{
+    <p class="admin__succes" role="status">Enregistré. <a href="/">Voir l'accueil</a> ou <a href="@PlanDuSite.Liens.Adresse">la page de liens</a>.</p>
+}
+@if (erreur is not null)
+{
+    <p class="admin__erreur" role="alert">@erreur</p>
+}
+
+<EditForm Model="Formulaire" FormName="maintenant" OnValidSubmit="EnregistrerAsync" class="admin__formulaire">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="admin__erreurs" />
+
+    <div class="champ">
+        <label for="accroche">Accroche</label>
+        <InputTextArea id="accroche" @bind-Value="Formulaire!.Accroche" rows="2" maxlength="@StatutDuMoment.LongueurMaxAccroche" />
+        <span class="champ__aide">La grande phrase de l'accueil. @StatutDuMoment.LongueurMaxAccroche caractères au plus.</span>
+    </div>
+
+    <fieldset class="groupe">
+        <legend>Les lignes sous l'accroche</legend>
+        <p class="champ__aide">Jusqu'à trois. Une ligne laissée vide n'est pas affichée.</p>
+        @for (var i = 0; i < Formulaire!.Lignes.Length; i++)
+        {
+            var index = i;
+            <div class="ligne-admin">
+                <div class="champ">
+                    <label for="ligne-@index">Ligne @(index + 1)</label>
+                    <InputText id="@($"ligne-{index}")" @bind-Value="Formulaire.Lignes[index].Texte" maxlength="@StatutDuMoment.LongueurMaxLigne" />
+                </div>
+                <div class="champ champ--court">
+                    <label for="rubrique-@index">Mène vers</label>
+                    <InputSelect id="@($"rubrique-{index}")" @bind-Value="Formulaire.Lignes[index].Rubrique">
+                        @foreach (var rubrique in Enum.GetValues<Rubrique>())
+                        {
+                            <option value="@rubrique">@NomDe(rubrique)</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        }
+    </fieldset>
+
+    <fieldset class="groupe">
+        <legend>Prochain objectif</legend>
+        <div class="ligne-admin">
+            <div class="champ">
+                <label for="objectif">Objectif</label>
+                <InputText id="objectif" @bind-Value="Formulaire.LibelleObjectif" maxlength="@Objectif.LongueurMaxLibelle" />
+                <span class="champ__aide">Affiché en or. Laisser vide pour ne pas en afficher.</span>
+            </div>
+            <div class="champ champ--court">
+                <label for="date-objectif">Date</label>
+                <InputDate id="date-objectif" @bind-Value="Formulaire.DateObjectif" />
+                <span class="champ__aide">Vide : « Date à confirmer ».</span>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="actions">
+        <button type="submit" class="bouton-objectif">Enregistrer</button>
+        <a class="vers" href="/">Voir l'accueil</a>
+    </div>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private FormulaireMaintenant? Formulaire { get; set; }
+
+    [SupplyParameterFromQuery(Name = "enregistre")]
+    private int? Enregistre { get; set; }
+
+    private string? erreur;
+    private DateTimeOffset? misAJourLe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // En lecture, on part de la base ; à l'envoi, le formulaire arrive déjà rempli.
+        var statut = await Mediateur.EnvoyerAsync(new ObtenirStatutDuMoment());
+        misAJourLe = statut?.MisAJourLe;
+        Formulaire ??= FormulaireMaintenant.Depuis(statut);
+    }
+
+    private async Task EnregistrerAsync()
+    {
+        try
+        {
+            await Mediateur.EnvoyerAsync(Formulaire!.EnCommande());
+        }
+        catch (RegleMetierException regle)
+        {
+            erreur = regle.Message;
+            return;
+        }
+
+        // L'accueil et la page de liens relisent le nouveau statut tout de suite.
+        Lecteur.Oublier();
+        Navigation.NavigateTo("/admin?enregistre=1");
+    }
+
+    private static string NomDe(Rubrique rubrique) =>
+        PlanDuSite.Pour(rubrique)?.Libelle ?? "Nulle part";
+}
