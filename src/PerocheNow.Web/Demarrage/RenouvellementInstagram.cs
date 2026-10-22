@@ -14,16 +14,16 @@ public sealed class RenouvellementInstagram(IServiceScopeFactory portees, ILogge
     private static readonly TimeSpan PremierPassage = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan Intervalle = TimeSpan.FromHours(12);
 
-    protected override async Task ExecuteAsync(CancellationToken arret)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await Task.Delay(PremierPassage, arret);
+        await Task.Delay(PremierPassage, stoppingToken);
 
         using var minuteur = new PeriodicTimer(Intervalle);
         do
         {
-            await VerifierAsync(arret);
+            await VerifierAsync(stoppingToken);
         }
-        while (await minuteur.WaitForNextTickAsync(arret));
+        while (await minuteur.WaitForNextTickAsync(stoppingToken));
     }
 
     private async Task VerifierAsync(CancellationToken arret)
