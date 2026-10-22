@@ -1,0 +1,17 @@
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
+
+@* Un format court vertical (Short, Reel) : miniature 9:16, titre sur deux lignes, plateforme et date. *@
+<a class="carte-court" href="@Contenu.Lien">
+    @if (Contenu.Miniature is { } miniature)
+    {
+        <img class="carte-court__image" src="@miniature" alt="" width="270" height="480" loading="lazy" />
+    }
+    <span class="carte-court__titre">@Contenu.Titre</span>
+    <span class="carte-court__mention">@LecteurDeContenus.Mention(Contenu)</span>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public Contenu Contenu { get; set; } = default!;
+}

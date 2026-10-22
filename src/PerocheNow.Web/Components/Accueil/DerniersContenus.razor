@@ -1,9 +1,47 @@
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
+@inject LecteurDeContenus Lecteur
+
 <section class="contenus conteneur" aria-labelledby="contenus-titre">
     <div class="section-tete">
         <h2 id="contenus-titre" class="titre-section">Derniers contenus</h2>
         <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tous les contenus</a>
     </div>
-    <p class="chantier">
-        C'est la prochaine brique du site : mes dernières vidéos YouTube et publications Instagram apparaîtront ici d'elles-mêmes.
-    </p>
+
+    @if (video is null && courts.Count == 0)
+    {
+        <p class="chantier">
+            Mes dernières vidéos YouTube et mes formats courts apparaîtront ici d'eux-mêmes.
+        </p>
+    }
+    else
+    {
+        <div class="contenus__grille">
+            @if (video is not null)
+            {
+                <CarteVideo Contenu="video" />
+            }
+            @if (courts.Count > 0)
+            {
+                <div class="contenus__courts">
+                    @foreach (var court in courts)
+                    {
+                        <CarteCourt Contenu="court" />
+                    }
+                </div>
+            }
+        </div>
+    }
 </section>
+
+@code {
+    private Contenu? video;
+    private List<Contenu> courts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var contenus = await Lecteur.LireAsync();
+        video = contenus.FirstOrDefault(c => c.Format == FormatDeContenu.Video);
+        courts = contenus.Where(c => c.Format == FormatDeContenu.Court).Take(3).ToList();
+    }
+}

@@ -1,3 +1,4 @@
+using PerocheNow.Business.Contenus;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
 
@@ -45,3 +46,12 @@ public interface ISourceDuDirect
 
 /// <summary>Un direct en cours, tel que la plateforme le décrit.</summary>
 public sealed record DirectEnCours(string Titre, string? Jeu, DateTimeOffset DebutLe);
+
+/// <summary>
+/// Une plateforme de contenus (YouTube, Instagram…). Chaque implémentation adapte l'API ou le flux
+/// de sa plateforme en <see cref="Contenu"/>.
+/// </summary>
+public interface ISourceDeContenus
+{
+    Task<IReadOnlyList<Contenu>> ObtenirAsync(CancellationToken annulation);
+}

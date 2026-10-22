@@ -1,15 +1,18 @@
 @page "/contenus"
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
 @inject IOptions<LiensOptions> Liens
+@inject LecteurDeContenus Lecteur
 
 <PageTitle>Contenus | peroche.now</PageTitle>
 <HeadContent>
-    <meta name="description" content="Les vidéos YouTube et Reels Instagram d'Alexandre Peroche, rangés par projet : NUR24 et tout ce qui se passe à côté de la piste." />
+    <meta name="description" content="Les vidéos YouTube et formats courts d'Alexandre Peroche : NUR24, la Nordschleife, et tout ce qui se passe à côté de la piste." />
 </HeadContent>
 
 <section class="page-tete conteneur" aria-labelledby="contenus-titre">
     <h1 id="contenus-titre" class="page-tete__titre">Contenus</h1>
     <p class="page-tete__intro">
-        Mes vidéos YouTube et mes Reels Instagram, repris automatiquement et rangés par projet.
+        Mes vidéos et mes formats courts, repris automatiquement dès leur publication.
         @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
         {
             <text>Les lives, eux, se passent sur <a href="@Liens.Value.Twitch">Twitch</a>.</text>
@@ -17,29 +20,72 @@
     </p>
 </section>
 
-<section class="conteneur page-corps" aria-label="En construction">
-    <div class="chantier chantier--encadre">
-        <p>C'est la prochaine brique du site. Ici arriveront d'eux-mêmes, dès leur publication :</p>
-        <ul>
-            <li>les vidéos YouTube, des rediffusions de course aux vlogs ;</li>
-            <li>les Reels Instagram, dont le carnet de route hebdomadaire de NUR24 ;</li>
-            <li>un tri par projet (NUR24, à côté de la piste) et par format.</li>
-        </ul>
-        @if (reseaux.Count > 0)
+@if (videos.Count == 0 && courts.Count == 0)
+{
+    <section class="conteneur page-corps" aria-label="Contenus indisponibles">
+        <div class="chantier chantier--encadre">
+            <p>Les contenus ne sont pas disponibles pour le moment. Ils sont toujours sur mes réseaux :</p>
+            @if (reseaux.Count > 0)
+            {
+                <p class="chantier__reseaux">
+                    @foreach (var (nom, adresse) in reseaux)
+                    {
+                        <a href="@adresse">@nom</a>
+                    }
+                </p>
+            }
+        </div>
+    </section>
+}
+else
+{
+    <div class="conteneur page-corps galeries">
+        @if (videos.Count > 0)
         {
-            <p class="chantier__reseaux">
-                En attendant :
-                @foreach (var (nom, adresse) in reseaux)
-                {
-                    <a href="@adresse">@nom</a>
-                }
-            </p>
+            <section aria-labelledby="videos-titre">
+                <div class="section-tete">
+                    <h2 id="videos-titre" class="titre-section">Vidéos</h2>
+                    @if (!string.IsNullOrWhiteSpace(Liens.Value.YouTube))
+                    {
+                        <a class="vers" href="@Liens.Value.YouTube">La chaîne YouTube</a>
+                    }
+                </div>
+                <div class="galerie-videos">
+                    @foreach (var video in videos)
+                    {
+                        <CarteVideo Contenu="video" />
+                    }
+                </div>
+            </section>
+        }
+
+        @if (courts.Count > 0)
+        {
+            <section aria-labelledby="courts-titre">
+                <div class="section-tete">
+                    <h2 id="courts-titre" class="titre-section">Formats courts</h2>
+                </div>
+                <div class="galerie-courts">
+                    @foreach (var court in courts)
+                    {
+                        <CarteCourt Contenu="court" />
+                    }
+                </div>
+            </section>
         }
     </div>
-</section>
+}
 
 @code {
+    private List<Contenu> videos = [];
+    private List<Contenu> courts = [];
     private List<(string Nom, string Adresse)> reseaux = [];
 
-    protected override void OnInitialized() => reseaux = Liens.Value.Reseaux().ToList();
+    protected override async Task OnInitializedAsync()
+    {
+        reseaux = Liens.Value.Reseaux().ToList();
+        var contenus = await Lecteur.LireAsync();
+        videos = contenus.Where(c => c.Format == FormatDeContenu.Video).Take(6).ToList();
+        courts = contenus.Where(c => c.Format == FormatDeContenu.Court).Take(10).ToList();
+    }
 }

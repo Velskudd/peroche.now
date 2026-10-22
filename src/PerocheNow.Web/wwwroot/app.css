@@ -348,9 +348,36 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 .trace { stroke-dasharray: 1; animation: trace-entree 2.4s cubic-bezier(.3, .6, .2, 1) both; }
 @keyframes trace-entree { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
+/* ---------- Contenus : cartes vidéo (16:9) et formats courts (9:16) ---------- */
+
+.carte-video, .carte-court { display: flex; flex-direction: column; text-decoration: none; }
+.carte-video { gap: 12px; color: var(--argent); }
+.carte-court { gap: 8px; color: var(--gris); font-size: 13px; }
+.carte-video__image, .carte-court__image { width: 100%; height: auto; object-fit: cover; background: var(--surface); }
+.carte-video__image { aspect-ratio: 16 / 9; }
+.carte-court__image { aspect-ratio: 9 / 16; }
+.carte-video__titre {
+  font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600;
+  font-size: clamp(18px, 1.8vw, 22px); line-height: 1.2; color: var(--blanc);
+}
+.carte-court__titre {
+  font-size: 14px; line-height: 1.3; color: var(--argent);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.carte-video__mention { font-size: 14px; color: var(--gris); }
+.carte-video:hover, .carte-court:hover { color: var(--gris); }
+.carte-video:hover .carte-video__titre,
+.carte-court:hover .carte-court__titre { text-decoration: underline; text-decoration-color: var(--argent); text-underline-offset: 4px; }
+
 /* ---------- Accueil : contenus, à côté de la piste ---------- */
 
 .contenus { padding-top: var(--respiration); }
+.contenus__grille { display: flex; flex-wrap: wrap; gap: 28px; }
+.contenus__grille > .carte-video { flex: 3 1 520px; min-width: 0; }
+.contenus__courts {
+  flex: 2 1 360px; min-width: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-content: start;
+}
 
 .a-cote { padding-top: clamp(56px, 7vw, 96px); padding-bottom: var(--respiration); }
 .a-cote__liste {
@@ -455,6 +482,10 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 .page-corps { padding-bottom: clamp(72px, 9vw, 128px); }
 
 .chantier--encadre { display: flex; flex-direction: column; gap: 12px; }
+
+.galeries { display: flex; flex-direction: column; gap: clamp(56px, 7vw, 96px); }
+.galerie-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 36px 24px; }
+.galerie-courts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 28px 16px; }
 .chantier--encadre p { margin: 0; }
 .chantier--encadre ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
 .chantier__reseaux { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--gris); }

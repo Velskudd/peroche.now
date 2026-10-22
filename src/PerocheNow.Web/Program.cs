@@ -6,6 +6,7 @@ using PerocheNow.Infrastructure;
 using PerocheNow.Web.Administration;
 using PerocheNow.Web.Components;
 using PerocheNow.Web.Configuration;
+using PerocheNow.Web.Contenus;
 using PerocheNow.Web.Demarrage;
 using PerocheNow.Web.Direct;
 using PerocheNow.Web.Maintenant;
@@ -31,6 +32,7 @@ builder.Services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<LecteurDuMoment>();
 builder.Services.AddScoped<LecteurDuDirect>();
+builder.Services.AddScoped<LecteurDeContenus>();
 builder.Services.Configure<LiensOptions>(builder.Configuration.GetSection(LiensOptions.Section));
 builder.Services.AddHostedService<InitialisationAuDemarrage>();
 

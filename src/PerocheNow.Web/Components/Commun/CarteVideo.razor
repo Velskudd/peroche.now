@@ -1,0 +1,17 @@
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
+
+@* Une vidéo longue : miniature 16:9, titre, plateforme et date. *@
+<a class="carte-video" href="@Contenu.Lien">
+    @if (Contenu.Miniature is { } miniature)
+    {
+        <img class="carte-video__image" src="@miniature" alt="" width="480" height="270" loading="lazy" />
+    }
+    <span class="carte-video__titre">@Contenu.Titre</span>
+    <span class="carte-video__mention">@LecteurDeContenus.Mention(Contenu)</span>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public Contenu Contenu { get; set; } = default!;
+}
