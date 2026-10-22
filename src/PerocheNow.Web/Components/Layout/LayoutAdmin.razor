@@ -10,6 +10,20 @@
         <span class="entete__nom">Administration</span>
     </a>
 
+    <nav class="admin-entete__nav" aria-label="Administration">
+        @foreach (var (libelle, adresse) in Rubriques)
+        {
+            @if (EstCourante(adresse))
+            {
+                <a href="@adresse" aria-current="page">@libelle</a>
+            }
+            else
+            {
+                <a href="@adresse">@libelle</a>
+            }
+        }
+    </nav>
+
     <div class="admin-entete__session">
         @if (Contexte?.User.Identity?.Name is { Length: > 0 } nom)
         {
@@ -28,6 +42,15 @@
 </main>
 
 @code {
+    private static readonly (string Libelle, string Adresse)[] Rubriques =
+    [
+        ("En ce moment", "/admin"),
+        ("Instagram", "/admin/instagram"),
+    ];
+
     [CascadingParameter]
     private HttpContext? Contexte { get; set; }
+
+    private bool EstCourante(string adresse) =>
+        string.Equals(Contexte?.Request.Path.Value?.TrimEnd('/'), adresse, StringComparison.OrdinalIgnoreCase);
 }

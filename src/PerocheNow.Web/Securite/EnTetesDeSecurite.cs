@@ -3,14 +3,14 @@ namespace PerocheNow.Web.Securite;
 public static class EnTetesDeSecurite
 {
     // Tout est servi depuis le site lui-même : polices, images, scripts et styles.
-    // Seule exception : les miniatures des vidéos, servies par YouTube.
+    // Seule exception : les miniatures des contenus, servies par YouTube et Instagram.
     private const string PolitiqueDeContenu =
-        "default-src 'self'; img-src 'self' data: https://*.ytimg.com; font-src 'self'; style-src 'self'; script-src 'self'; " +
+        "default-src 'self'; img-src 'self' data: https://*.ytimg.com https://*.cdninstagram.com https://*.fbcdn.net; font-src 'self'; style-src 'self'; script-src 'self'; " +
         "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     // En développement, « dotnet watch » rafraîchit le navigateur par un WebSocket sur un autre port de localhost.
     private const string PolitiqueDeContenuDeveloppement =
-        "default-src 'self'; img-src 'self' data: https://*.ytimg.com; font-src 'self'; style-src 'self'; script-src 'self'; " +
+        "default-src 'self'; img-src 'self' data: https://*.ytimg.com https://*.cdninstagram.com https://*.fbcdn.net; font-src 'self'; style-src 'self'; script-src 'self'; " +
         "connect-src 'self' ws://localhost:* wss://localhost:*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     public static IApplicationBuilder UseEnTetesDeSecurite(this IApplicationBuilder app)

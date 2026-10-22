@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
+using PerocheNow.Business.Contenus;
 using PerocheNow.Business.Ports;
 using IMediateur = PerocheNow.Business.Mediateur.IMediateur;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Plateformes;
 
 namespace PerocheNow.Business.Tests;
 
@@ -45,6 +47,34 @@ internal sealed class UtilisateurFixe(string nom) : IUtilisateurCourant
     public string Nom { get; } = nom;
 }
 
+internal sealed class FauxAccesInstagram : IAccesInstagramRepository
+{
+    public AccesInstagram? Acces { get; set; }
+
+    public Task<AccesInstagram?> ObtenirAsync(CancellationToken annulation) => Task.FromResult(Acces);
+
+    public void Ajouter(AccesInstagram acces) => Acces = acces;
+}
+
+/// <summary>Instagram simulé : un seul jeton valide, et un compteur de renouvellements.</summary>
+internal sealed class FausseApiInstagram : IApiInstagram
+{
+    public const string JetonValide = "IGAAvalide";
+    public int Renouvellements { get; private set; }
+
+    public Task<string?> IdentifierCompteAsync(string jeton, CancellationToken annulation) =>
+        Task.FromResult(jeton == JetonValide ? "peroche" : null);
+
+    public Task<JetonInstagram> RenouvelerAsync(string jeton, CancellationToken annulation)
+    {
+        Renouvellements++;
+        return Task.FromResult(new JetonInstagram($"IGAArenouvele{Renouvellements}", TimeSpan.FromDays(60)));
+    }
+
+    public Task<IReadOnlyList<Contenu>> ObtenirPublicationsAsync(string jeton, CancellationToken annulation) =>
+        Task.FromResult<IReadOnlyList<Contenu>>([]);
+}
+
 internal sealed class FauxDirect : ISourceDuDirect
 {
     public DirectEnCours? Direct { get; set; }
@@ -64,6 +94,8 @@ internal sealed class Banc : IDisposable
     public FausseUniteDeTravail UniteDeTravail { get; } = new();
     public HorlogeFixe Horloge { get; } = new(Instant);
     public FauxDirect Direct { get; } = new();
+    public FauxAccesInstagram AccesInstagram { get; } = new();
+    public FausseApiInstagram Instagram { get; } = new();
 
     public Banc(Action<IServiceCollection>? configurer = null)
     {
@@ -75,6 +107,8 @@ internal sealed class Banc : IDisposable
         services.AddSingleton<IHorloge>(Horloge);
         services.AddSingleton<IUtilisateurCourant>(new UtilisateurFixe("alexandre"));
         services.AddSingleton<ISourceDuDirect>(Direct);
+        services.AddSingleton<IAccesInstagramRepository>(AccesInstagram);
+        services.AddSingleton<IApiInstagram>(Instagram);
         configurer?.Invoke(services);
 
         _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });

@@ -73,7 +73,7 @@ public sealed class SourcesDeContenusTests
     [InlineData("Touristenfahrten Onboard - Golf GTI 7.5 #8", "Touristenfahrten Onboard - Golf GTI 7.5 #8")]
     public void Les_mots_dieses_sont_retires_des_titres(string titre, string attendu)
     {
-        Assert.Equal(attendu, SourceYouTube.NettoyerTitre(titre));
+        Assert.Equal(attendu, Titres.Nettoyer(titre));
     }
 
     [Fact]

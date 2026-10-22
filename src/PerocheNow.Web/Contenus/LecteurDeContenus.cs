@@ -30,6 +30,8 @@ public sealed class LecteurDeContenus(IMediateur mediateur, ILogger<LecteurDeCon
     }
 
     /// <summary>« YouTube, 22 octobre 2026 ».</summary>
-    public static string Mention(Contenu contenu) =>
-        $"{contenu.Plateforme}, {contenu.PublieLe.ToString("d MMMM yyyy", Francais)}";
+    public static string Mention(Contenu contenu) => $"{contenu.Plateforme}, {Date(contenu)}";
+
+    /// <summary>« 22 octobre 2026 ».</summary>
+    public static string Date(Contenu contenu) => contenu.PublieLe.ToString("d MMMM yyyy", Francais);
 }

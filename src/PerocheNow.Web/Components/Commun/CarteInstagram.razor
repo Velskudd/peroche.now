@@ -1,0 +1,17 @@
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
+
+@* Une publication ou un Reel Instagram : visuel 4:5, début de la légende, date. *@
+<a class="carte-instagram" href="@Contenu.Lien">
+    @if (Contenu.Miniature is { } miniature)
+    {
+        <img class="carte-instagram__image" src="@miniature" alt="" width="320" height="400" loading="lazy" />
+    }
+    <span class="carte-instagram__titre">@Contenu.Titre</span>
+    <span class="carte-instagram__mention">@(Contenu.Format == FormatDeContenu.Court ? "Reel" : "Publication"), @LecteurDeContenus.Date(Contenu)</span>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public Contenu Contenu { get; set; } = default!;
+}

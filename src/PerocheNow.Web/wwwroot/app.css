@@ -486,6 +486,16 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 .galeries { display: flex; flex-direction: column; gap: clamp(56px, 7vw, 96px); }
 .galerie-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 36px 24px; }
 .galerie-courts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 28px 16px; }
+.galerie-instagram { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 28px 16px; }
+
+.carte-instagram { display: flex; flex-direction: column; gap: 8px; color: var(--gris); font-size: 13px; text-decoration: none; }
+.carte-instagram__image { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; background: var(--surface); }
+.carte-instagram__titre {
+  font-size: 15px; line-height: 1.35; color: var(--argent);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.carte-instagram:hover { color: var(--gris); }
+.carte-instagram:hover .carte-instagram__titre { text-decoration: underline; text-decoration-color: var(--argent); text-underline-offset: 4px; }
 .chantier--encadre p { margin: 0; }
 .chantier--encadre ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
 .chantier__reseaux { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--gris); }
@@ -633,6 +643,13 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
   padding-top: 20px; padding-bottom: 20px;
   border-bottom: 1px solid var(--trait);
 }
+.admin-entete__nav { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; font-weight: 500; }
+.admin-entete__nav a { text-decoration: none; }
+.admin-entete__nav a:hover { text-decoration: underline; }
+.admin-entete__nav a[aria-current="page"] {
+  color: var(--blanc);
+  text-decoration: underline; text-decoration-color: var(--argent); text-decoration-thickness: 2px; text-underline-offset: 8px;
+}
 .admin-entete__session { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; font-size: 15px; }
 .admin-entete__session form { margin: 0; }
 .admin-entete__compte { color: var(--gris); }
@@ -687,6 +704,11 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 .champ .invalid { border-color: #C2766A; }
 .validation-message { font-size: 14px; color: #F1C9C2; }
 button.bouton-objectif { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+.admin__etat { margin-bottom: 28px; gap: 8px; }
+.admin__etat p { margin: 0; }
+.admin__aide { margin-top: 36px; color: var(--gris); }
+.admin__aide summary { cursor: pointer; color: var(--argent); font-weight: 600; }
+.admin__aide ol { margin: 12px 0 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
 
 /* ---------- Pages simples (introuvable, erreur) ---------- */
 

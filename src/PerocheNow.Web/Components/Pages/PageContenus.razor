@@ -6,13 +6,13 @@
 
 <PageTitle>Contenus | peroche.now</PageTitle>
 <HeadContent>
-    <meta name="description" content="Les vidéos YouTube et formats courts d'Alexandre Peroche : NUR24, la Nordschleife, et tout ce qui se passe à côté de la piste." />
+    <meta name="description" content="Les vidéos YouTube, formats courts et publications Instagram d'Alexandre Peroche : NUR24, la Nordschleife, et tout ce qui se passe à côté de la piste." />
 </HeadContent>
 
 <section class="page-tete conteneur" aria-labelledby="contenus-titre">
     <h1 id="contenus-titre" class="page-tete__titre">Contenus</h1>
     <p class="page-tete__intro">
-        Mes vidéos et mes formats courts, repris automatiquement dès leur publication.
+        Mes vidéos, mes formats courts et mes publications Instagram, repris automatiquement dès leur publication.
         @if (!string.IsNullOrWhiteSpace(Liens.Value.Twitch))
         {
             <text>Les lives, eux, se passent sur <a href="@Liens.Value.Twitch">Twitch</a>.</text>
@@ -20,7 +20,7 @@
     </p>
 </section>
 
-@if (videos.Count == 0 && courts.Count == 0)
+@if (videos.Count == 0 && courts.Count == 0 && instagram.Count == 0)
 {
     <section class="conteneur page-corps" aria-label="Contenus indisponibles">
         <div class="chantier chantier--encadre">
@@ -59,6 +59,25 @@ else
             </section>
         }
 
+        @if (instagram.Count > 0)
+        {
+            <section aria-labelledby="instagram-titre">
+                <div class="section-tete">
+                    <h2 id="instagram-titre" class="titre-section">Sur Instagram</h2>
+                    @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
+                    {
+                        <a class="vers" href="@Liens.Value.Instagram">Le compte Instagram</a>
+                    }
+                </div>
+                <div class="galerie-instagram">
+                    @foreach (var publication in instagram)
+                    {
+                        <CarteInstagram Contenu="publication" />
+                    }
+                </div>
+            </section>
+        }
+
         @if (courts.Count > 0)
         {
             <section aria-labelledby="courts-titre">
@@ -79,6 +98,7 @@ else
 @code {
     private List<Contenu> videos = [];
     private List<Contenu> courts = [];
+    private List<Contenu> instagram = [];
     private List<(string Nom, string Adresse)> reseaux = [];
 
     protected override async Task OnInitializedAsync()
@@ -86,6 +106,7 @@ else
         reseaux = Liens.Value.Reseaux().ToList();
         var contenus = await Lecteur.LireAsync();
         videos = contenus.Where(c => c.Format == FormatDeContenu.Video).Take(6).ToList();
-        courts = contenus.Where(c => c.Format == FormatDeContenu.Court).Take(10).ToList();
+        courts = contenus.Where(c => c.Format == FormatDeContenu.Court && c.Plateforme == Plateforme.YouTube).Take(10).ToList();
+        instagram = contenus.Where(c => c.Plateforme == Plateforme.Instagram).Take(8).ToList();
     }
 }

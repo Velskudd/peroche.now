@@ -12,6 +12,17 @@ public sealed class ContenusOptions
     public const string Section = "Contenus";
 
     public FluxYouTubeOptions YouTube { get; init; } = new();
+    public InstagramOptions Instagram { get; init; } = new();
+}
+
+/// <summary>
+/// L'API Instagram (connexion Instagram, compte professionnel). Le jeton, lui, n'est pas dans la configuration :
+/// il est saisi dans l'administration, gardé en base et renouvelé par le site.
+/// </summary>
+public sealed class InstagramOptions
+{
+    public Uri? AdresseApi { get; init; }
+    public int NombreDePublications { get; init; } = 12;
 }
 
 /// <summary>
@@ -26,6 +37,9 @@ public sealed class FluxYouTubeOptions
 
 public static class EnregistrementContenus
 {
+    /// <summary>Clé de cache des publications Instagram, à oublier quand un nouveau jeton est saisi.</summary>
+    public const string CleInstagram = "contenus:instagram";
+
     /// <summary>
     /// Enregistre une source par flux configuré, chacune enveloppée dans le décorateur de cache.
     /// Un flux absent de la configuration n'est simplement pas lu.
@@ -52,6 +66,28 @@ public static class EnregistrementContenus
                 cle));
         }
 
+        AjouterInstagram(services, options.Instagram);
         return services;
+    }
+
+    private static void AjouterInstagram(IServiceCollection services, InstagramOptions options)
+    {
+        if (options.AdresseApi is not { } adresseApi)
+        {
+            services.AddSingleton<IApiInstagram, ApiInstagramNonConfiguree>();
+            return;
+        }
+
+        services.AddHttpClient(ApiInstagram.NomClient, client => client.Timeout = TimeSpan.FromSeconds(8));
+        services.AddSingleton<IApiInstagram>(fournisseur => new ApiInstagram(
+            fournisseur.GetRequiredService<IHttpClientFactory>(), adresseApi, options.NombreDePublications));
+        services.AddSingleton<ISourceDeContenus>(fournisseur => new SourceAvecCache(
+            new SourceInstagram(
+                fournisseur.GetRequiredService<IServiceScopeFactory>(),
+                fournisseur.GetRequiredService<IApiInstagram>(),
+                fournisseur.GetRequiredService<IHorloge>()),
+            fournisseur.GetRequiredService<IMemoryCache>(),
+            fournisseur.GetRequiredService<ILogger<SourceAvecCache>>(),
+            CleInstagram));
     }
 }

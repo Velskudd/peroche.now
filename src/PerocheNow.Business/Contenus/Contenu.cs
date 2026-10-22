@@ -27,4 +27,12 @@ public sealed record Contenu(
     string Titre,
     Uri Lien,
     Uri? Miniature,
-    DateTimeOffset PublieLe);
+    DateTimeOffset PublieLe)
+{
+    /// <summary>Les mots-dièses du contenu, sans « # » (par exemple « NUR24 »).</summary>
+    public IReadOnlyCollection<string> Etiquettes { get; init; } = [];
+
+    /// <summary>Vrai si le contenu porte ce mot-dièse, sans tenir compte des majuscules.</summary>
+    public bool PorteEtiquette(string etiquette) =>
+        Etiquettes.Contains(etiquette.TrimStart('#'), StringComparer.OrdinalIgnoreCase);
+}

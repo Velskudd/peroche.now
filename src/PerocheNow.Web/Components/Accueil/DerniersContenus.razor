@@ -42,6 +42,7 @@
     {
         var contenus = await Lecteur.LireAsync();
         video = contenus.FirstOrDefault(c => c.Format == FormatDeContenu.Video);
-        courts = contenus.Where(c => c.Format == FormatDeContenu.Court).Take(3).ToList();
+        // Les Reels reprennent les mêmes clips que les Shorts : l'accueil s'en tient à YouTube pour éviter les doublons.
+        courts = contenus.Where(c => c.Format == FormatDeContenu.Court && c.Plateforme == Plateforme.YouTube).Take(3).ToList();
     }
 }

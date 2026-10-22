@@ -35,6 +35,7 @@ public static class EnregistrementInfrastructure
         services.AddScoped<IUniteDeTravail>(sp => sp.GetRequiredService<PerocheNowDbContext>());
         services.AddScoped<IStatutDuMomentRepository, StatutDuMomentRepository>();
         services.AddScoped<ITraceAuditRepository, TraceAuditRepository>();
+        services.AddScoped<IAccesInstagramRepository, AccesInstagramRepository>();
         services.AddSingleton<IHorloge, HorlogeSysteme>();
         services.AddSingleton<IUtilisateurCourant, UtilisateurSysteme>();
         services.AjouterDirectTwitch(configuration);

@@ -1,0 +1,113 @@
+@page "/admin/instagram"
+@layout LayoutAdmin
+@attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Caching.Memory
+@using PerocheNow.Business.Contenus.Instagram
+@using PerocheNow.Business.Mediateur
+@using PerocheNow.Domain.Commun
+@using PerocheNow.Infrastructure.Contenus
+@using PerocheNow.Web.Administration
+@inject IMediateur Mediateur
+@inject IMemoryCache Cache
+@inject NavigationManager Navigation
+
+<PageTitle>Instagram | Administration | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<div class="admin__tete">
+    <h1 class="admin__titre">Instagram</h1>
+    <p class="admin__intro">
+        Le site lit tes publications avec un jeton d'accès, puis le prolonge tout seul chaque semaine.
+        Tu n'as besoin de le coller ici qu'une fois, ou s'il a expiré.
+    </p>
+</div>
+
+@if (Connecte == 1 && erreur is null)
+{
+    <p class="admin__succes" role="status">Compte branché. Tes publications apparaissent sur <a href="@PlanDuSite.Contenus.Adresse">la page Contenus</a>.</p>
+}
+@if (erreur is not null)
+{
+    <p class="admin__erreur" role="alert">@erreur</p>
+}
+
+<div class="groupe admin__etat">
+    @if (etat is null)
+    {
+        <p>Aucun compte Instagram branché pour l'instant.</p>
+    }
+    else
+    {
+        <p>Compte branché : <strong>@etat.Compte</strong>.</p>
+        <p class="champ__aide">
+            Jeton obtenu le @Quand(etat.ObtenuLe), valable jusqu'au @Quand(etat.ExpireLe).
+            @if (etat.EstExpire)
+            {
+                <strong> Il a expiré : colle un nouveau jeton.</strong>
+            }
+        </p>
+    }
+</div>
+
+<EditForm Model="Formulaire" FormName="instagram" OnValidSubmit="BrancherAsync" class="admin__formulaire">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="admin__erreurs" />
+
+    <div class="champ">
+        <label for="jeton">Jeton d'accès</label>
+        <InputText id="jeton" type="password" autocomplete="off" spellcheck="false" @bind-Value="Formulaire!.Jeton" />
+        <span class="champ__aide">Il commence en général par « IGAA ». Il n'est jamais affiché ensuite.</span>
+    </div>
+
+    <div class="actions">
+        <button type="submit" class="bouton-objectif">Brancher le compte</button>
+    </div>
+</EditForm>
+
+<details class="admin__aide">
+    <summary>Où trouver le jeton ?</summary>
+    <ol>
+        <li>Sur <a href="https://developers.facebook.com/apps/">Meta for Developers</a>, crée une application avec le cas d'usage Instagram.</li>
+        <li>Dans « API setup with Instagram login », ajoute ton compte Instagram (il doit être professionnel : Créateur ou Entreprise).</li>
+        <li>Clique sur « Generate token » à côté du compte, accepte, puis copie le jeton affiché.</li>
+    </ol>
+</details>
+
+@code {
+    [SupplyParameterFromForm]
+    private FormulaireInstagram? Formulaire { get; set; }
+
+    [SupplyParameterFromQuery(Name = "connecte")]
+    private int? Connecte { get; set; }
+
+    private EtatInstagram? etat;
+    private string? erreur;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Formulaire ??= new FormulaireInstagram();
+        etat = await Mediateur.EnvoyerAsync(new ObtenirEtatInstagram());
+    }
+
+    private async Task BrancherAsync()
+    {
+        try
+        {
+            await Mediateur.EnvoyerAsync(new ConnecterInstagram(Formulaire!.Jeton));
+        }
+        catch (RegleMetierException regle)
+        {
+            erreur = regle.Message;
+            return;
+        }
+
+        // Les publications sont relues tout de suite avec le nouveau jeton.
+        Cache.Remove(EnregistrementContenus.CleInstagram);
+        Navigation.NavigateTo("/admin/instagram?connecte=1");
+    }
+
+    private static string Quand(DateTimeOffset instant) => HeureDeParis.FormaterDate(instant) ?? instant.ToString("u");
+}

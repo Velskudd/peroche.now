@@ -1,6 +1,7 @@
 using PerocheNow.Business.Contenus;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Plateformes;
 
 namespace PerocheNow.Business.Ports;
 
@@ -54,4 +55,30 @@ public sealed record DirectEnCours(string Titre, string? Jeu, DateTimeOffset Deb
 public interface ISourceDeContenus
 {
     Task<IReadOnlyList<Contenu>> ObtenirAsync(CancellationToken annulation);
+}
+
+/// <summary>L'accès au compte Instagram (jeton). Il n'en existe qu'un à la fois.</summary>
+public interface IAccesInstagramRepository
+{
+    Task<AccesInstagram?> ObtenirAsync(CancellationToken annulation);
+    void Ajouter(AccesInstagram acces);
+}
+
+/// <summary>L'API Instagram, vue par le site : vérifier un jeton, le prolonger, lire les publications.</summary>
+public interface IApiInstagram
+{
+    /// <summary>Le nom du compte auquel le jeton donne accès, ou <c>null</c> si Instagram refuse le jeton.</summary>
+    Task<string?> IdentifierCompteAsync(string jeton, CancellationToken annulation);
+
+    /// <summary>Un nouveau jeton longue durée, à partir d'un jeton encore valide.</summary>
+    Task<JetonInstagram> RenouvelerAsync(string jeton, CancellationToken annulation);
+
+    Task<IReadOnlyList<Contenu>> ObtenirPublicationsAsync(string jeton, CancellationToken annulation);
+}
+
+/// <summary>Un jeton délivré par Instagram et sa durée de validité.</summary>
+public sealed record JetonInstagram(string Valeur, TimeSpan Validite)
+{
+    /// <summary>Jamais le jeton dans un journal.</summary>
+    public override string ToString() => $"Jeton Instagram ({Validite.TotalDays:0} jours)";
 }

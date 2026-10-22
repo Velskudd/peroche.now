@@ -35,6 +35,7 @@ builder.Services.AddScoped<LecteurDuDirect>();
 builder.Services.AddScoped<LecteurDeContenus>();
 builder.Services.Configure<LiensOptions>(builder.Configuration.GetSection(LiensOptions.Section));
 builder.Services.AddHostedService<InitialisationAuDemarrage>();
+builder.Services.AddHostedService<RenouvellementInstagram>();
 
 // La sonde de santé ne touche pas la base : elle ne doit pas réveiller la base serverless.
 builder.Services.AddHealthChecks();

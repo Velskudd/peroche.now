@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using PerocheNow.Business.Contenus;
 using PerocheNow.Business.Ports;
@@ -10,7 +9,7 @@ namespace PerocheNow.Infrastructure.Contenus;
 /// Adaptateur YouTube : lit un flux Atom public (aucune clé d'API) et le traduit en <see cref="Contenu"/>.
 /// Un lien en <c>/shorts/</c> signale un format court, tout autre lien une vidéo.
 /// </summary>
-public sealed partial class SourceYouTube(IHttpClientFactory fabrique, Uri adresseFlux) : ISourceDeContenus
+public sealed class SourceYouTube(IHttpClientFactory fabrique, Uri adresseFlux) : ISourceDeContenus
 {
     public const string NomClient = "YouTube";
 
@@ -57,29 +56,12 @@ public sealed partial class SourceYouTube(IHttpClientFactory fabrique, Uri adres
         return new Contenu(
             Plateforme.YouTube,
             format,
-            NettoyerTitre(titre),
+            Titres.Nettoyer(titre),
             adresse,
             Uri.TryCreate(miniature, UriKind.Absolute, out var image) ? image : null,
-            publieLe);
+            publieLe)
+        {
+            Etiquettes = Titres.Etiquettes(titre),
+        };
     }
-
-    /// <summary>
-    /// Retire les mots-dièses, utiles sur YouTube mais bruyants sur le site :
-    /// « Au millimètre | #ap15fr sur #Twitch » devient « Au millimètre ».
-    /// Un numéro d'épisode (« #4 ») n'est pas un mot-dièse et reste.
-    /// </summary>
-    public static string NettoyerTitre(string titre)
-    {
-        var barre = titre.IndexOf(" | ", StringComparison.Ordinal);
-        var utile = barre > 0 && MotDiese().IsMatch(titre[barre..]) ? titre[..barre] : titre;
-
-        var propre = Espaces().Replace(MotDiese().Replace(utile, " "), " ").Trim();
-        return propre.Length > 0 ? propre : titre.Trim();
-    }
-
-    [GeneratedRegex(@"#\p{L}[\p{L}\p{N}_]*", RegexOptions.None, matchTimeoutMilliseconds: 200)]
-    private static partial Regex MotDiese();
-
-    [GeneratedRegex(@"\s{2,}", RegexOptions.None, matchTimeoutMilliseconds: 200)]
-    private static partial Regex Espaces();
 }

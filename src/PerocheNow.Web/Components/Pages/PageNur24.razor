@@ -1,5 +1,8 @@
 @page "/nur24"
+@using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Contenus
 @inject IOptions<LiensOptions> Liens
+@inject LecteurDeContenus Lecteur
 
 <PageTitle>NUR24, de la Test Week aux 24 Heures du Nürburgring | peroche.now</PageTitle>
 <HeadContent>
@@ -91,13 +94,25 @@
         <h2 id="carnet" class="titre-section">Le carnet de route</h2>
         <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tout le carnet de route</a>
     </div>
-    <p class="chantier">
-        Un Reel par semaine sur l'avancement du projet. Ils apparaîtront ici dès que la brique « Contenus » sera en place.
-        @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
-        {
-            <text>En attendant, ils sont sur <a href="@Liens.Value.Instagram">Instagram</a>.</text>
-        }
-    </p>
+    @if (carnet.Count > 0)
+    {
+        <div class="galerie-instagram">
+            @foreach (var publication in carnet)
+            {
+                <CarteInstagram Contenu="publication" />
+            }
+        </div>
+    }
+    else
+    {
+        <p class="chantier">
+            Un Reel par semaine sur l'avancement du projet, marqué #NUR24 : les prochains apparaîtront ici d'eux-mêmes.
+            @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
+            {
+                <text>En attendant, ils sont sur <a href="@Liens.Value.Instagram">Instagram</a>.</text>
+            }
+        </p>
+    }
 </section>
 
 <section class="partenaires conteneur" aria-labelledby="partenaires-nur">
@@ -109,3 +124,16 @@
         <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a>
     </div>
 </section>
+
+@code {
+    /// <summary>Le mot-dièse qui range une publication dans le carnet de route du projet.</summary>
+    private const string EtiquetteDuProjet = "NUR24";
+
+    private List<Contenu> carnet = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var contenus = await Lecteur.LireAsync();
+        carnet = contenus.Where(c => c.PorteEtiquette(EtiquetteDuProjet)).Take(4).ToList();
+    }
+}
