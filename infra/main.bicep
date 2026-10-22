@@ -17,9 +17,9 @@ param adminSql string = 'perochenow'
 @description('Mot de passe administrateur du serveur SQL.')
 param motDePasseSql string
 
-@description('Délai avant mise en pause de la base, en minutes. 60 par défaut ; 15 consomme moins de quota gratuit.')
+@description('Délai avant mise en pause de la base, en minutes. 15 (le minimum) : chaque réveil consomme quatre fois moins de quota gratuit qu\'avec 60.')
 @minValue(15)
-param delaiPauseMinutes int = 60
+param delaiPauseMinutes int = 15
 
 @description('Utilisateur GitHub pour tirer une image privée de GHCR. Vide si le paquet est public.')
 param utilisateurGhcr string = ''
