@@ -52,20 +52,23 @@
     }
 </div>
 
-<EditForm Model="Formulaire" FormName="instagram" OnValidSubmit="BrancherAsync" class="admin__formulaire">
-    <DataAnnotationsValidator />
-    <ValidationSummary class="admin__erreurs" />
+@if (Formulaire is not null)
+{
+    <EditForm Model="Formulaire" FormName="instagram" OnValidSubmit="BrancherAsync" class="admin__formulaire">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="admin__erreurs" />
 
-    <div class="champ">
-        <label for="jeton">Jeton d'accès</label>
-        <InputText id="jeton" type="password" autocomplete="off" spellcheck="false" @bind-Value="Formulaire!.Jeton" />
-        <span class="champ__aide">Il commence en général par « IGAA ». Il n'est jamais affiché ensuite.</span>
-    </div>
+        <div class="champ">
+            <label for="jeton">Jeton d'accès</label>
+            <InputText id="jeton" type="password" autocomplete="off" spellcheck="false" @bind-Value="Formulaire!.Jeton" />
+            <span class="champ__aide">Il commence en général par « IGAA ». Il n'est jamais affiché ensuite.</span>
+        </div>
 
-    <div class="actions">
-        <button type="submit" class="bouton-objectif">Brancher le compte</button>
-    </div>
-</EditForm>
+        <div class="actions">
+            <button type="submit" class="bouton-objectif">Brancher le compte</button>
+        </div>
+    </EditForm>
+}
 
 <details class="admin__aide">
     <summary>Où trouver le jeton ?</summary>

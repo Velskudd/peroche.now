@@ -35,61 +35,65 @@
     <p class="admin__erreur" role="alert">@erreur</p>
 }
 
-<EditForm Model="Formulaire" FormName="maintenant" OnValidSubmit="EnregistrerAsync" class="admin__formulaire">
-    <DataAnnotationsValidator />
-    <ValidationSummary class="admin__erreurs" />
+@* Le formulaire n'existe qu'une fois le statut lu : le premier rendu a lieu pendant la lecture en base. *@
+@if (Formulaire is not null)
+{
+    <EditForm Model="Formulaire" FormName="maintenant" OnValidSubmit="EnregistrerAsync" class="admin__formulaire">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="admin__erreurs" />
 
-    <div class="champ">
-        <label for="accroche">Accroche</label>
-        <InputTextArea id="accroche" @bind-Value="Formulaire!.Accroche" rows="2" maxlength="@StatutDuMoment.LongueurMaxAccroche" />
-        <span class="champ__aide">La grande phrase de l'accueil. @StatutDuMoment.LongueurMaxAccroche caractères au plus.</span>
-    </div>
+        <div class="champ">
+            <label for="accroche">Accroche</label>
+            <InputTextArea id="accroche" @bind-Value="Formulaire!.Accroche" rows="2" maxlength="@StatutDuMoment.LongueurMaxAccroche" />
+            <span class="champ__aide">La grande phrase de l'accueil. @StatutDuMoment.LongueurMaxAccroche caractères au plus.</span>
+        </div>
 
-    <fieldset class="groupe">
-        <legend>Les lignes sous l'accroche</legend>
-        <p class="champ__aide">Jusqu'à trois. Une ligne laissée vide n'est pas affichée.</p>
-        @for (var i = 0; i < Formulaire!.Lignes.Length; i++)
-        {
-            var index = i;
+        <fieldset class="groupe">
+            <legend>Les lignes sous l'accroche</legend>
+            <p class="champ__aide">Jusqu'à trois. Une ligne laissée vide n'est pas affichée.</p>
+            @for (var i = 0; i < Formulaire!.Lignes.Length; i++)
+            {
+                var index = i;
+                <div class="ligne-admin">
+                    <div class="champ">
+                        <label for="ligne-@index">Ligne @(index + 1)</label>
+                        <InputText id="@($"ligne-{index}")" @bind-Value="Formulaire.Lignes[index].Texte" maxlength="@StatutDuMoment.LongueurMaxLigne" />
+                    </div>
+                    <div class="champ champ--court">
+                        <label for="rubrique-@index">Mène vers</label>
+                        <InputSelect id="@($"rubrique-{index}")" @bind-Value="Formulaire.Lignes[index].Rubrique">
+                            @foreach (var rubrique in Enum.GetValues<Rubrique>())
+                            {
+                                <option value="@rubrique">@NomDe(rubrique)</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            }
+        </fieldset>
+
+        <fieldset class="groupe">
+            <legend>Prochain objectif</legend>
             <div class="ligne-admin">
                 <div class="champ">
-                    <label for="ligne-@index">Ligne @(index + 1)</label>
-                    <InputText id="@($"ligne-{index}")" @bind-Value="Formulaire.Lignes[index].Texte" maxlength="@StatutDuMoment.LongueurMaxLigne" />
+                    <label for="objectif">Objectif</label>
+                    <InputText id="objectif" @bind-Value="Formulaire.LibelleObjectif" maxlength="@Objectif.LongueurMaxLibelle" />
+                    <span class="champ__aide">Affiché en or. Laisser vide pour ne pas en afficher.</span>
                 </div>
                 <div class="champ champ--court">
-                    <label for="rubrique-@index">Mène vers</label>
-                    <InputSelect id="@($"rubrique-{index}")" @bind-Value="Formulaire.Lignes[index].Rubrique">
-                        @foreach (var rubrique in Enum.GetValues<Rubrique>())
-                        {
-                            <option value="@rubrique">@NomDe(rubrique)</option>
-                        }
-                    </InputSelect>
+                    <label for="date-objectif">Date</label>
+                    <InputDate id="date-objectif" @bind-Value="Formulaire.DateObjectif" />
+                    <span class="champ__aide">Vide : « Date à confirmer ».</span>
                 </div>
             </div>
-        }
-    </fieldset>
+        </fieldset>
 
-    <fieldset class="groupe">
-        <legend>Prochain objectif</legend>
-        <div class="ligne-admin">
-            <div class="champ">
-                <label for="objectif">Objectif</label>
-                <InputText id="objectif" @bind-Value="Formulaire.LibelleObjectif" maxlength="@Objectif.LongueurMaxLibelle" />
-                <span class="champ__aide">Affiché en or. Laisser vide pour ne pas en afficher.</span>
-            </div>
-            <div class="champ champ--court">
-                <label for="date-objectif">Date</label>
-                <InputDate id="date-objectif" @bind-Value="Formulaire.DateObjectif" />
-                <span class="champ__aide">Vide : « Date à confirmer ».</span>
-            </div>
+        <div class="actions">
+            <button type="submit" class="bouton-objectif">Enregistrer</button>
+            <a class="vers" href="/">Voir l'accueil</a>
         </div>
-    </fieldset>
-
-    <div class="actions">
-        <button type="submit" class="bouton-objectif">Enregistrer</button>
-        <a class="vers" href="/">Voir l'accueil</a>
-    </div>
-</EditForm>
+    </EditForm>
+}
 
 @code {
     [SupplyParameterFromForm]
