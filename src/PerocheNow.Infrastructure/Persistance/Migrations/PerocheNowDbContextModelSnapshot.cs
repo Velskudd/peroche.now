@@ -17,7 +17,7 @@ namespace PerocheNow.Infrastructure.Persistance.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -76,6 +76,32 @@ namespace PerocheNow.Infrastructure.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StatutDuMoment", (string)null);
+                });
+
+            modelBuilder.Entity("PerocheNow.Domain.Plateformes.AccesInstagram", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Compte")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("ExpireLe")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Jeton")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("ObtenuLe")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccesInstagram", (string)null);
                 });
 
             modelBuilder.Entity("PerocheNow.Domain.Maintenant.StatutDuMoment", b =>
