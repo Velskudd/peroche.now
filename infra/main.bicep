@@ -17,9 +17,11 @@ param adminSql string = 'perochenow'
 @description('Mot de passe administrateur du serveur SQL.')
 param motDePasseSql string
 
-@description('Délai avant mise en pause de la base, en minutes. 15 (le minimum) : chaque réveil consomme quatre fois moins de quota gratuit qu\'avec 60.')
+// Avec l'offre gratuite en mode « pause si quota épuisé », Azure n'accepte que la valeur par défaut (60) :
+// « Only default value for auto pause delay is allowed for Free Limit database with auto pause exhaustion behavior ».
+@description('Délai avant mise en pause de la base, en minutes. Imposé à 60 par l\'offre gratuite.')
 @minValue(15)
-param delaiPauseMinutes int = 15
+param delaiPauseMinutes int = 60
 
 @description('Utilisateur GitHub pour tirer une image privée de GHCR. Vide si le paquet est public.')
 param utilisateurGhcr string = ''
