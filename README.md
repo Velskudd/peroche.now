@@ -38,6 +38,7 @@ La base serverless se réveille à chaque connexion et chaque réveil consomme l
 - Au démarrage, les migrations ne sont appliquées que si la copie `etat-de-la-base.json` ne connaît pas encore la dernière migration du site : la base n'est réveillée qu'au premier démarrage d'une nouvelle version.
 - Le versionnage Blob garde chaque copie remplacée : l'historique de « En ce moment » se consulte et se restaure depuis le portail (compte de stockage › conteneur `copies` › le fichier › *Versions*).
 - Sans section `Copies` dans la configuration (en local), il n'y a pas de copie et le site lit la base directement.
+- Prérequis, une seule fois par abonnement : le fournisseur `Microsoft.Storage` doit être inscrit (portail : Abonnement › Fournisseurs de ressources › Microsoft.Storage › Inscrire, ou `az provider register --namespace Microsoft.Storage`). Sinon le workflow Infrastructure échoue avec `MissingSubscriptionRegistration`.
 
 Ajouter un cas d'usage : un `record` qui implémente `ICommande<T>` ou `IConsultation<T>` et une classe `IGestionnaire<,>` dans `PerocheNow.Business`. L'enregistrement est automatique.
 
