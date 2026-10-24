@@ -21,6 +21,7 @@ public static class EnregistrementBusiness
         services.AddScoped(typeof(IComportement<,>), typeof(ComportementAudit<,>));
 
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<ActionsApresEnregistrement>();
         return services;
     }
 

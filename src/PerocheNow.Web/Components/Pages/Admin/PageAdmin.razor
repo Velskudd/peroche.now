@@ -2,6 +2,7 @@
 @layout LayoutAdmin
 @attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
 @using Microsoft.AspNetCore.Authorization
+@using PerocheNow.Business.Audit
 @using PerocheNow.Business.Mediateur
 @using PerocheNow.Domain.Commun
 @using PerocheNow.Domain.Maintenant
@@ -9,6 +10,7 @@
 @inject IMediateur Mediateur
 @inject LecteurDuMoment Lecteur
 @inject NavigationManager Navigation
+@inject ILogger<PageAdmin> Journal
 
 <PageTitle>Administration | peroche.now</PageTitle>
 <HeadContent>
@@ -108,9 +110,17 @@
     protected override async Task OnInitializedAsync()
     {
         // En lecture, on part de la base ; à l'envoi, le formulaire arrive déjà rempli.
-        var statut = await Mediateur.EnvoyerAsync(new ObtenirStatutDuMoment());
-        misAJourLe = statut?.MisAJourLe;
-        Formulaire ??= FormulaireMaintenant.Depuis(statut);
+        try
+        {
+            var statut = await Mediateur.EnvoyerAsync(new ObtenirStatutDuMoment());
+            misAJourLe = statut?.MisAJourLe;
+            Formulaire ??= FormulaireMaintenant.Depuis(statut);
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Base injoignable depuis l'administration.");
+            erreur = MessagesAdmin.BaseInjoignable;
+        }
     }
 
     private async Task EnregistrerAsync()
@@ -122,6 +132,18 @@
         catch (RegleMetierException regle)
         {
             erreur = regle.Message;
+            return;
+        }
+        catch (PublicationIncompleteException incomplete)
+        {
+            Journal.LogWarning(incomplete, "Statut enregistré, copie de lecture non mise à jour.");
+            erreur = MessagesAdmin.CopieNonMiseAJour;
+            return;
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Enregistrement du statut impossible.");
+            erreur = MessagesAdmin.BaseInjoignable;
             return;
         }
 

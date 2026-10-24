@@ -3,6 +3,7 @@
 @attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Caching.Memory
+@using PerocheNow.Business.Audit
 @using PerocheNow.Business.Contenus.Instagram
 @using PerocheNow.Business.Mediateur
 @using PerocheNow.Domain.Commun
@@ -11,6 +12,7 @@
 @inject IMediateur Mediateur
 @inject IMemoryCache Cache
 @inject NavigationManager Navigation
+@inject ILogger<PageAdminInstagram> Journal
 
 <PageTitle>Instagram | Administration | peroche.now</PageTitle>
 <HeadContent>
@@ -34,25 +36,28 @@
     <p class="admin__erreur" role="alert">@erreur</p>
 }
 
-<div class="groupe admin__etat">
-    @if (etat is null)
-    {
-        <p>Aucun compte Instagram branché pour l'instant.</p>
-    }
-    else
-    {
-        <p>Compte branché : <strong>@etat.Compte</strong>.</p>
-        <p class="champ__aide">
-            Jeton obtenu le @Quand(etat.ObtenuLe), valable jusqu'au @Quand(etat.ExpireLe).
-            @if (etat.EstExpire)
-            {
-                <strong> Il a expiré : colle un nouveau jeton.</strong>
-            }
-        </p>
-    }
-</div>
+@if (!baseInjoignable)
+{
+    <div class="groupe admin__etat">
+        @if (etat is null)
+        {
+            <p>Aucun compte Instagram branché pour l'instant.</p>
+        }
+        else
+        {
+            <p>Compte branché : <strong>@etat.Compte</strong>.</p>
+            <p class="champ__aide">
+                Jeton obtenu le @Quand(etat.ObtenuLe), valable jusqu'au @Quand(etat.ExpireLe).
+                @if (etat.EstExpire)
+                {
+                    <strong> Il a expiré : colle un nouveau jeton.</strong>
+                }
+            </p>
+        }
+    </div>
+}
 
-@if (Formulaire is not null)
+@if (Formulaire is not null && !baseInjoignable)
 {
     <EditForm Model="Formulaire" FormName="instagram" OnValidSubmit="BrancherAsync" class="admin__formulaire">
         <DataAnnotationsValidator />
@@ -88,11 +93,21 @@
 
     private EtatInstagram? etat;
     private string? erreur;
+    private bool baseInjoignable;
 
     protected override async Task OnInitializedAsync()
     {
         Formulaire ??= new FormulaireInstagram();
-        etat = await Mediateur.EnvoyerAsync(new ObtenirEtatInstagram());
+        try
+        {
+            etat = await Mediateur.EnvoyerAsync(new ObtenirEtatInstagram());
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Base injoignable depuis l'administration Instagram.");
+            baseInjoignable = true;
+            erreur = MessagesAdmin.BaseInjoignable;
+        }
     }
 
     private async Task BrancherAsync()
@@ -104,6 +119,18 @@
         catch (RegleMetierException regle)
         {
             erreur = regle.Message;
+            return;
+        }
+        catch (PublicationIncompleteException incomplete)
+        {
+            Journal.LogWarning(incomplete, "Accès Instagram enregistré, copie de lecture non mise à jour.");
+            erreur = MessagesAdmin.CopieNonMiseAJour;
+            return;
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Branchement du compte Instagram impossible.");
+            erreur = MessagesAdmin.BranchementImpossible;
             return;
         }
 

@@ -76,6 +76,20 @@ public interface IApiInstagram
     Task<IReadOnlyList<Contenu>> ObtenirPublicationsAsync(string jeton, CancellationToken annulation);
 }
 
+/// <summary>
+/// Copies de lecture : de petits documents tirés de la base et relus à sa place par les pages publiques.
+/// La base (serverless, offre gratuite) reste ainsi en pause tant que personne ne passe par l'administration.
+/// La base reste la référence : une copie se réécrit après chaque enregistrement, et se reconstruit si elle manque.
+/// </summary>
+public interface ICopiesDeLecture
+{
+    /// <summary>La copie, ou <c>null</c> si elle n'a encore jamais été publiée.</summary>
+    Task<T?> LireAsync<T>(string nom, CancellationToken annulation) where T : class;
+
+    /// <summary>Remplace la copie (l'ancienne version reste conservée par le stockage).</summary>
+    Task PublierAsync<T>(string nom, T copie, CancellationToken annulation) where T : class;
+}
+
 /// <summary>Un jeton délivré par Instagram et sa durée de validité.</summary>
 public sealed record JetonInstagram(string Valeur, TimeSpan Validite)
 {

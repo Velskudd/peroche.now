@@ -2,7 +2,7 @@
 
 Le site d'Alexandre Peroche : ce qu'il fait en ce moment, et les projets qui le composent, à commencer par NUR24.
 
-Blazor (.NET 10, rendu statique côté serveur), architecture en oignon, EF Core, hébergé sur Azure Container Apps avec une base Azure SQL gratuite.
+Blazor (.NET 10, rendu statique côté serveur), architecture en oignon, EF Core, hébergé sur Azure Container Apps avec une base Azure SQL gratuite et des copies de lecture dans Azure Blob.
 
 ## Architecture
 
@@ -10,7 +10,7 @@ Blazor (.NET 10, rendu statique côté serveur), architecture en oignon, EF Core
 src/
   PerocheNow.Domain          Le cœur : entités et règles métier, sans aucune dépendance.
   PerocheNow.Business        Cas d'usage, médiateur maison, ports (interfaces), audit. Dépend du Domain.
-  PerocheNow.Infrastructure  Adaptateurs : EF Core (SQL Server / SQLite), horloge, utilisateur courant.
+  PerocheNow.Infrastructure  Adaptateurs : EF Core (SQL Server / SQLite), copies Azure Blob, Twitch, YouTube, Instagram, horloge.
   PerocheNow.Web             Blazor : pages, composants, démarrage. Assemble les couches.
 tests/
   PerocheNow.Domain.Tests          Règles métier.
@@ -24,10 +24,20 @@ Les dépendances vont toujours vers le centre : l'Infrastructure implémente les
 
 Une requête est soit une **consultation** (`IConsultation<T>`, lecture), soit une **commande** (`ICommande<T>`, écriture). Le médiateur trouve son gestionnaire (`IGestionnaire<TRequete, TReponse>`) et l'enveloppe dans les **comportements** enregistrés, du plus extérieur au plus intérieur :
 
-1. `ComportementUniteDeTravail` enregistre tout en une fois après une commande réussie.
+1. `ComportementUniteDeTravail` enregistre tout en une fois après une commande réussie, puis lance les `ActionsApresEnregistrement` prévues par le gestionnaire.
 2. `ComportementAudit` ajoute une trace (`TraceAudit`) pour chaque commande réussie.
 
 Les gestionnaires n'appellent donc jamais `SaveChanges` : si une règle métier échoue, rien n'est écrit, ni la modification ni la trace.
+
+### Les copies de lecture
+
+La base serverless se réveille à chaque connexion et chaque réveil consomme le quota gratuit (au moins une heure de calcul). Les pages publiques ne la lisent donc pas : elles lisent des **copies de lecture**, de petits documents JSON rangés dans un conteneur Azure Blob privé (`ICopiesDeLecture`).
+
+- La base reste la référence. Une commande qui la modifie (« En ce moment », accès Instagram) réécrit la copie **après** l'enregistrement : une copie ne montre jamais ce que la base n'a pas gardé.
+- Une copie absente est reconstruite une fois depuis la base (premier démarrage).
+- Au démarrage, les migrations ne sont appliquées que si la copie `etat-de-la-base.json` ne connaît pas encore la dernière migration du site : la base n'est réveillée qu'au premier démarrage d'une nouvelle version.
+- Le versionnage Blob garde chaque copie remplacée : l'historique de « En ce moment » se consulte et se restaure depuis le portail (compte de stockage › conteneur `copies` › le fichier › *Versions*).
+- Sans section `Copies` dans la configuration (en local), il n'y a pas de copie et le site lit la base directement.
 
 Ajouter un cas d'usage : un `record` qui implémente `ICommande<T>` ou `IConsultation<T>` et une classe `IGestionnaire<,>` dans `PerocheNow.Business`. L'enregistrement est automatique.
 
@@ -191,12 +201,13 @@ Le job **Analyse SonarCloud** du workflow CI/CD envoie en plus l'analyse et la c
 ## Coûts et limites gratuites
 
 - **Container Apps** (consommation) : le site s'arrête sans visiteur. Chaque mois, les 180 000 premières vCPU-secondes, 360 000 Gio-secondes et 2 millions de requêtes sont gratuites ([tarifs](https://azure.microsoft.com/pricing/details/container-apps/)). Le premier visiteur après une pause attend le démarrage.
-- **Azure SQL Database, offre gratuite** : 100 000 vCore-secondes et 32 Go par base et par mois ([documentation](https://learn.microsoft.com/azure/azure-sql/database/free-offer)). La base se met en pause après `delaiPauseMinutes` d'inactivité (60 par défaut, 15 au minimum). Si le quota du mois est épuisé, elle reste en pause jusqu'au mois suivant : aucune facture, et l'accueil affiche alors le statut de secours (`StatutInitial`).
+- **Azure SQL Database, offre gratuite** : 100 000 vCore-secondes et 32 Go par base et par mois ([documentation](https://learn.microsoft.com/azure/azure-sql/database/free-offer)). La base se met en pause après 60 minutes d'inactivité (seule valeur acceptée par l'offre gratuite). Si le quota du mois est épuisé, elle reste en pause jusqu'au mois suivant : aucune facture, l'accueil continue d'afficher sa copie de lecture et l'administration l'indique.
+- **Stockage Azure Blob** (copies de lecture, LRS, niveau chaud) : quelques Ko et quelques milliers de lectures par mois, soit moins d'un centime ([tarifs](https://azure.microsoft.com/pricing/details/storage/blobs/)).
 - Surveiller la métrique *Free amount remaining* de la base dans le portail Azure.
 
 ## Migrations
 
-Le schéma de la base est géré par les migrations EF Core (`src/PerocheNow.Infrastructure/Persistance/Migrations`), appliquées au démarrage sur SQL Server. En local, SQLite crée le schéma directement à partir du modèle.
+Le schéma de la base est géré par les migrations EF Core (`src/PerocheNow.Infrastructure/Persistance/Migrations`), appliquées au premier démarrage de chaque nouvelle version sur SQL Server (voir *Les copies de lecture*). En local, SQLite crée le schéma directement à partir du modèle.
 
 Après une modification du modèle (entité, configuration), générer la migration :
 

@@ -1,4 +1,5 @@
-// Infrastructure de peroche.now : Azure Container Apps (consommation, mise à zéro) + Azure SQL Database (offre gratuite).
+// Infrastructure de peroche.now : Azure Container Apps (consommation, mise à zéro) + Azure SQL Database (offre gratuite)
+// + un compte de stockage pour les copies de lecture (ce que les pages publiques lisent à la place de la base).
 // Déployée par le workflow « Infrastructure » (.github/workflows/infrastructure.yml).
 
 @description('Région Azure. France Central par défaut.')
@@ -104,6 +105,44 @@ resource base 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
 
 var chaineDeConnexion = 'Server=tcp:${serveurSql.properties.fullyQualifiedDomainName},1433;Initial Catalog=${nomBase};User ID=${adminSql};Password=${motDePasseSql};Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;'
 
+// ---------- Copies de lecture ----------
+// Petits documents JSON tirés de la base, relus par les pages publiques : la base serverless reste en pause
+// (et son quota gratuit intact) tant que personne ne passe par l'administration. Coût : moins d'un centime par mois.
+
+resource stockage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+  name: take('perochenow${suffixe}', 24)
+  location: emplacement
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    accessTier: 'Hot'
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: false
+    // Le site signe ses requêtes avec la clé du compte (la CI n'a pas le droit d'attribuer des rôles).
+    allowSharedKeyAccess: true
+  }
+}
+
+resource servicesBlob 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: stockage
+  name: 'default'
+  properties: {
+    // Chaque copie remplacée est gardée : l'historique de « En ce moment », restaurable depuis le portail.
+    isVersioningEnabled: true
+  }
+}
+
+resource conteneurCopies 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: servicesBlob
+  name: 'copies'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
 // ---------- Hébergement ----------
 
 resource environnement 'Microsoft.App/managedEnvironments@2024-03-01' = {
@@ -147,6 +186,10 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           {
             name: 'chaine-sql'
             value: chaineDeConnexion
+          }
+          {
+            name: 'cle-stockage'
+            value: stockage.listKeys().keys[0].value
           }
         ],
         registrePrive
@@ -202,6 +245,18 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
               {
                 name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED'
                 value: 'true'
+              }
+              {
+                name: 'Copies__AdresseConteneur'
+                value: '${stockage.properties.primaryEndpoints.blob}${conteneurCopies.name}'
+              }
+              {
+                name: 'Copies__Compte'
+                value: stockage.name
+              }
+              {
+                name: 'Copies__Cle'
+                secretRef: 'cle-stockage'
               }
             ],
             avecTwitch
@@ -274,3 +329,4 @@ output adresseParDefaut string = 'https://${app.properties.configuration.ingress
 output ipStatique string = environnement.properties.staticIp
 output idVerificationDomaine string = app.properties.customDomainVerificationId
 output nomEnvironnement string = environnement.name
+output compteDeStockage string = stockage.name

@@ -1,3 +1,5 @@
+using PerocheNow.Business.Audit;
+using PerocheNow.Business.CopiesDeLecture;
 using PerocheNow.Business.Mediateur;
 using PerocheNow.Business.Ports;
 using PerocheNow.Domain.Commun;
@@ -18,7 +20,9 @@ public sealed record ConnecterInstagram(string Jeton) : ICommande<Guid>
 public sealed class ConnecterInstagramGestionnaire(
     IAccesInstagramRepository acces,
     IApiInstagram instagram,
-    IHorloge horloge) : IGestionnaire<ConnecterInstagram, Guid>
+    IHorloge horloge,
+    ICopiesDeLecture copies,
+    ActionsApresEnregistrement apresEnregistrement) : IGestionnaire<ConnecterInstagram, Guid>
 {
     public async Task<Guid> TraiterAsync(ConnecterInstagram requete, CancellationToken annulation)
     {
@@ -44,6 +48,7 @@ public sealed class ConnecterInstagramGestionnaire(
             existant.Remplacer(jeton, compte, expireLe, maintenant);
         }
 
+        CopieAccesInstagram.PublierApresEnregistrement(existant, copies, apresEnregistrement);
         return existant.Id;
     }
 }
@@ -57,7 +62,9 @@ public sealed record RenouvelerAccesInstagram : ICommande<Guid?>;
 public sealed class RenouvelerAccesInstagramGestionnaire(
     IAccesInstagramRepository acces,
     IApiInstagram instagram,
-    IHorloge horloge) : IGestionnaire<RenouvelerAccesInstagram, Guid?>
+    IHorloge horloge,
+    ICopiesDeLecture copies,
+    ActionsApresEnregistrement apresEnregistrement) : IGestionnaire<RenouvelerAccesInstagram, Guid?>
 {
     public async Task<Guid?> TraiterAsync(RenouvelerAccesInstagram requete, CancellationToken annulation)
     {
@@ -68,11 +75,13 @@ public sealed class RenouvelerAccesInstagramGestionnaire(
         var nouveau = await instagram.RenouvelerAsync(existant.Jeton, annulation);
         var maintenant = horloge.Instant;
         existant.Renouveler(nouveau.Valeur, maintenant + nouveau.Validite, maintenant);
+
+        CopieAccesInstagram.PublierApresEnregistrement(existant, copies, apresEnregistrement);
         return existant.Id;
     }
 }
 
-/// <summary>Où en est l'accès Instagram, pour l'administration et le renouvellement automatique.</summary>
+/// <summary>Où en est l'accès Instagram, lu dans la base : pour l'administration.</summary>
 public sealed record ObtenirEtatInstagram : IConsultation<EtatInstagram?>;
 
 public sealed record EtatInstagram(
@@ -99,4 +108,54 @@ public sealed class ObtenirEtatInstagramGestionnaire(IAccesInstagramRepository a
             existant.EstExpire(maintenant),
             existant.DoitEtreRenouvele(maintenant));
     }
+}
+
+/// <summary>
+/// L'accès Instagram lu dans sa copie : de quoi lire les publications et savoir s'il faut renouveler le jeton,
+/// sans réveiller la base. Si la copie n'existe pas encore, elle est reconstruite une fois depuis la base,
+/// y compris quand aucun compte n'est branché (pour ne pas reposer la question à chaque lecture).
+/// </summary>
+public sealed record ObtenirAccesInstagramPublie : IConsultation<CopieAccesInstagram?>;
+
+public sealed class ObtenirAccesInstagramPublieGestionnaire(ICopiesDeLecture copies, IAccesInstagramRepository acces)
+    : IGestionnaire<ObtenirAccesInstagramPublie, CopieAccesInstagram?>
+{
+    public async Task<CopieAccesInstagram?> TraiterAsync(ObtenirAccesInstagramPublie requete, CancellationToken annulation)
+    {
+        var publie = await copies.LireAsync<AccesInstagramPublie>(NomsDesCopies.AccesInstagram, annulation);
+        if (publie is not null)
+            return publie.Acces;
+
+        var existant = await acces.ObtenirAsync(annulation);
+        var copie = existant is null ? null : CopieAccesInstagram.Depuis(existant);
+        await copies.PublierAsync(NomsDesCopies.AccesInstagram, new AccesInstagramPublie(copie), annulation);
+        return copie;
+    }
+}
+
+/// <summary>Ce que contient la copie de l'accès Instagram. <see cref="Acces"/> vaut <c>null</c> sans compte branché.</summary>
+public sealed record AccesInstagramPublie(CopieAccesInstagram? Acces);
+
+/// <summary>L'accès Instagram tel que copié hors de la base.</summary>
+public sealed record CopieAccesInstagram(string Jeton, string Compte, DateTimeOffset ObtenuLe, DateTimeOffset ExpireLe)
+{
+    public bool EstExpire(DateTimeOffset maintenant) => AccesInstagram.Expire(ExpireLe, maintenant);
+
+    public bool DoitEtreRenouvele(DateTimeOffset maintenant) => AccesInstagram.ARenouveler(ObtenuLe, ExpireLe, maintenant);
+
+    public static CopieAccesInstagram Depuis(AccesInstagram acces) =>
+        new(acces.Jeton, acces.Compte, acces.ObtenuLe, acces.ExpireLe);
+
+    /// <summary>Réécrit la copie une fois l'accès enregistré en base.</summary>
+    internal static void PublierApresEnregistrement(
+        AccesInstagram acces,
+        ICopiesDeLecture copies,
+        ActionsApresEnregistrement apresEnregistrement)
+    {
+        var copie = new AccesInstagramPublie(Depuis(acces));
+        apresEnregistrement.Ajouter(annulation => copies.PublierAsync(NomsDesCopies.AccesInstagram, copie, annulation));
+    }
+
+    /// <summary>Jamais le jeton dans un journal.</summary>
+    public override string ToString() => $"Accès Instagram de {Compte}, valable jusqu'au {ExpireLe:yyyy-MM-dd}";
 }

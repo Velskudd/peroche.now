@@ -6,10 +6,10 @@ using PerocheNow.Business.Ports;
 namespace PerocheNow.Web.Maintenant;
 
 /// <summary>
-/// Lit le statut du moment pour l'accueil.
+/// Lit le statut du moment pour l'accueil, dans sa copie de lecture : la base reste en pause.
 /// <list type="bullet">
-/// <item>Le résultat est gardé quelques minutes en mémoire : la base serverless peut rester en pause.</item>
-/// <item>Si la base met trop longtemps à se réveiller ou ne répond pas, l'accueil affiche le statut de secours
+/// <item>Le résultat est gardé quelques minutes en mémoire, pour ne pas relire la copie à chaque page.</item>
+/// <item>Si la copie manque et que la base met trop longtemps à se réveiller ou ne répond pas, l'accueil affiche le statut de secours
 /// au lieu d'une erreur. Le secours n'est pas mis en cache, pour retenter la base à la visite suivante.</item>
 /// </list>
 /// </summary>
@@ -43,7 +43,7 @@ public sealed class LecteurDuMoment(
 
         try
         {
-            var statut = await mediateur.EnvoyerAsync(new ObtenirStatutDuMoment(), delai.Token);
+            var statut = await mediateur.EnvoyerAsync(new ObtenirStatutPublie(), delai.Token);
             if (statut is null)
                 return StatutInitial.CommeStatutDeSecours(horloge.Instant);
 

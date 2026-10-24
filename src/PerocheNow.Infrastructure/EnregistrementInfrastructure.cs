@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PerocheNow.Business.Ports;
 using PerocheNow.Infrastructure.Contenus;
+using PerocheNow.Infrastructure.Copies;
 using PerocheNow.Infrastructure.Persistance;
 using PerocheNow.Infrastructure.Systeme;
 using PerocheNow.Infrastructure.Twitch;
@@ -12,7 +13,8 @@ namespace PerocheNow.Infrastructure;
 public static class EnregistrementInfrastructure
 {
     /// <summary>
-    /// Branche les adaptateurs : base de données, repositories, horloge, utilisateur courant, direct Twitch et contenus.
+    /// Branche les adaptateurs : base de données, repositories, horloge, utilisateur courant, copies de lecture,
+    /// direct Twitch et contenus.
     /// <para>
     /// Configuration attendue : <c>ConnectionStrings:PerocheNow</c> et <c>BaseDeDonnees:Fournisseur</c>
     /// (<c>SqlServer</c> par défaut, <c>Sqlite</c> pour travailler en local sans serveur).
@@ -38,6 +40,7 @@ public static class EnregistrementInfrastructure
         services.AddScoped<IAccesInstagramRepository, AccesInstagramRepository>();
         services.AddSingleton<IHorloge, HorlogeSysteme>();
         services.AddSingleton<IUtilisateurCourant, UtilisateurSysteme>();
+        services.AjouterCopiesDeLecture(configuration);
         services.AjouterDirectTwitch(configuration);
         services.AjouterContenus(configuration);
 

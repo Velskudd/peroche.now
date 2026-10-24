@@ -67,8 +67,14 @@ public sealed class AccesInstagram : Entite
         ExpireLe = expireLe;
     }
 
-    public bool EstExpire(DateTimeOffset maintenant) => maintenant >= ExpireLe;
+    public bool EstExpire(DateTimeOffset maintenant) => Expire(ExpireLe, maintenant);
 
-    public bool DoitEtreRenouvele(DateTimeOffset maintenant) =>
-        !EstExpire(maintenant) && maintenant - ObtenuLe >= AgeDeRenouvellement;
+    public bool DoitEtreRenouvele(DateTimeOffset maintenant) => ARenouveler(ObtenuLe, ExpireLe, maintenant);
+
+    /// <summary>La règle d'expiration, utilisable sans l'entité (sur une copie de lecture, par exemple).</summary>
+    public static bool Expire(DateTimeOffset expireLe, DateTimeOffset maintenant) => maintenant >= expireLe;
+
+    /// <summary>La règle de renouvellement, utilisable sans l'entité (sur une copie de lecture, par exemple).</summary>
+    public static bool ARenouveler(DateTimeOffset obtenuLe, DateTimeOffset expireLe, DateTimeOffset maintenant) =>
+        !Expire(expireLe, maintenant) && maintenant - obtenuLe >= AgeDeRenouvellement;
 }

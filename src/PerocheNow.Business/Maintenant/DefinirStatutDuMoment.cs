@@ -1,3 +1,5 @@
+using PerocheNow.Business.Audit;
+using PerocheNow.Business.CopiesDeLecture;
 using PerocheNow.Business.Mediateur;
 using PerocheNow.Business.Ports;
 using PerocheNow.Domain.Maintenant;
@@ -19,7 +21,9 @@ public sealed record LigneSaisie(string Texte, Rubrique Rubrique = Rubrique.Aucu
 
 public sealed class DefinirStatutDuMomentGestionnaire(
     IStatutDuMomentRepository statuts,
-    IHorloge horloge) : IGestionnaire<DefinirStatutDuMoment, Guid>
+    IHorloge horloge,
+    ICopiesDeLecture copies,
+    ActionsApresEnregistrement apresEnregistrement) : IGestionnaire<DefinirStatutDuMoment, Guid>
 {
     public async Task<Guid> TraiterAsync(DefinirStatutDuMoment requete, CancellationToken annulation)
     {
@@ -42,6 +46,10 @@ public sealed class DefinirStatutDuMomentGestionnaire(
             instant);
 
         // L'enregistrement est fait par le pipeline (ComportementUniteDeTravail), avec la trace d'audit.
+        // La copie lue par les pages publiques n'est réécrite qu'ensuite, si la base a bien tout gardé.
+        var copie = StatutDuMomentDto.Depuis(statut);
+        apresEnregistrement.Ajouter(annulationApres => copies.PublierAsync(NomsDesCopies.StatutDuMoment, copie, annulationApres));
+
         return statut.Id;
     }
 }
