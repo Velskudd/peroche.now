@@ -12,7 +12,7 @@ public sealed class CopiesDeLectureBlobTests
 {
     private const string Compte = "perochetest";
     private static readonly byte[] Cle = Encoding.UTF8.GetBytes("cle-de-test-peroche");
-    private static readonly DateTimeOffset Instant = new(2026, 10, 24, 16, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset MomentFixe = new(2026, 10, 24, 16, 0, 0, TimeSpan.Zero);
     private static readonly Uri Conteneur = new UriBuilder(Uri.UriSchemeHttps, $"{Compte}.blob.core.windows.test") { Path = "copies" }.Uri;
 
     // Vecteurs calculés à part (HMAC-SHA256 en Python) à partir de la chaîne décrite par la documentation Azure.
@@ -24,7 +24,7 @@ public sealed class CopiesDeLectureBlobTests
     {
         using var requete = new HttpRequestMessage(HttpMethod.Get, new Uri(Conteneur, "?restype=container&comp=list"));
 
-        SignatureCleePartagee.Signer(requete, Compte, Cle, Instant);
+        SignatureCleePartagee.Signer(requete, Compte, Cle, MomentFixe);
 
         Assert.Equal(
             "GET" + new string('\n', 12)
@@ -45,7 +45,7 @@ public sealed class CopiesDeLectureBlobTests
         requete.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" };
         requete.Headers.TryAddWithoutValidation("x-ms-blob-type", "BlockBlob");
 
-        SignatureCleePartagee.Signer(requete, Compte, Cle, Instant);
+        SignatureCleePartagee.Signer(requete, Compte, Cle, MomentFixe);
 
         Assert.Equal($"{Compte}:{SignatureDepot}", requete.Headers.Authorization?.Parameter);
     }
@@ -67,7 +67,7 @@ public sealed class CopiesDeLectureBlobTests
             "Je prépare ma 1re course sur la Nordschleife",
             [new LigneDuMomentDto("Sur iRacing, en NEC.", Rubrique.ProjetEnCours), new LigneDuMomentDto("Deux lives par semaine.", Rubrique.Contenus)],
             new ObjectifDto("RCN 2027", new DateOnly(2027, 9, 1)),
-            Instant);
+            MomentFixe);
 
         await copies.PublierAsync("statut-du-moment.json", statut, CancellationToken.None);
         var relu = await copies.LireAsync<StatutDuMomentDto>("statut-du-moment.json", CancellationToken.None);
@@ -115,7 +115,7 @@ public sealed class CopiesDeLectureBlobTests
     }
 
     private static CopiesDeLectureBlob Copies(FauxStockage stockage) =>
-        new(new FabriqueDeClients(stockage), new ParametresCopies(Conteneur, Compte, Cle), new HorlogeFixe(Instant));
+        new(new FabriqueDeClients(stockage), new ParametresCopies(Conteneur, Compte, Cle), new HorlogeFixe(MomentFixe));
 
     private sealed record RequeteRecue(HttpMethod Methode, string Chemin, IReadOnlyDictionary<string, string> EnTetes);
 
