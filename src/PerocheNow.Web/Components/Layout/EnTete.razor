@@ -11,11 +11,11 @@
         {
             @if (PlanDuSite.EstCourante(destination, cheminCourant))
             {
-                <a href="@destination.Adresse" aria-current="page">@destination.Libelle</a>
+                <a href="@destination.Adresse" aria-current="page">@Textes[destination.Libelle]</a>
             }
             else
             {
-                <a href="@destination.Adresse">@destination.Libelle</a>
+                <a href="@destination.Adresse">@Textes[destination.Libelle]</a>
             }
         }
     </nav>

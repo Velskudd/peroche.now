@@ -1,9 +1,10 @@
 using PerocheNow.Domain.Maintenant;
+using PerocheNow.Web.Textes;
 
 namespace PerocheNow.Web.Navigation;
 
-/// <summary>Une entrée de navigation : son libellé et son adresse.</summary>
-public sealed record Destination(string Libelle, string Adresse);
+/// <summary>Une entrée de navigation : son libellé (modifiable dans l'administration) et son adresse.</summary>
+public sealed record Destination(DefinitionTexte Libelle, string Adresse);
 
 /// <summary>
 /// Les pages du site et la rubrique vers laquelle mène chaque ligne du moment.
@@ -11,17 +12,17 @@ public sealed record Destination(string Libelle, string Adresse);
 /// </summary>
 public static class PlanDuSite
 {
-    public static readonly Destination Maintenant = new("Maintenant", "/");
+    public static readonly Destination Maintenant = new(TextesCommuns.MenuMaintenant, "/");
 
     /// <summary>Le projet course en cours. Quand NUR24 sera terminé, le suivant prendra sa place ici.</summary>
-    public static readonly Destination ProjetEnCours = new("NUR24", "/nur24");
+    public static readonly Destination ProjetEnCours = new(TextesCommuns.MenuProjet, "/nur24");
 
-    public static readonly Destination Contenus = new("Contenus", "/contenus");
-    public static readonly Destination HorsPiste = new("À côté de la piste", "/contenus");
-    public static readonly Destination Partenaires = new("Partenaires", "/partenaires");
+    public static readonly Destination Contenus = new(TextesCommuns.MenuContenus, "/contenus");
+    public static readonly Destination HorsPiste = new(TextesCommuns.MenuHorsPiste, "/contenus");
+    public static readonly Destination Partenaires = new(TextesCommuns.MenuPartenaires, "/partenaires");
 
     /// <summary>La page de liens à mettre en bio des réseaux. Hors menu : elle a sa propre mise en page.</summary>
-    public static readonly Destination Liens = new("Liens", "/liens");
+    public const string AdresseLiens = "/liens";
 
     // Tableau nommé : Split('?', '#') appellerait Split(char, int count), « # » devenant le nombre 35.
     private static readonly char[] FinDuChemin = ['?', '#'];

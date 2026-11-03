@@ -1,15 +1,15 @@
 ﻿@page "/Error"
 @using System.Diagnostics
 
-<PageTitle>Erreur | peroche.now</PageTitle>
+<PageTitle>@Textes[TextesCommuns.ErreurOnglet]</PageTitle>
 
 <section class="page-simple conteneur">
-    <h1>Quelque chose a lâché.</h1>
-    <p>La page n'a pas pu s'afficher. Réessayez dans un instant.</p>
-    <p><a href="/">Revenir à l'accueil</a></p>
+    <h1>@Textes[TextesCommuns.ErreurTitre]</h1>
+    <p>@Textes[TextesCommuns.ErreurTexte]</p>
+    <p><a href="/">@Textes[TextesCommuns.ErreurLien]</a></p>
     @if (!string.IsNullOrEmpty(reference))
     {
-        <p class="reference">Référence de l'incident : <code>@reference</code></p>
+        <p class="reference">@Textes[TextesCommuns.ErreurReference] <code>@reference</code></p>
     }
 </section>
 

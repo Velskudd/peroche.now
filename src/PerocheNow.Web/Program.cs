@@ -11,6 +11,7 @@ using PerocheNow.Web.Demarrage;
 using PerocheNow.Web.Direct;
 using PerocheNow.Web.Maintenant;
 using PerocheNow.Web.Securite;
+using PerocheNow.Web.Textes;
 
 var francais = CultureInfo.GetCultureInfo("fr-FR");
 CultureInfo.DefaultThreadCurrentCulture = francais;
@@ -33,6 +34,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<LecteurDuMoment>();
 builder.Services.AddScoped<LecteurDuDirect>();
 builder.Services.AddScoped<LecteurDeContenus>();
+builder.Services.AddScoped<TextesDuSite>();
 builder.Services.Configure<LiensOptions>(builder.Configuration.GetSection(LiensOptions.Section));
 builder.Services.AddHostedService<InitialisationAuDemarrage>();
 builder.Services.AddHostedService<RenouvellementInstagram>();
@@ -53,6 +55,8 @@ app.UseEnTetesDeSecurite();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+// Les textes modifiés dans l'administration sont chargés avant le rendu de chaque page.
+app.UseTextesDuSite();
 
 app.MapStaticAssets();
 app.MapHealthChecks("/sante");

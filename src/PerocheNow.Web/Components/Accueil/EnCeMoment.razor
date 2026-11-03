@@ -21,8 +21,8 @@
         <h1 id="maintenant-titre" class="ouverture__accroche">@statut.Accroche</h1>
 
         <div class="ouverture__actions">
-            <a class="bouton-objectif" href="@PlanDuSite.ProjetEnCours.Adresse">Suivre le projet NUR24</a>
-            <a class="vers" href="#en-ce-moment">Ce que je fais en ce moment</a>
+            <a class="bouton-objectif" href="@PlanDuSite.ProjetEnCours.Adresse">@Textes[TextesAccueil.Bouton]</a>
+            <a class="vers" href="#en-ce-moment">@Textes[TextesAccueil.LienEnCeMoment]</a>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
         @if (statut.ProchainObjectif is { } objectif)
         {
             <a class="ouverture__objectif" href="@PlanDuSite.ProjetEnCours.Adresse">
-                <span class="objectif__etiquette">Prochain objectif</span>
+                <span class="objectif__etiquette">@Textes[TextesAccueil.EtiquetteObjectif]</span>
                 <span class="objectif__libelle">@objectif.Libelle</span>
                 <span class="objectif__date">@DateObjectif(objectif)</span>
             </a>
@@ -42,7 +42,7 @@
 
 @if (statut.Lignes.Count > 0)
 {
-    <section id="en-ce-moment" class="en-ce-moment conteneur" aria-label="Ce que je fais en ce moment">
+    <section id="en-ce-moment" class="en-ce-moment conteneur" aria-label="@Textes[TextesAccueil.LienEnCeMoment]">
         <ul class="maintenant__lignes">
             @foreach (var ligne in statut.Lignes)
             {
@@ -50,7 +50,7 @@
                     @if (PlanDuSite.Pour(ligne.Rubrique) is { } destination)
                     {
                         <a class="porte" href="@destination.Adresse">
-                            <span class="porte__nom">@destination.Libelle</span>
+                            <span class="porte__nom">@Textes[destination.Libelle]</span>
                             <span>@ligne.Texte</span>
                         </a>
                     }
@@ -65,19 +65,20 @@
 }
 
 @code {
-    private const string Lieu = "en Bretagne";
-    private static readonly string Suite = $" {Lieu}. Voici ce que je fais.";
     private static readonly CultureInfo Francais = CultureInfo.GetCultureInfo("fr-FR");
+
+    private string Lieu => Textes[TextesAccueil.Lieu];
+    private string Suite => $" {Lieu}. {Textes[TextesAccueil.ApresHeure]}";
 
     private StatutDuMomentDto? statut;
 
     private string LigneHeure =>
         HeureDeParis.Formater(Horloge.Instant) is { } heure
             ? heure + Suite
-            : $"En ce moment, {Lieu}. Voici ce que je fais.";
+            : $"En ce moment, {Lieu}. {Textes[TextesAccueil.ApresHeure]}";
 
     protected override async Task OnInitializedAsync() => statut = await Lecteur.LireAsync();
 
-    private static string DateObjectif(ObjectifDto objectif) =>
-        objectif.DateCible is { } date ? date.ToString("d MMMM yyyy", Francais) : "Date à confirmer";
+    private string DateObjectif(ObjectifDto objectif) =>
+        objectif.DateCible is { } date ? date.ToString("d MMMM yyyy", Francais) : Textes[TextesAccueil.DateAConfirmer];
 }

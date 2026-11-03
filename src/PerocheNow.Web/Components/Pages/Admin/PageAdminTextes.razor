@@ -1,0 +1,177 @@
+@page "/admin/textes"
+@layout LayoutAdmin
+@attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
+@using Microsoft.AspNetCore.Authorization
+@using PerocheNow.Business.Audit
+@using PerocheNow.Business.Mediateur
+@using PerocheNow.Business.Textes
+@using PerocheNow.Domain.Commun
+@using PerocheNow.Web.Administration
+@inject IMediateur Mediateur
+@inject NavigationManager Navigation
+@inject ILogger<PageAdminTextes> Journal
+
+<PageTitle>Textes | Administration | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<div class="admin__tete">
+    <h1 class="admin__titre">Textes</h1>
+    <p class="admin__intro">
+        Tous les textes du site, page par page. Chaque champ montre le texte en place :
+        modifie-le puis enregistre. Vider un champ remet le texte d'origine.
+    </p>
+</div>
+
+<nav class="admin-onglets" aria-label="Pages du site">
+    @foreach (var autre in CatalogueDesTextes.Pages)
+    {
+        @if (autre == pageCourante)
+        {
+            <a href="@Adresse(autre)" aria-current="page">@autre.Nom</a>
+        }
+        else
+        {
+            <a href="@Adresse(autre)">@autre.Nom</a>
+        }
+    }
+</nav>
+
+@if (Enregistre == 1 && erreurs.Count == 0)
+{
+    <p class="admin__succes" role="status">Enregistré. <a href="@pageCourante.Adresse">Voir la page</a>.</p>
+}
+@if (erreurs.Count > 0)
+{
+    <ul class="admin__erreurs" role="alert">
+        @foreach (var erreur in erreurs)
+        {
+            <li>@erreur</li>
+        }
+    </ul>
+}
+
+@* Le formulaire n'existe qu'une fois les textes lus : le premier rendu a lieu pendant la lecture en base. *@
+@if (Formulaire is not null)
+{
+    <EditForm Model="Formulaire" FormName="@($"textes-{pageCourante.Code}")" OnSubmit="EnregistrerAsync" class="admin__formulaire">
+        @foreach (var groupe in Sections())
+        {
+            <fieldset class="groupe">
+                <legend>@groupe.Key</legend>
+                @foreach (var (texte, index) in groupe)
+                {
+                    var id = $"texte-{index}";
+                    <div class="champ">
+                        <InputText type="hidden" @bind-Value="Formulaire.Champs[index].Cle" />
+                        <label for="@id">
+                            @texte.Libelle
+                            @if (modifies.ContainsKey(texte.Cle))
+                            {
+                                <span class="champ__modifie">modifié</span>
+                            }
+                        </label>
+                        @if (texte.Saisie == Saisie.Ligne)
+                        {
+                            <InputText id="@id" @bind-Value="Formulaire.Champs[index].Valeur" maxlength="@texte.LongueurMax" />
+                        }
+                        else
+                        {
+                            <InputTextArea id="@id" @bind-Value="Formulaire.Champs[index].Valeur" rows="@Lignes(texte)" maxlength="@texte.LongueurMax" />
+                        }
+                        @if (modifies.ContainsKey(texte.Cle))
+                        {
+                            <p class="champ__aide">Texte d'origine : @texte.ParDefaut.Replace("\n", " · ")</p>
+                        }
+                        else if (texte.Saisie == Saisie.Liste)
+                        {
+                            <p class="champ__aide">Un élément par ligne.</p>
+                        }
+                    </div>
+                }
+            </fieldset>
+        }
+
+        <div class="actions">
+            <button type="submit" class="bouton-objectif">Enregistrer</button>
+            <a class="vers" href="@pageCourante.Adresse">Voir la page</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private FormulaireTextes? Formulaire { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    private string? CodePage { get; set; }
+
+    [SupplyParameterFromQuery(Name = "enregistre")]
+    private int? Enregistre { get; set; }
+
+    private PageDeTextes pageCourante = CatalogueDesTextes.Pages[0];
+    private IReadOnlyDictionary<string, string> modifies = TextesPublies.Aucun.Textes;
+    private List<string> erreurs = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        pageCourante = CatalogueDesTextes.Page(CodePage) ?? CatalogueDesTextes.Pages[0];
+        try
+        {
+            modifies = (await Mediateur.EnvoyerAsync(new ObtenirTextesDuSite())).Textes;
+            // En lecture, on part des textes en place ; à l'envoi, le formulaire arrive déjà rempli.
+            Formulaire ??= FormulaireTextes.Depuis(pageCourante, modifies);
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Base injoignable depuis l'administration des textes.");
+            erreurs = [MessagesAdmin.BaseInjoignable];
+        }
+    }
+
+    private async Task EnregistrerAsync()
+    {
+        erreurs = Formulaire!.Erreurs(pageCourante).ToList();
+        if (erreurs.Count > 0)
+            return;
+
+        try
+        {
+            await Mediateur.EnvoyerAsync(Formulaire.EnCommande(pageCourante));
+        }
+        catch (RegleMetierException regle)
+        {
+            erreurs = [regle.Message];
+            return;
+        }
+        catch (PublicationIncompleteException incomplete)
+        {
+            Journal.LogWarning(incomplete, "Textes enregistrés, copie de lecture non mise à jour.");
+            erreurs = [MessagesAdmin.CopieNonMiseAJour];
+            return;
+        }
+        catch (Exception panne)
+        {
+            Journal.LogWarning(panne, "Enregistrement des textes impossible.");
+            erreurs = [MessagesAdmin.BaseInjoignable];
+            return;
+        }
+
+        // Le site relit les textes tout de suite.
+        Textes.Oublier();
+        Navigation.NavigateTo($"{Adresse(pageCourante)}&enregistre=1");
+    }
+
+    /// <summary>Les textes de la page regroupés par section, avec leur place dans le formulaire.</summary>
+    private IEnumerable<IGrouping<string, (DefinitionTexte Texte, int Index)>> Sections() =>
+        pageCourante.Textes
+            .Select(texte => (Texte: texte, Index: Formulaire!.Champs.FindIndex(c => c.Cle == texte.Cle)))
+            .Where(paire => paire.Index >= 0)
+            .GroupBy(paire => paire.Texte.Section);
+
+    private static string Adresse(PageDeTextes cible) => $"/admin/textes?page={cible.Code}";
+
+    private static int Lignes(DefinitionTexte texte) =>
+        Math.Clamp(texte.ParDefaut.Length / 70 + texte.ParDefaut.Count(c => c == '\n') + 2, 2, 8);
+}

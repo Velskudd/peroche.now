@@ -30,7 +30,7 @@
 
 @if (Enregistre == 1 && erreur is null)
 {
-    <p class="admin__succes" role="status">Enregistré. <a href="/">Voir l'accueil</a> ou <a href="@PlanDuSite.Liens.Adresse">la page de liens</a>.</p>
+    <p class="admin__succes" role="status">Enregistré. <a href="/">Voir l'accueil</a> ou <a href="@PlanDuSite.AdresseLiens">la page de liens</a>.</p>
 }
 @if (erreur is not null)
 {
@@ -152,6 +152,6 @@
         Navigation.NavigateTo("/admin?enregistre=1");
     }
 
-    private static string NomDe(Rubrique rubrique) =>
-        PlanDuSite.Pour(rubrique)?.Libelle ?? "Nulle part";
+    private string NomDe(Rubrique rubrique) =>
+        PlanDuSite.Pour(rubrique) is { } destination ? Textes[destination.Libelle] : "Nulle part";
 }

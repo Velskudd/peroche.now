@@ -3,9 +3,9 @@
 @inject LecteurDuMoment Lecteur
 @inject IOptions<LiensOptions> Liens
 
-<PageTitle>Alexandre Peroche, tous mes liens | peroche.now</PageTitle>
+<PageTitle>@Textes[TextesLiens.Onglet]</PageTitle>
 <HeadContent>
-    <meta name="description" content="Tous les liens d'Alexandre Peroche : ce qu'il fait en ce moment, ses réseaux, le projet NUR24 jusqu'aux 24 Heures du Nürburgring." />
+    <meta name="description" content="@Textes[TextesLiens.Description]" />
 </HeadContent>
 
 <header class="liens__tete">
@@ -16,8 +16,8 @@
     </picture>
     <div class="liens__identite">
         <svg width="30" height="30" aria-hidden="true"><use href="#ap15" width="30" height="30"></use></svg>
-        <h1 class="liens__nom">Alexandre Peroche</h1>
-        <p class="liens__devise">Essayer, c'est déjà réussir.</p>
+        <h1 class="liens__nom">@Textes[TextesLiens.Nom]</h1>
+        <p class="liens__devise">@Textes[TextesLiens.Devise]</p>
     </div>
 </header>
 
@@ -27,22 +27,22 @@
     @if (statut is not null)
     {
         <a class="liens__carte" href="@PlanDuSite.Maintenant.Adresse">
-            <span class="liens__etiquette">En ce moment</span>
+            <span class="liens__etiquette">@Textes[TextesLiens.CarteEtiquette]</span>
             <span class="liens__accroche">@statut.Accroche</span>
             @if (statut.ProchainObjectif is { } objectif)
             {
                 <span class="liens__objectif">
-                    <span class="objectif__etiquette">Prochain objectif</span>
+                    <span class="objectif__etiquette">@Textes[TextesLiens.CarteObjectif]</span>
                     <span>@objectif.Libelle</span>
                 </span>
             }
-            <span class="liens__vers">Tout suivre sur peroche.now</span>
+            <span class="liens__vers">@Textes[TextesLiens.CarteVers]</span>
         </a>
     }
 
     @if (reseaux.Count > 0)
     {
-        <h2 class="liens__groupe">Me suivre partout</h2>
+        <h2 class="liens__groupe">@Textes[TextesLiens.GroupeReseaux]</h2>
         <ul class="liens__boutons">
             @foreach (var (nom, adresse) in reseaux)
             {
@@ -51,10 +51,10 @@
         </ul>
     }
 
-    <h2 class="liens__groupe">Le projet NUR24</h2>
+    <h2 class="liens__groupe">@Textes[TextesLiens.GroupeProjet]</h2>
     <ul class="liens__boutons">
-        <li><a class="liens__bouton liens__bouton--projet" href="@PlanDuSite.ProjetEnCours.Adresse">De la Test Week aux 24 Heures</a></li>
-        <li><a class="liens__bouton liens__bouton--objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a></li>
+        <li><a class="liens__bouton liens__bouton--projet" href="@PlanDuSite.ProjetEnCours.Adresse">@Textes[TextesLiens.BoutonProjet]</a></li>
+        <li><a class="liens__bouton liens__bouton--objectif" href="@PlanDuSite.Partenaires.Adresse">@Textes[TextesLiens.BoutonPartenaire]</a></li>
     </ul>
 
     <footer class="liens__pied">

@@ -4,30 +4,30 @@
 @inject IOptions<LiensOptions> Liens
 @inject LecteurDeContenus Lecteur
 
-<PageTitle>NUR24, de la Test Week aux 24 Heures du Nürburgring | peroche.now</PageTitle>
+<PageTitle>@Textes[TextesNur24.Onglet]</PageTitle>
 <HeadContent>
-    <meta name="description" content="NUR24 : le projet d'Alexandre Peroche, de la Test Week sur la Nordschleife aux 24 Heures du Nürburgring en 2029. Où il en est, la route, d'où il part." />
+    <meta name="description" content="@Textes[TextesNur24.Description]" />
 </HeadContent>
 
 <section class="nur-tete conteneur" aria-labelledby="nur24">
     <div class="nur-tete__texte">
-        <p class="projet__contexte">Le projet en cours, depuis 2026</p>
-        <h1 id="nur24" class="projet__nom nur-tete__nom">NUR24</h1>
-        <p class="projet__promesse">De la Test Week aux 24 Heures du Nürburgring, en trois saisons.</p>
-        <p class="nur-tete__intro">La Nordschleife, 20,8 kilomètres et plus de 150 virages. Je ne viens pas du karting de compétition : j'y arrive par la simulation, étape par étape, et je raconte chacune d'elles.</p>
+        <p class="projet__contexte">@Textes[TextesNur24.Contexte]</p>
+        <h1 id="nur24" class="projet__nom nur-tete__nom">@Textes[TextesNur24.Nom]</h1>
+        <p class="projet__promesse">@Textes[TextesNur24.Promesse]</p>
+        <p class="nur-tete__intro">@Textes[TextesNur24.Intro]</p>
     </div>
-    <TraceNordschleife Legende="Nordschleife et circuit Grand Prix, la configuration des 24 Heures." />
+    <TraceNordschleife Legende="@Textes[TextesNur24.Legende]" />
 </section>
 
 <section class="bande" aria-labelledby="ou-jen-suis">
     <div class="bande__interieur conteneur ou-jen-suis">
-        <h2 id="ou-jen-suis" class="titre-section ou-jen-suis__titre">Où j'en suis</h2>
+        <h2 id="ou-jen-suis" class="titre-section ou-jen-suis__titre">@Textes[TextesNur24.OuTitre]</h2>
         <div class="ou-jen-suis__texte">
-            <p class="ou-jen-suis__phrase">Je suis engagé pour une Test Week sur la Nordschleife. D'ici là, je la parcours chaque semaine en simulation.</p>
+            <p class="ou-jen-suis__phrase">@Textes[TextesNur24.OuPhrase]</p>
             <p class="objectif objectif--statique">
-                <span class="objectif__etiquette">Prochaine étape</span>
-                <span class="objectif__libelle">Test Week Nordschleife</span>
-                <span class="objectif__date">Date à confirmer</span>
+                <span class="objectif__etiquette">@Textes[TextesNur24.OuEtiquette]</span>
+                <span class="objectif__libelle">@Textes[TextesNur24.OuEtape]</span>
+                <span class="objectif__date">@Textes[TextesNur24.OuDate]</span>
             </p>
         </div>
         <figure class="ou-jen-suis__photo">
@@ -41,33 +41,33 @@
 </section>
 
 <section class="route conteneur" aria-labelledby="la-route">
-    <h2 id="la-route" class="titre-section">La route jusqu'en 2029</h2>
+    <h2 id="la-route" class="titre-section">@Textes[TextesNur24.RouteTitre]</h2>
     <ol class="route__etapes">
         <li class="route__etape route__etape--atteinte">
             <span class="route__barre" aria-hidden="true"></span>
             <span class="route__annee">2026</span>
-            <span class="route__titre">Préparation</span>
-            <span>Test Week sur la Nordschleife, tours coachés, sessions Tourist Drive et kilomètres en simulation.</span>
-            <span class="route__repere">Vous êtes ici</span>
+            <span class="route__titre">@Textes[TextesNur24.Route2026Titre]</span>
+            <span>@Textes[TextesNur24.Route2026Texte]</span>
+            <span class="route__repere">@Textes[TextesNur24.RouteIci]</span>
         </li>
         <li class="route__etape">
             <span class="route__barre" aria-hidden="true"></span>
             <span class="route__annee">2027</span>
-            <span class="route__titre">Premières courses en RCN</span>
-            <span>La seconde partie de la saison RCN, pour apprendre la course sur la Nordschleife.</span>
+            <span class="route__titre">@Textes[TextesNur24.Route2027Titre]</span>
+            <span>@Textes[TextesNur24.Route2027Texte]</span>
         </li>
         <li class="route__etape">
             <span class="route__barre" aria-hidden="true"></span>
             <span class="route__annee">2028</span>
-            <span class="route__titre">Saison RCN complète</span>
-            <span>Toute la saison RCN, et au moins une manche de NLS pour franchir le palier suivant.</span>
+            <span class="route__titre">@Textes[TextesNur24.Route2028Titre]</span>
+            <span>@Textes[TextesNur24.Route2028Texte]</span>
         </li>
         <li class="route__etape route__etape--but">
             <span class="route__barre" aria-hidden="true"></span>
             <span class="route__annee">2029</span>
-            <span class="route__titre">Les 24 Heures du Nürburgring</span>
-            <span>Toutes les manches NLS qui précèdent la course, puis le départ des 24 Heures.</span>
-            <span class="route__repere">Objectif</span>
+            <span class="route__titre">@Textes[TextesNur24.Route2029Titre]</span>
+            <span>@Textes[TextesNur24.Route2029Texte]</span>
+            <span class="route__repere">@Textes[TextesNur24.RouteObjectif]</span>
         </li>
     </ol>
 </section>
@@ -75,24 +75,23 @@
 <section class="parcours conteneur" aria-labelledby="parcours">
     <div class="parcours__interieur">
         <div class="parcours__tete">
-            <h2 id="parcours" class="titre-section">D'où je pars</h2>
-            <p>Un parcours atypique, que chacun peut suivre et dans lequel on peut se reconnaître.</p>
+            <h2 id="parcours" class="titre-section">@Textes[TextesNur24.ParcoursTitre]</h2>
+            <p>@Textes[TextesNur24.ParcoursIntro]</p>
         </div>
         <ol class="parcours__etapes">
-            <li>Karting de location</li>
-            <li>Simulation</li>
-            <li>Courses d'endurance de 24 heures en ligne</li>
-            <li>Tourist Drives sur la Nordschleife</li>
-            <li>Tours coachés</li>
-            <li class="parcours__actuelle">Test Week</li>
+            @{ var etapes = Textes.Elements(TextesNur24.ParcoursEtapes); }
+            @for (var i = 0; i < etapes.Count; i++)
+            {
+                <li class="@(i == etapes.Count - 1 ? "parcours__actuelle" : null)">@etapes[i]</li>
+            }
         </ol>
     </div>
 </section>
 
 <section class="carnet conteneur" aria-labelledby="carnet">
     <div class="section-tete">
-        <h2 id="carnet" class="titre-section">Le carnet de route</h2>
-        <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tout le carnet de route</a>
+        <h2 id="carnet" class="titre-section">@Textes[TextesNur24.CarnetTitre]</h2>
+        <a class="vers" href="@PlanDuSite.Contenus.Adresse">@Textes[TextesNur24.CarnetLien]</a>
     </div>
     @if (carnet.Count > 0)
     {
@@ -106,10 +105,10 @@
     else
     {
         <p class="chantier">
-            Un Reel par semaine sur l'avancement du projet, marqué #NUR24 : les prochains apparaîtront ici d'eux-mêmes.
+            @Textes[TextesNur24.CarnetVide]
             @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
             {
-                <text>En attendant, ils sont sur <a href="@Liens.Value.Instagram">Instagram</a>.</text>
+                <text>@Textes[TextesNur24.CarnetAttente] <a href="@Liens.Value.Instagram">@Textes[TextesNur24.CarnetLienInstagram]</a>.</text>
             }
         </p>
     }
@@ -118,10 +117,10 @@
 <section class="partenaires conteneur" aria-labelledby="partenaires-nur">
     <div class="partenaires__interieur">
         <div class="partenaires__texte">
-            <h2 id="partenaires-nur" class="partenaires__titre">Votre logo sur la voiture, dès 2027.</h2>
-            <p>Le projet cherche de vrais partenaires commerciaux, pas du mécénat : une image de pilote construite en public, une communauté qui suit chaque étape et trois saisons de visibilité.</p>
+            <h2 id="partenaires-nur" class="partenaires__titre">@Textes[TextesNur24.PartenairesTitre]</h2>
+            <p>@Textes[TextesNur24.PartenairesTexte]</p>
         </div>
-        <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">Devenir partenaire</a>
+        <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">@Textes[TextesNur24.PartenairesBouton]</a>
     </div>
 </section>
 

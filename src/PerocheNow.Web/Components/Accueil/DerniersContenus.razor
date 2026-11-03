@@ -4,15 +4,13 @@
 
 <section class="contenus conteneur" aria-labelledby="contenus-titre">
     <div class="section-tete">
-        <h2 id="contenus-titre" class="titre-section">Derniers contenus</h2>
-        <a class="vers" href="@PlanDuSite.Contenus.Adresse">Tous les contenus</a>
+        <h2 id="contenus-titre" class="titre-section">@Textes[TextesAccueil.ContenusTitre]</h2>
+        <a class="vers" href="@PlanDuSite.Contenus.Adresse">@Textes[TextesAccueil.ContenusLien]</a>
     </div>
 
     @if (video is null && courts.Count == 0)
     {
-        <p class="chantier">
-            Mes dernières vidéos YouTube et mes formats courts apparaîtront ici d'eux-mêmes.
-        </p>
+        <p class="chantier">@Textes[TextesAccueil.ContenusVide]</p>
     }
     else
     {
