@@ -104,6 +104,32 @@ namespace PerocheNow.Infrastructure.Persistance.Migrations
                     b.ToTable("AccesInstagram", (string)null);
                 });
 
+            modelBuilder.Entity("PerocheNow.Domain.Textes.TexteDuSite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("ModifieLe")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Valeur")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cle")
+                        .IsUnique();
+
+                    b.ToTable("TexteDuSite", (string)null);
+                });
+
             modelBuilder.Entity("PerocheNow.Domain.Maintenant.StatutDuMoment", b =>
                 {
                     b.OwnsMany("PerocheNow.Domain.Maintenant.LigneDuMoment", "Lignes", b1 =>
