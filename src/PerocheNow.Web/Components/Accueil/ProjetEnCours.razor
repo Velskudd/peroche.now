@@ -1,14 +1,20 @@
+@using PerocheNow.Web.Circuits
+@inject IHorloge Horloge
+
 <section class="projet" aria-labelledby="projet-titre">
     <div class="projet__interieur conteneur">
         <div class="projet__texte">
             <p class="projet__contexte">@Textes[TextesAccueil.ProjetContexte]</p>
             <h2 id="projet-titre" class="projet__nom">@Textes[TextesAccueil.ProjetNom]</h2>
             <p class="projet__promesse">@Textes[TextesAccueil.ProjetPromesse]</p>
-            <Saisons />
             <p class="projet__ou">@Textes[TextesAccueil.ProjetOu]</p>
             <a class="vers" href="@PlanDuSite.ProjetEnCours.Adresse">@Textes[TextesAccueil.ProjetLien]</a>
         </div>
 
-        <TraceNordschleife Legende="@Textes[TextesAccueil.ProjetLegende]" />
+        <CircuitInteractif Identifiant="route-accueil"
+                           Etapes="EtapesDuProjet.Route(Textes, Horloge)"
+                           Legende="@Textes[TextesAccueil.ProjetLegende]"
+                           EtiquetteEnCours="@Textes[TextesNur24.RouteIci]"
+                           EtiquetteObjectif="@Textes[TextesNur24.RouteObjectif]" />
     </div>
 </section>

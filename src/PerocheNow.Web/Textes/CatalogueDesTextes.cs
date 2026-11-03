@@ -17,6 +17,9 @@ public static class TextesCommuns
     public static readonly DefinitionTexte MenuHorsPiste = Page.Ligne("menu.hors-piste", "Menu", "Nom de la rubrique hors piste", "À côté de la piste", 40);
     public static readonly DefinitionTexte Direct = Page.Ligne("direct", "Menu", "Pastille pendant un live", "En direct sur Twitch", 40);
 
+    public static readonly DefinitionTexte CircuitAide = Page.Ligne("circuit.aide", "Circuits", "Indication sous chaque circuit", "Survolez ou touchez un secteur pour voir l'étape.", 100);
+    public static readonly DefinitionTexte CircuitSecteur = Page.Ligne("circuit.secteur", "Circuits", "Mot devant le numéro du secteur", "Secteur", 20);
+
     public static readonly DefinitionTexte PiedSignature = Page.Paragraphe("pied.signature", "Pied de page", "Signature",
         "Alexandre Peroche, numéro 15. Ce site se construit en public, au fil des projets.", 200);
     public static readonly DefinitionTexte PiedTitreSite = Page.Ligne("pied.titre-site", "Pied de page", "Titre de la colonne du site", "Le site", 40);
@@ -60,12 +63,10 @@ public static class TextesAccueil
     public static readonly DefinitionTexte ProjetContexte = Page.Ligne("projet.contexte", "Le projet en cours", "Au-dessus du nom", "Le projet en cours, depuis 2026", 80);
     public static readonly DefinitionTexte ProjetNom = Page.Ligne("projet.nom", "Le projet en cours", "Nom du projet", "NUR24", 20);
     public static readonly DefinitionTexte ProjetPromesse = Page.Ligne("projet.promesse", "Le projet en cours", "Sous le nom", "De la Test Week aux 24 Heures du Nürburgring, en trois saisons.", 140);
-    public static readonly DefinitionTexte Saisons = Page.Liste("projet.saisons", "Le projet en cours", "Les quatre étapes de la frise (2026 à 2029), une par ligne",
-        "Préparation\nRCN\nRCN et NLS\n24 Heures", 120);
     public static readonly DefinitionTexte ProjetOu = Page.Paragraphe("projet.ou", "Le projet en cours", "Où j'en suis",
         "Où j'en suis : engagé pour une Test Week sur la Nordschleife, et chaque semaine sur iRacing en attendant.", 300);
     public static readonly DefinitionTexte ProjetLien = Page.Ligne("projet.lien", "Le projet en cours", "Lien vers la page du projet", "Suivre le projet NUR24", 50);
-    public static readonly DefinitionTexte ProjetLegende = Page.Ligne("projet.legende", "Le projet en cours", "Légende du tracé",
+    public static readonly DefinitionTexte ProjetLegende = Page.Ligne("projet.legende", "Le projet en cours", "Légende du circuit (les étapes se modifient dans la page NUR24)",
         "Nürburgring, Nordschleife et circuit Grand Prix. 20,8 kilomètres pour la boucle nord seule.", 160);
 
     public static readonly DefinitionTexte ContenusTitre = Page.Ligne("contenus.titre", "Derniers contenus", "Titre", "Derniers contenus", 50);
@@ -100,7 +101,7 @@ public static class TextesNur24
     public static readonly DefinitionTexte Promesse = Page.Ligne("tete.promesse", "Haut de page", "Sous le nom", "De la Test Week aux 24 Heures du Nürburgring, en trois saisons.", 140);
     public static readonly DefinitionTexte Intro = Page.Paragraphe("tete.intro", "Haut de page", "Présentation",
         "La Nordschleife, 20,8 kilomètres et plus de 150 virages. Je ne viens pas du karting de compétition : j'y arrive par la simulation, étape par étape, et je raconte chacune d'elles.");
-    public static readonly DefinitionTexte Legende = Page.Ligne("tete.legende", "Haut de page", "Légende du tracé", "Nordschleife et circuit Grand Prix, la configuration des 24 Heures.", 160);
+    public static readonly DefinitionTexte Legende = Page.Ligne("tete.legende", "Haut de page", "Légende du circuit", "La Nordschleife découpée en quatre secteurs : un par saison jusqu'aux 24 Heures.", 160);
 
     public static readonly DefinitionTexte OuTitre = Page.Ligne("ou.titre", "Où j'en suis", "Titre", "Où j'en suis", 50);
     public static readonly DefinitionTexte OuPhrase = Page.Paragraphe("ou.phrase", "Où j'en suis", "Texte",
@@ -109,7 +110,7 @@ public static class TextesNur24
     public static readonly DefinitionTexte OuEtape = Page.Ligne("ou.etape", "Où j'en suis", "Prochaine étape", "Test Week Nordschleife", 80);
     public static readonly DefinitionTexte OuDate = Page.Ligne("ou.date", "Où j'en suis", "Date de la prochaine étape", "Date à confirmer", 40);
 
-    public static readonly DefinitionTexte RouteTitre = Page.Ligne("route.titre", "La route", "Titre", "La route jusqu'en 2029", 60);
+    public static readonly DefinitionTexte RouteTitre = Page.Ligne("route.titre", "La route", "Titre au-dessus des étapes du circuit", "La route jusqu'en 2029", 60);
     public static readonly DefinitionTexte Route2026Titre = Page.Ligne("route.2026.titre", "La route", "2026 : titre", "Préparation", 60);
     public static readonly DefinitionTexte Route2026Texte = Page.Paragraphe("route.2026.texte", "La route", "2026 : texte",
         "Test Week sur la Nordschleife, tours coachés, sessions Tourist Drive et kilomètres en simulation.", 300);
@@ -130,6 +131,14 @@ public static class TextesNur24
         "Un parcours atypique, que chacun peut suivre et dans lequel on peut se reconnaître.", 300);
     public static readonly DefinitionTexte ParcoursEtapes = Page.Liste("parcours.etapes", "D'où je pars", "Les étapes, une par ligne (la dernière est l'étape actuelle)",
         "Karting de location\nSimulation\nCourses d'endurance de 24 heures en ligne\nTourist Drives sur la Nordschleife\nTours coachés\nTest Week");
+    public static readonly DefinitionTexte ParcoursDetails = Page.Liste("parcours.details", "D'où je pars", "Le texte de chaque étape dans sa bulle, une ligne par étape, dans le même ordre",
+        "Les premiers tours, en karting de location : pas de compétition, juste l'envie de rouler.\n"
+        + "La simulation pour apprendre les circuits, les trajectoires et la régularité, chaque semaine.\n"
+        + "Des courses de 24 heures en ligne, en équipe : les relais, le trafic et la gestion de l'effort.\n"
+        + "Mes premiers tours réels de la Nordschleife, en Tourist Drive.\n"
+        + "Des tours avec un coach, pour apprendre la piste en vrai.\n"
+        + "La prochaine étape : une semaine de roulage encadré sur la Nordschleife.", 1200);
+    public static readonly DefinitionTexte ParcoursLegende = Page.Ligne("parcours.legende", "D'où je pars", "Légende du circuit", "Chaque secteur, une étape déjà parcourue.", 160);
 
     public static readonly DefinitionTexte CarnetTitre = Page.Ligne("carnet.titre", "Le carnet de route", "Titre", "Le carnet de route", 50);
     public static readonly DefinitionTexte CarnetLien = Page.Ligne("carnet.lien", "Le carnet de route", "Lien vers les contenus", "Tout le carnet de route", 50);

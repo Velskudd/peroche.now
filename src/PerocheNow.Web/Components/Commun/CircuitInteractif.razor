@@ -1,0 +1,153 @@
+@using PerocheNow.Web.Circuits
+
+@* Une frise devenue circuit : chaque étape occupe un secteur de la Nordschleife.
+   Survoler, toucher ou atteindre au clavier un secteur (ou son étape dans la liste) ouvre sa bulle.
+   Sans JavaScript, la liste des étapes reste lisible sous le dessin. *@
+<figure class="circuit" data-circuit aria-labelledby="@($"{Identifiant}-legende")">
+    <div class="circuit__scene">
+        <svg class="circuit__dessin" viewBox="@TraceDuCircuit.ViewBox" role="group" aria-label="@Legende">
+            <path class="circuit__contexte" d="@TraceDuCircuit.Contexte"></path>
+
+            @for (var i = 0; i < Etapes.Count; i++)
+            {
+                var etape = Etapes[i];
+                var secteur = secteurs[i];
+                <g class="@($"secteur secteur--{Classe(etape.Etat)}")" data-secteur="@i" tabindex="0" role="button"
+                   aria-label="@($"{etape.Repere}, {etape.Titre}")" aria-controls="@IdBulle(i)" aria-expanded="false">
+                    <path class="secteur__zone" d="@secteur.Chemin"></path>
+                    <path class="secteur__trait" d="@secteur.Chemin"></path>
+                </g>
+            }
+
+            @for (var i = 0; i < Etapes.Count; i++)
+            {
+                var secteur = secteurs[i];
+                <circle class="circuit__borne" cx="@TraceDuCircuit.Nombre(secteur.Debut.X)" cy="@TraceDuCircuit.Nombre(secteur.Debut.Y)" r="9"></circle>
+                @* « text » est un mot réservé de Razor : l'élément SVG est écrit à la main, texte encodé. *@
+                @RepereSvg(Etapes[i], secteur)
+            }
+
+            @if (IndexEnCours is { } enCours)
+            {
+                var ici = secteurs[enCours].Milieu;
+                <circle class="circuit__ici-onde" cx="@TraceDuCircuit.Nombre(ici.X)" cy="@TraceDuCircuit.Nombre(ici.Y)" r="14"></circle>
+                <circle class="circuit__ici" cx="@TraceDuCircuit.Nombre(ici.X)" cy="@TraceDuCircuit.Nombre(ici.Y)" r="9"></circle>
+            }
+        </svg>
+
+        @for (var i = 0; i < Etapes.Count; i++)
+        {
+            var etape = Etapes[i];
+            var (gauche, haut) = TraceDuCircuit.EnPourcentage(secteurs[i].Milieu);
+            <div class="@($"bulle {Cote(gauche, haut)}")" id="@IdBulle(i)" data-x="@TraceDuCircuit.Nombre(gauche)" data-y="@TraceDuCircuit.Nombre(haut)" hidden>
+                @if (!string.IsNullOrWhiteSpace(etape.Photo))
+                {
+                    <img class="bulle__photo" src="@Assets[etape.Photo]" alt="@(etape.TextePhoto ?? string.Empty)" loading="lazy" />
+                }
+                <div class="bulle__texte">
+                    <p class="bulle__repere">
+                        @RepereDeBulle(etape, i)
+                        @if (Etiquette(etape.Etat) is { } etiquette)
+                        {
+                            <span class="@($"bulle__etat bulle__etat--{Classe(etape.Etat)}")">@etiquette</span>
+                        }
+                    </p>
+                    <p class="bulle__titre">@etape.Titre</p>
+                    @if (!string.IsNullOrWhiteSpace(etape.Texte))
+                    {
+                        <p>@etape.Texte</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <figcaption class="circuit__pied">
+        @if (!string.IsNullOrWhiteSpace(Titre))
+        {
+            <span class="circuit__titre">@Titre</span>
+        }
+        <ol class="circuit__etapes">
+            @for (var i = 0; i < Etapes.Count; i++)
+            {
+                var etape = Etapes[i];
+                <li>
+                    <button type="button" class="@($"circuit__etape circuit__etape--{Classe(etape.Etat)}")" data-secteur="@i"
+                            aria-controls="@IdBulle(i)" aria-expanded="false">
+                        <span class="circuit__etape-repere">@etape.Repere</span>
+                        <span>@etape.Titre</span>
+                    </button>
+                </li>
+            }
+        </ol>
+        <span class="legende" id="@($"{Identifiant}-legende")">@Legende</span>
+        <span class="circuit__aide">@Textes[TextesCommuns.CircuitAide]</span>
+    </figcaption>
+</figure>
+
+@code {
+    /// <summary>Préfixe des identifiants : deux circuits peuvent cohabiter sur une même page.</summary>
+    [Parameter, EditorRequired] public string Identifiant { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired] public IReadOnlyList<EtapeDuCircuit> Etapes { get; set; } = [];
+
+    [Parameter, EditorRequired] public string Legende { get; set; } = string.Empty;
+
+    /// <summary>Titre facultatif au-dessus de la liste des étapes.</summary>
+    [Parameter] public string? Titre { get; set; }
+
+    /// <summary>Repère de l'étape en cours et de l'objectif dans les bulles.</summary>
+    [Parameter] public string? EtiquetteEnCours { get; set; }
+
+    [Parameter] public string? EtiquetteObjectif { get; set; }
+
+    private IReadOnlyList<SecteurDuCircuit> secteurs = [];
+
+    private int? IndexEnCours
+    {
+        get
+        {
+            for (var i = 0; i < Etapes.Count; i++)
+                if (Etapes[i].Etat == EtatEtape.EnCours)
+                    return i;
+            return null;
+        }
+    }
+
+    protected override void OnParametersSet() => secteurs = TraceDuCircuit.Secteurs(Math.Max(Etapes.Count, 1));
+
+    private string IdBulle(int index) => $"{Identifiant}-bulle-{index}";
+
+    private string? Etiquette(EtatEtape etat) => etat switch
+    {
+        EtatEtape.EnCours => EtiquetteEnCours,
+        EtatEtape.Objectif => EtiquetteObjectif,
+        _ => null,
+    };
+
+    private static string Classe(EtatEtape etat) => etat switch
+    {
+        EtatEtape.Franchie => "franchie",
+        EtatEtape.EnCours => "en-cours",
+        EtatEtape.Objectif => "objectif",
+        _ => "a-venir",
+    };
+
+    /// <summary>« 2026 · Secteur 1 », ou seulement « Secteur 4 » quand le repère est déjà le numéro du secteur.</summary>
+    private string RepereDeBulle(EtapeDuCircuit etape, int index)
+    {
+        var secteur = $"{Textes[TextesCommuns.CircuitSecteur]} {index + 1}";
+        return etape.Repere == (index + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)
+            ? secteur
+            : $"{etape.Repere} · {secteur}";
+    }
+
+    private static MarkupString RepereSvg(EtapeDuCircuit etape, SecteurDuCircuit secteur) => new(
+        $"<text class=\"circuit__repere circuit__repere--{Classe(etape.Etat)}\" x=\"{TraceDuCircuit.Nombre(secteur.Repere.X)}\" " +
+        $"y=\"{TraceDuCircuit.Nombre(secteur.Repere.Y)}\" text-anchor=\"{secteur.Ancrage}\" dominant-baseline=\"central\" aria-hidden=\"true\">" +
+        $"{System.Net.WebUtility.HtmlEncode(etape.Repere)}</text>");
+
+    /// <summary>La bulle s'ouvre du côté où il y a de la place : vers le centre du dessin.</summary>
+    private static string Cote(double gauche, double haut) =>
+        $"{(gauche > 55 ? "bulle--gauche" : "bulle--droite")} {(haut > 55 ? "bulle--haut" : "bulle--bas")}";
+}

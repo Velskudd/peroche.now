@@ -1,7 +1,9 @@
 @page "/nur24"
 @using PerocheNow.Business.Contenus
+@using PerocheNow.Web.Circuits
 @using PerocheNow.Web.Contenus
 @inject IOptions<LiensOptions> Liens
+@inject IHorloge Horloge
 @inject LecteurDeContenus Lecteur
 
 <PageTitle>@Textes[TextesNur24.Onglet]</PageTitle>
@@ -16,7 +18,12 @@
         <p class="projet__promesse">@Textes[TextesNur24.Promesse]</p>
         <p class="nur-tete__intro">@Textes[TextesNur24.Intro]</p>
     </div>
-    <TraceNordschleife Legende="@Textes[TextesNur24.Legende]" />
+    <CircuitInteractif Identifiant="route"
+                       Etapes="EtapesDuProjet.Route(Textes, Horloge)"
+                       Titre="@Textes[TextesNur24.RouteTitre]"
+                       Legende="@Textes[TextesNur24.Legende]"
+                       EtiquetteEnCours="@Textes[TextesNur24.RouteIci]"
+                       EtiquetteObjectif="@Textes[TextesNur24.RouteObjectif]" />
 </section>
 
 <section class="bande" aria-labelledby="ou-jen-suis">
@@ -40,51 +47,16 @@
     </div>
 </section>
 
-<section class="route conteneur" aria-labelledby="la-route">
-    <h2 id="la-route" class="titre-section">@Textes[TextesNur24.RouteTitre]</h2>
-    <ol class="route__etapes">
-        <li class="route__etape route__etape--atteinte">
-            <span class="route__barre" aria-hidden="true"></span>
-            <span class="route__annee">2026</span>
-            <span class="route__titre">@Textes[TextesNur24.Route2026Titre]</span>
-            <span>@Textes[TextesNur24.Route2026Texte]</span>
-            <span class="route__repere">@Textes[TextesNur24.RouteIci]</span>
-        </li>
-        <li class="route__etape">
-            <span class="route__barre" aria-hidden="true"></span>
-            <span class="route__annee">2027</span>
-            <span class="route__titre">@Textes[TextesNur24.Route2027Titre]</span>
-            <span>@Textes[TextesNur24.Route2027Texte]</span>
-        </li>
-        <li class="route__etape">
-            <span class="route__barre" aria-hidden="true"></span>
-            <span class="route__annee">2028</span>
-            <span class="route__titre">@Textes[TextesNur24.Route2028Titre]</span>
-            <span>@Textes[TextesNur24.Route2028Texte]</span>
-        </li>
-        <li class="route__etape route__etape--but">
-            <span class="route__barre" aria-hidden="true"></span>
-            <span class="route__annee">2029</span>
-            <span class="route__titre">@Textes[TextesNur24.Route2029Titre]</span>
-            <span>@Textes[TextesNur24.Route2029Texte]</span>
-            <span class="route__repere">@Textes[TextesNur24.RouteObjectif]</span>
-        </li>
-    </ol>
-</section>
-
 <section class="parcours conteneur" aria-labelledby="parcours">
     <div class="parcours__interieur">
         <div class="parcours__tete">
             <h2 id="parcours" class="titre-section">@Textes[TextesNur24.ParcoursTitre]</h2>
             <p>@Textes[TextesNur24.ParcoursIntro]</p>
         </div>
-        <ol class="parcours__etapes">
-            @{ var etapes = Textes.Elements(TextesNur24.ParcoursEtapes); }
-            @for (var i = 0; i < etapes.Count; i++)
-            {
-                <li class="@(i == etapes.Count - 1 ? "parcours__actuelle" : null)">@etapes[i]</li>
-            }
-        </ol>
+        <CircuitInteractif Identifiant="parcours"
+                           Etapes="EtapesDuProjet.Parcours(Textes)"
+                           Legende="@Textes[TextesNur24.ParcoursLegende]"
+                           EtiquetteEnCours="@Textes[TextesNur24.RouteIci]" />
     </div>
 </section>
 
