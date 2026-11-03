@@ -38,6 +38,7 @@ public static class EnregistrementInfrastructure
         services.AddScoped<IStatutDuMomentRepository, StatutDuMomentRepository>();
         services.AddScoped<ITraceAuditRepository, TraceAuditRepository>();
         services.AddScoped<IAccesInstagramRepository, AccesInstagramRepository>();
+        services.AddScoped<ITextesDuSiteRepository, TextesDuSiteRepository>();
         services.AddSingleton<IHorloge, HorlogeSysteme>();
         services.AddSingleton<IUtilisateurCourant, UtilisateurSysteme>();
         services.AjouterCopiesDeLecture(configuration);

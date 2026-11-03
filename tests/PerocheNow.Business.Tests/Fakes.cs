@@ -5,6 +5,7 @@ using IMediateur = PerocheNow.Business.Mediateur.IMediateur;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
 using PerocheNow.Domain.Plateformes;
+using PerocheNow.Domain.Textes;
 
 namespace PerocheNow.Business.Tests;
 
@@ -88,6 +89,23 @@ internal sealed class FausseApiInstagram : IApiInstagram
         Task.FromResult<IReadOnlyList<Contenu>>([]);
 }
 
+internal sealed class FauxTextes : ITextesDuSiteRepository
+{
+    public List<TexteDuSite> Textes { get; } = [];
+
+    public int Lectures { get; private set; }
+
+    public Task<IReadOnlyList<TexteDuSite>> ListerAsync(CancellationToken annulation)
+    {
+        Lectures++;
+        return Task.FromResult<IReadOnlyList<TexteDuSite>>(Textes.ToList());
+    }
+
+    public void Ajouter(TexteDuSite texte) => Textes.Add(texte);
+
+    public void Supprimer(TexteDuSite texte) => Textes.Remove(texte);
+}
+
 /// <summary>
 /// Copies de lecture en mémoire. Chaque publication note combien d'enregistrements la base avait déjà reçus,
 /// pour vérifier qu'une copie n'est jamais publiée avant la base.
@@ -140,6 +158,7 @@ internal sealed class Banc : IDisposable
     public FauxAccesInstagram AccesInstagram { get; } = new();
     public FausseApiInstagram Instagram { get; } = new();
     public FaussesCopies Copies { get; }
+    public FauxTextes Textes { get; } = new();
 
     public Banc(Action<IServiceCollection>? configurer = null)
     {
@@ -156,6 +175,7 @@ internal sealed class Banc : IDisposable
         services.AddSingleton<IAccesInstagramRepository>(AccesInstagram);
         services.AddSingleton<IApiInstagram>(Instagram);
         services.AddSingleton<ICopiesDeLecture>(Copies);
+        services.AddSingleton<ITextesDuSiteRepository>(Textes);
         configurer?.Invoke(services);
 
         _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });

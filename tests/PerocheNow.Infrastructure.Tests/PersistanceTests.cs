@@ -154,5 +154,8 @@ public sealed class PersistanceTests : IAsyncLifetime
         Assert.Contains("[Rubrique] nvarchar(30) NOT NULL", script);
         Assert.Contains("CREATE TABLE [AccesInstagram]", script);
         Assert.Contains("[Jeton] nvarchar(1000) NOT NULL", script);
+        Assert.Contains("CREATE TABLE [TexteDuSite]", script);
+        Assert.Contains("[Valeur] nvarchar(2000) NOT NULL", script);
+        Assert.Contains("CREATE UNIQUE INDEX [IX_TexteDuSite_Cle]", script);
     }
 }

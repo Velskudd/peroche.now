@@ -2,6 +2,7 @@ using PerocheNow.Business.Contenus;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
 using PerocheNow.Domain.Plateformes;
+using PerocheNow.Domain.Textes;
 
 namespace PerocheNow.Business.Ports;
 
@@ -62,6 +63,14 @@ public interface IAccesInstagramRepository
 {
     Task<AccesInstagram?> ObtenirAsync(CancellationToken annulation);
     void Ajouter(AccesInstagram acces);
+}
+
+/// <summary>Les textes du site modifiés depuis l'administration (les autres gardent leur texte d'origine).</summary>
+public interface ITextesDuSiteRepository
+{
+    Task<IReadOnlyList<TexteDuSite>> ListerAsync(CancellationToken annulation);
+    void Ajouter(TexteDuSite texte);
+    void Supprimer(TexteDuSite texte);
 }
 
 /// <summary>L'API Instagram, vue par le site : vérifier un jeton, le prolonger, lire les publications.</summary>

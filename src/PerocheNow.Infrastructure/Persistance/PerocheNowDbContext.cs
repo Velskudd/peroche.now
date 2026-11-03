@@ -3,6 +3,7 @@ using PerocheNow.Business.Ports;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
 using PerocheNow.Domain.Plateformes;
+using PerocheNow.Domain.Textes;
 
 namespace PerocheNow.Infrastructure.Persistance;
 
@@ -12,6 +13,7 @@ public sealed class PerocheNowDbContext(DbContextOptions<PerocheNowDbContext> op
     public DbSet<StatutDuMoment> StatutsDuMoment => Set<StatutDuMoment>();
     public DbSet<TraceAudit> TracesAudit => Set<TraceAudit>();
     public DbSet<AccesInstagram> AccesInstagram => Set<AccesInstagram>();
+    public DbSet<TexteDuSite> TextesDuSite => Set<TexteDuSite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(PerocheNowDbContext).Assembly);

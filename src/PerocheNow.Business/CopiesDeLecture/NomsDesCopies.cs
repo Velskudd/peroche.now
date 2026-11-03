@@ -9,6 +9,9 @@ public static class NomsDesCopies
     /// <summary>L'accès au compte Instagram (jeton compris) : la copie n'est jamais publique.</summary>
     public const string AccesInstagram = "acces-instagram.json";
 
+    /// <summary>Les textes du site modifiés depuis l'administration.</summary>
+    public const string TextesDuSite = "textes-du-site.json";
+
     /// <summary>La dernière migration appliquée : évite de réveiller la base à chaque démarrage du site.</summary>
     public const string EtatDeLaBase = "etat-de-la-base.json";
 }
