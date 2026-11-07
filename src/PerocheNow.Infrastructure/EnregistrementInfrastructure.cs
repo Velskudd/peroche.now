@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PerocheNow.Business.Ports;
 using PerocheNow.Infrastructure.Contenus;
 using PerocheNow.Infrastructure.Copies;
+using PerocheNow.Infrastructure.Medias;
 using PerocheNow.Infrastructure.Persistance;
 using PerocheNow.Infrastructure.Systeme;
 using PerocheNow.Infrastructure.Twitch;
@@ -39,9 +40,11 @@ public static class EnregistrementInfrastructure
         services.AddScoped<ITraceAuditRepository, TraceAuditRepository>();
         services.AddScoped<IAccesInstagramRepository, AccesInstagramRepository>();
         services.AddScoped<ITextesDuSiteRepository, TextesDuSiteRepository>();
+        services.AddScoped<IMediasDuSiteRepository, MediasDuSiteRepository>();
         services.AddSingleton<IHorloge, HorlogeSysteme>();
         services.AddSingleton<IUtilisateurCourant, UtilisateurSysteme>();
         services.AjouterCopiesDeLecture(configuration);
+        services.AjouterStockageDeMedias(configuration);
         services.AjouterDirectTwitch(configuration);
         services.AjouterContenus(configuration);
 

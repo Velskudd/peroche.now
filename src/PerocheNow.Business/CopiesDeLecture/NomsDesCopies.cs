@@ -12,6 +12,9 @@ public static class NomsDesCopies
     /// <summary>Les textes du site modifiés depuis l'administration.</summary>
     public const string TextesDuSite = "textes-du-site.json";
 
+    /// <summary>Les photos et vidéos envoyées depuis l'administration.</summary>
+    public const string MediasDuSite = "medias-du-site.json";
+
     /// <summary>La dernière migration appliquée : évite de réveiller la base à chaque démarrage du site.</summary>
     public const string EtatDeLaBase = "etat-de-la-base.json";
 }

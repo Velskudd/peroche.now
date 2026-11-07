@@ -4,6 +4,7 @@ using PerocheNow.Business.Ports;
 using IMediateur = PerocheNow.Business.Mediateur.IMediateur;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Medias;
 using PerocheNow.Domain.Plateformes;
 using PerocheNow.Domain.Textes;
 
@@ -89,6 +90,41 @@ internal sealed class FausseApiInstagram : IApiInstagram
         Task.FromResult<IReadOnlyList<Contenu>>([]);
 }
 
+internal sealed class FauxMedias : IMediasDuSiteRepository
+{
+    public List<MediaDuSite> Medias { get; } = [];
+
+    public int Lectures { get; private set; }
+
+    public Task<IReadOnlyList<MediaDuSite>> ListerAsync(CancellationToken annulation)
+    {
+        Lectures++;
+        return Task.FromResult<IReadOnlyList<MediaDuSite>>(Medias.ToList());
+    }
+
+    public void Ajouter(MediaDuSite media) => Medias.Add(media);
+
+    public void Supprimer(MediaDuSite media) => Medias.Remove(media);
+}
+
+/// <summary>Un stockage en mémoire qui note chaque dépôt et ce que la base avait déjà enregistré à ce moment-là.</summary>
+internal sealed class FauxStockageDeMedias(FausseUniteDeTravail uniteDeTravail) : IStockageDeMedias
+{
+    public Dictionary<string, byte[]> Fichiers { get; } = [];
+
+    public List<(string Nom, int EnregistrementsAvant)> Depots { get; } = [];
+
+    public Task DeposerAsync(FichierMedia fichier, ReadOnlyMemory<byte> contenu, CancellationToken annulation)
+    {
+        Fichiers[fichier.Nom] = contenu.ToArray();
+        Depots.Add((fichier.Nom, uniteDeTravail.Enregistrements));
+        return Task.CompletedTask;
+    }
+
+    public Task<MediaOuvert?> OuvrirAsync(string nom, string? plage, CancellationToken annulation) =>
+        Task.FromResult<MediaOuvert?>(null);
+}
+
 internal sealed class FauxTextes : ITextesDuSiteRepository
 {
     public List<TexteDuSite> Textes { get; } = [];
@@ -159,10 +195,13 @@ internal sealed class Banc : IDisposable
     public FausseApiInstagram Instagram { get; } = new();
     public FaussesCopies Copies { get; }
     public FauxTextes Textes { get; } = new();
+    public FauxMedias Medias { get; } = new();
+    public FauxStockageDeMedias Stockage { get; }
 
     public Banc(Action<IServiceCollection>? configurer = null)
     {
         Copies = new FaussesCopies(UniteDeTravail);
+        Stockage = new FauxStockageDeMedias(UniteDeTravail);
 
         var services = new ServiceCollection();
         services.AjouterBusiness();
@@ -176,6 +215,8 @@ internal sealed class Banc : IDisposable
         services.AddSingleton<IApiInstagram>(Instagram);
         services.AddSingleton<ICopiesDeLecture>(Copies);
         services.AddSingleton<ITextesDuSiteRepository>(Textes);
+        services.AddSingleton<IMediasDuSiteRepository>(Medias);
+        services.AddSingleton<IStockageDeMedias>(Stockage);
         configurer?.Invoke(services);
 
         _fournisseur = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });

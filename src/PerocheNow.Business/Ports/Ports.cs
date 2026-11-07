@@ -1,6 +1,7 @@
 using PerocheNow.Business.Contenus;
 using PerocheNow.Domain.Audit;
 using PerocheNow.Domain.Maintenant;
+using PerocheNow.Domain.Medias;
 using PerocheNow.Domain.Plateformes;
 using PerocheNow.Domain.Textes;
 
@@ -71,6 +72,40 @@ public interface ITextesDuSiteRepository
     Task<IReadOnlyList<TexteDuSite>> ListerAsync(CancellationToken annulation);
     void Ajouter(TexteDuSite texte);
     void Supprimer(TexteDuSite texte);
+}
+
+/// <summary>Les photos et vidéos envoyées depuis l'administration (les autres emplacements gardent leur fichier d'origine).</summary>
+public interface IMediasDuSiteRepository
+{
+    Task<IReadOnlyList<MediaDuSite>> ListerAsync(CancellationToken annulation);
+    void Ajouter(MediaDuSite media);
+    void Supprimer(MediaDuSite media);
+}
+
+/// <summary>Où sont rangés les fichiers des photos et vidéos du site.</summary>
+public interface IStockageDeMedias
+{
+    Task DeposerAsync(FichierMedia fichier, ReadOnlyMemory<byte> contenu, CancellationToken annulation);
+
+    /// <summary>
+    /// Ouvre un fichier pour le servir aux visiteurs, en entier ou seulement une plage d'octets
+    /// (les navigateurs lisent les vidéos par morceaux). <c>null</c> si le fichier n'existe pas.
+    /// </summary>
+    Task<MediaOuvert?> OuvrirAsync(string nom, string? plage, CancellationToken annulation);
+}
+
+/// <summary>Un fichier ouvert pour être servi : à refermer une fois copié vers le visiteur.</summary>
+public sealed record MediaOuvert(
+    Stream Contenu,
+    string TypeContenu,
+    long? Longueur,
+    string? PlageRenvoyee,
+    string? Empreinte,
+    IAsyncDisposable Liberation) : IAsyncDisposable
+{
+    public bool EstPartiel => PlageRenvoyee is not null;
+
+    public ValueTask DisposeAsync() => Liberation.DisposeAsync();
 }
 
 /// <summary>L'API Instagram, vue par le site : vérifier un jeton, le prolonger, lire les publications.</summary>
