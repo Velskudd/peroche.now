@@ -113,6 +113,9 @@ public static class TextesNur24
     public static readonly DefinitionTexte OuEtiquette = Page.Ligne("ou.etiquette", "Où j'en suis", "Au-dessus de la prochaine étape", "Prochaine étape", 40);
     public static readonly DefinitionTexte OuEtape = Page.Ligne("ou.etape", "Où j'en suis", "Prochaine étape", "Première course en RCN", 80);
     public static readonly DefinitionTexte OuDate = Page.Ligne("ou.date", "Où j'en suis", "Date de la prochaine étape", "Saison 2027", 40);
+    public static readonly DefinitionTexte OuVlogAdresse = Page.Ligne("ou.vlog.adresse", "Où j'en suis", "Vidéo YouTube à mettre en avant (adresse ; vide pour la masquer)", "https://youtu.be/C22P9v49xVo", 200);
+    public static readonly DefinitionTexte OuVlogEtiquette = Page.Ligne("ou.vlog.etiquette", "Où j'en suis", "Au-dessus du titre de la vidéo", "Le vlog de la Test Week", 60);
+    public static readonly DefinitionTexte OuVlogTitre = Page.Ligne("ou.vlog.titre", "Où j'en suis", "Titre de la vidéo", "Ma première fois sur la Nordschleife", 100);
 
     public static readonly DefinitionTexte RouteTitre = Page.Ligne("route.titre", "La route", "Titre au-dessus des étapes du circuit", "La route jusqu'en 2029", 60);
     public static readonly DefinitionTexte Route2026Titre = Page.Ligne("route.2026.titre", "La route", "2026 : titre", "Préparation", 60);

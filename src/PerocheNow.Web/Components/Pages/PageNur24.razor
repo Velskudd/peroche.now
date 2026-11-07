@@ -1,5 +1,6 @@
 @page "/nur24"
 @using PerocheNow.Web.Circuits
+@using PerocheNow.Web.Contenus
 @inject IHorloge Horloge
 
 <PageTitle>@Textes[TextesNur24.Onglet]</PageTitle>
@@ -22,24 +23,6 @@
                        EtiquetteObjectif="@Textes[TextesNur24.RouteObjectif]" />
 </section>
 
-<section class="bande" aria-labelledby="ou-jen-suis">
-    <div class="bande__interieur conteneur ou-jen-suis">
-        <h2 id="ou-jen-suis" class="titre-section ou-jen-suis__titre">@Textes[TextesNur24.OuTitre]</h2>
-        <div class="ou-jen-suis__texte">
-            <p class="ou-jen-suis__phrase">@Textes[TextesNur24.OuPhrase]</p>
-            <p class="objectif objectif--statique">
-                <span class="objectif__etiquette">@Textes[TextesNur24.OuEtiquette]</span>
-                <span class="objectif__libelle">@Textes[TextesNur24.OuEtape]</span>
-                <span class="objectif__date">@Textes[TextesNur24.OuDate]</span>
-            </p>
-        </div>
-        <figure class="ou-jen-suis__photo">
-            <PhotoDuSite Emplacement="CatalogueDesMedias.Nur24OuJenSuis" Repli="images/showroom.jpg"
-                         Largeur="498" Hauteur="665" Chargement="lazy" />
-        </figure>
-    </div>
-</section>
-
 <section class="parcours conteneur" aria-labelledby="parcours">
     <div class="parcours__interieur">
         <div class="parcours__tete">
@@ -50,6 +33,38 @@
                            Etapes="EtapesDuProjet.Parcours(Textes, Medias, Assets)"
                            Legende="@Textes[TextesNur24.ParcoursLegende]"
                            EtiquetteEnCours="@Textes[TextesNur24.RouteIci]" />
+    </div>
+</section>
+
+<section class="bande" aria-labelledby="ou-jen-suis">
+    <div class="bande__interieur conteneur ou-jen-suis">
+        <h2 id="ou-jen-suis" class="titre-section ou-jen-suis__titre">@Textes[TextesNur24.OuTitre]</h2>
+        <div class="ou-jen-suis__texte">
+            <p class="ou-jen-suis__phrase">@Textes[TextesNur24.OuPhrase]</p>
+            <p class="objectif objectif--statique">
+                <span class="objectif__etiquette">@Textes[TextesNur24.OuEtiquette]</span>
+                <span class="objectif__libelle">@Textes[TextesNur24.OuEtape]</span>
+                <span class="objectif__date">@Textes[TextesNur24.OuDate]</span>
+            </p>
+            @if (VideoYouTube.Lire(Textes[TextesNur24.OuVlogAdresse]) is { } vlog)
+            {
+                <a class="vlog" href="@vlog.Lien">
+                    <span class="vlog__vignette">
+                        <img src="@vlog.Miniature" srcset="@($"{vlog.Miniature} 320w, {vlog.MiniatureHauteDefinition} 1280w")" sizes="176px"
+                             width="176" height="99" alt="" loading="lazy" decoding="async" />
+                        <svg class="vlog__lecture" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"></path></svg>
+                    </span>
+                    <span class="vlog__texte">
+                        <span class="vlog__etiquette">@Textes[TextesNur24.OuVlogEtiquette]</span>
+                        <span class="vlog__titre">@Textes[TextesNur24.OuVlogTitre]</span>
+                    </span>
+                </a>
+            }
+        </div>
+        <figure class="ou-jen-suis__photo">
+            <PhotoDuSite Emplacement="CatalogueDesMedias.Nur24OuJenSuis" Repli="images/showroom.jpg"
+                         Largeur="498" Hauteur="665" Chargement="lazy" />
+        </figure>
     </div>
 </section>
 

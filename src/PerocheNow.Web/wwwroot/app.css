@@ -564,6 +564,9 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
   border-top: 1px solid var(--trait);
 }
 .partenaires--clair { padding-bottom: 0; }
+/* Après une bande, le trait de séparation ferait doublon avec sa bordure. */
+.bande + .partenaires { padding-top: clamp(56px, 7vw, 104px); }
+.bande + .partenaires .partenaires__interieur { padding-top: 0; border-top: 0; }
 .partenaires--clair .partenaires__interieur {
   padding-top: clamp(64px, 8vw, 112px); padding-bottom: clamp(64px, 8vw, 112px);
   border-top: 0;
@@ -599,6 +602,23 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
   color: var(--blanc);
 }
 .ou-jen-suis .objectif__libelle { font-size: 20px; }
+
+/* La vidéo mise en avant sous la prochaine étape : sa miniature et son titre, vers YouTube. */
+.vlog { display: flex; align-items: center; gap: 16px; max-width: 30em; color: var(--argent); text-decoration: none; }
+.vlog__vignette { position: relative; flex: 0 0 176px; line-height: 0; }
+.vlog__vignette img { width: 176px; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface); border-radius: 4px; }
+.vlog__lecture {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  padding: 6px; border-radius: 50%; background: rgb(17 19 21 / 0.72); color: var(--blanc);
+}
+.vlog__texte { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.vlog__etiquette { font-size: 14px; color: var(--gris); }
+.vlog__titre { font-weight: 600; line-height: 1.3; color: var(--blanc); }
+.vlog:hover .vlog__titre { text-decoration: underline; text-decoration-color: var(--argent); text-underline-offset: 4px; }
+.vlog:focus-visible { outline: 2px solid var(--argent); outline-offset: 4px; border-radius: 4px; }
+@media (max-width: 420px) {
+  .vlog__vignette, .vlog__vignette img { flex-basis: 128px; width: 128px; }
+}
 .ou-jen-suis__photo { flex: 0 1 280px; min-width: 220px; margin: 0; }
 .ou-jen-suis__photo img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; }
 
