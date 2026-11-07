@@ -19,9 +19,9 @@
 </div>
 
 <nav class="admin-onglets" aria-label="Pages du site">
-    @foreach (var groupe in Groupes)
+    @foreach (var page in Groupes.Select(groupe => groupe.Key))
     {
-        <a href="@($"#{AncreDeGroupe(groupe.Key)}")">@groupe.Key</a>
+        <a href="@($"#{AncreDeGroupe(page)}")">@page</a>
     }
 </nav>
 
