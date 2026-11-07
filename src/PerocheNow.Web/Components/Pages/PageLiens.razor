@@ -9,11 +9,8 @@
 </HeadContent>
 
 <header class="liens__tete">
-    <picture>
-        <source type="image/webp" srcset="@Assets["images/volant-regard.webp"]" />
-        <img class="liens__photo" src="@Assets["images/volant-regard.jpg"]" width="665" height="831"
-             alt="Alexandre au volant, en combinaison de course" fetchpriority="high" />
-    </picture>
+    <PhotoDuSite Emplacement="CatalogueDesMedias.LiensPhoto" Repli="images/volant-regard.jpg" Classe="liens__photo"
+                 Largeur="665" Hauteur="831" Priorite="high" />
     <div class="liens__identite">
         <svg width="30" height="30" aria-hidden="true"><use href="#ap15" width="30" height="30"></use></svg>
         <h1 class="liens__nom">@Textes[TextesLiens.Nom]</h1>

@@ -143,6 +143,16 @@ resource conteneurCopies 'Microsoft.Storage/storageAccounts/blobServices/contain
   }
 }
 
+// Les photos et vidéos envoyées depuis l'administration. Privées elles aussi : le site les sert lui-même
+// (/medias/…), un nom de fichier par envoi, gardé en cache un an par les navigateurs.
+resource conteneurMedias 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: servicesBlob
+  name: 'medias'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
 // ---------- Hébergement ----------
 
 resource environnement 'Microsoft.App/managedEnvironments@2024-03-01' = {
@@ -257,6 +267,10 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
               {
                 name: 'Copies__Cle'
                 secretRef: 'cle-stockage'
+              }
+              {
+                name: 'Medias__AdresseConteneur'
+                value: '${stockage.properties.primaryEndpoints.blob}${conteneurMedias.name}'
               }
             ],
             avecTwitch

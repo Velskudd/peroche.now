@@ -9,6 +9,9 @@ public static class MessagesAdmin
     public const string BranchementImpossible =
         "Le branchement n'a pas abouti : Instagram ou la base de données ne répond pas. Réessaie plus tard.";
 
+    public const string EnvoiImpossible =
+        "L'envoi n'a pas abouti : le stockage ou la base de données ne répond pas. Réessaie dans un instant.";
+
     public const string CopieNonMiseAJour =
         "C'est enregistré, mais le site public n'a pas pu être mis à jour. Enregistre à nouveau dans un instant.";
 }

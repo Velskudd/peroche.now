@@ -1,0 +1,44 @@
+@inject LecteurDuMoment Lecteur
+@inject NavigationManager Navigation
+
+@* Le projet en cours rappelé sous le menu, sur les pages qui n'en parlent pas déjà (ni l'accueil, ni la page du projet). *@
+@if (visible)
+{
+    <aside class="rappel" aria-label="@Textes[TextesCommuns.MenuProjet]">
+        <div class="rappel__interieur conteneur">
+            <a class="rappel__projet" href="@PlanDuSite.ProjetEnCours.Adresse">
+                <span class="rappel__nom">@Textes[TextesCommuns.RappelProjet]</span>
+                <span class="rappel__but">@Textes[TextesCommuns.RappelBut]</span>
+            </a>
+            @if (objectif is not null)
+            {
+                <a class="rappel__objectif" href="@($"{PlanDuSite.ProjetEnCours.Adresse}#ou-jen-suis")">
+                    <span class="objectif__etiquette">@Textes[TextesCommuns.RappelEtiquette]</span>
+                    <span class="rappel__libelle">@objectif.Libelle</span>
+                    @if (objectif.DateCible is { } date)
+                    {
+                        <span class="objectif__date">@date.ToString("MMMM yyyy", Francais)</span>
+                    }
+                </a>
+            }
+        </div>
+    </aside>
+}
+
+@code {
+    private static readonly CultureInfo Francais = CultureInfo.GetCultureInfo("fr-FR");
+
+    /// <summary>Une page secondaire ne doit pas attendre : au-delà, le rappel s'affiche sans l'objectif.</summary>
+    private static readonly TimeSpan AttenteMaximale = TimeSpan.FromSeconds(3);
+
+    private bool visible;
+    private ObjectifDto? objectif;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var chemin = Navigation.ToBaseRelativePath(Navigation.Uri);
+        visible = !PlanDuSite.EstCourante(PlanDuSite.Maintenant, chemin) && !PlanDuSite.EstCourante(PlanDuSite.ProjetEnCours, chemin);
+        if (visible)
+            objectif = (await Lecteur.LireAsync(AttenteMaximale)).ProchainObjectif;
+    }
+}

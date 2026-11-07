@@ -42,7 +42,7 @@
             <div class="@($"bulle {Cote(gauche, haut)}")" id="@IdBulle(i)" data-x="@TraceDuCircuit.Nombre(gauche)" data-y="@TraceDuCircuit.Nombre(haut)" hidden>
                 @if (!string.IsNullOrWhiteSpace(etape.Photo))
                 {
-                    <img class="bulle__photo" src="@Assets[etape.Photo]" alt="@(etape.TextePhoto ?? string.Empty)" loading="lazy" />
+                    <img class="bulle__photo" src="@etape.Photo" alt="@(etape.TextePhoto ?? string.Empty)" loading="lazy" />
                 }
                 <div class="bulle__texte">
                     <p class="bulle__repere">

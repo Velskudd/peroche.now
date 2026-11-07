@@ -244,6 +244,25 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 /* ---------- Accueil : l'ouverture ---------- */
 
 /* Sur l'accueil, l'en-tête flotte au-dessus de la vidéo au lieu de la pousser vers le bas. */
+/* Rappel du projet, sous le menu des pages secondaires. */
+.rappel { border-top: 1px solid var(--trait); border-bottom: 1px solid var(--trait); background: var(--surface); }
+.rappel__interieur { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 32px; padding-top: 12px; padding-bottom: 12px; font-size: 15px; }
+.rappel a { text-decoration: none; }
+.rappel__projet { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; color: var(--gris); }
+.rappel__nom { font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600; font-size: 19px; letter-spacing: 0.02em; color: var(--argent); }
+.rappel__objectif { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.rappel__libelle { font-weight: 600; color: var(--blanc); }
+.rappel__objectif .objectif__date { font-size: 14px; }
+.rappel__projet:hover .rappel__but, .rappel__objectif:hover .rappel__libelle { text-decoration: underline; text-decoration-color: var(--argent); text-underline-offset: 4px; }
+.rappel a:focus-visible { outline: 2px solid var(--argent); outline-offset: 4px; border-radius: 2px; }
+@media (max-width: 640px) {
+  /* Sur téléphone, le rappel tient en une ou deux lignes : le nom du projet et le prochain objectif. */
+  .rappel__interieur { justify-content: flex-start; gap: 4px 16px; padding-top: 10px; padding-bottom: 10px; font-size: 14px; }
+  .rappel__but, .rappel__objectif .objectif__date { display: none; }
+  .rappel__nom { font-size: 17px; }
+  .rappel__objectif .objectif__etiquette { font-size: 14px; }
+}
+
 .page:has(.ouverture) .entete { position: absolute; inset: 0 0 auto 0; z-index: 3; }
 
 .ouverture {
@@ -823,6 +842,27 @@ a.objectif:hover .objectif__libelle { text-decoration: underline; text-decoratio
 .validation-message { font-size: 14px; color: #F1C9C2; }
 button.bouton-objectif { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
 .admin__etat { margin-bottom: 28px; gap: 8px; }
+
+/* Médias dans l'administration : un aperçu à gauche, le formulaire à droite. */
+.medias-admin { display: flex; flex-direction: column; gap: 28px; }
+.medias-admin__page { margin: 0; font-family: var(--titre); font-stretch: var(--titre-largeur); font-weight: 600; font-size: 22px; color: var(--blanc); }
+.media-admin { display: flex; flex-wrap: wrap; gap: 16px 24px; padding-top: 18px; border-top: 1px solid var(--trait); scroll-margin-top: 24px; }
+.medias-admin__page + .media-admin { padding-top: 0; border-top: 0; }
+.media-admin__apercu { flex: 0 0 220px; max-width: 100%; }
+.media-admin__apercu img, .media-admin__apercu video { display: block; width: 100%; max-height: 260px; object-fit: contain; background: var(--surface); border-radius: 8px; }
+.media-admin__vide { margin: 0; padding: 24px 16px; border: 1px dashed var(--ardoise); border-radius: 8px; font-size: 14px; color: var(--gris); }
+.media-admin__corps { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.media-admin__titre { margin: 0; font-size: 17px; font-weight: 600; color: var(--blanc); }
+.media-admin__titre .champ__modifie { margin-left: 8px; vertical-align: 2px; }
+.media-admin__formulaire { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+.media-admin__formulaire input[type="file"] { padding: 8px; font-size: 15px; }
+.media-admin__retrait { margin: 0; }
+.lien-bouton {
+  padding: 0; border: 0; background: none; font: inherit; font-size: 15px; color: var(--argent);
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.lien-bouton:hover { color: var(--blanc); }
+.lien-bouton:focus-visible { outline: 2px solid var(--argent); outline-offset: 3px; border-radius: 2px; }
 
 /* Onglets des pages dans l'administration des textes. */
 .admin-onglets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }

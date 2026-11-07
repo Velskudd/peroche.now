@@ -19,8 +19,13 @@
 @code {
     [CascadingParameter] private HttpContext? Contexte { get; set; }
 
-    private string OgImage =>
-        Contexte is null
-            ? "images/combinaison-1040.jpg"
-            : $"{Contexte.Request.Scheme}://{Contexte.Request.Host}/images/combinaison-1040.jpg";
+    // Les réseaux veulent une adresse complète.
+    private string OgImage
+    {
+        get
+        {
+            var chemin = (Medias.Adresse(CatalogueDesMedias.Partage, Assets) ?? string.Empty).TrimStart('/');
+            return Contexte is null ? chemin : $"{Contexte.Request.Scheme}://{Contexte.Request.Host}/{chemin}";
+        }
+    }
 }

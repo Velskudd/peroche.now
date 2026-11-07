@@ -11,6 +11,7 @@ using PerocheNow.Web.Demarrage;
 using PerocheNow.Web.Direct;
 using PerocheNow.Web.Maintenant;
 using PerocheNow.Web.Securite;
+using PerocheNow.Web.Medias;
 using PerocheNow.Web.Textes;
 
 var francais = CultureInfo.GetCultureInfo("fr-FR");
@@ -35,6 +36,7 @@ builder.Services.AddScoped<LecteurDuMoment>();
 builder.Services.AddScoped<LecteurDuDirect>();
 builder.Services.AddScoped<LecteurDeContenus>();
 builder.Services.AddScoped<TextesDuSite>();
+builder.Services.AddScoped<MediasDuSite>();
 builder.Services.Configure<LiensOptions>(builder.Configuration.GetSection(LiensOptions.Section));
 builder.Services.AddHostedService<InitialisationAuDemarrage>();
 builder.Services.AddHostedService<RenouvellementInstagram>();
@@ -61,6 +63,7 @@ app.UseTextesDuSite();
 app.MapStaticAssets();
 app.MapHealthChecks("/sante");
 app.MapAdministration();
+app.MapMedias();
 app.MapRazorComponents<App>();
 
 await app.RunAsync();

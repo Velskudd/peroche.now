@@ -11,8 +11,8 @@
     <div class="ouverture__media" aria-hidden="true">
         @* La vidéo n'est chargée par video-accueil.js que si le visiteur n'a demandé ni moins d'animations ni d'économiser ses données. *@
         <video class="ouverture__video" muted loop playsinline preload="none"
-               poster="@Assets["images/accueil-poster.jpg"]"
-               data-src="@Assets["videos/accueil.mp4"]"></video>
+               poster="@Medias.Adresse(CatalogueDesMedias.OuvertureImage, Assets)"
+               data-src="@Medias.Adresse(CatalogueDesMedias.OuvertureVideo, Assets)"></video>
         <div class="ouverture__voile"></div>
     </div>
 

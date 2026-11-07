@@ -1,0 +1,194 @@
+@page "/admin/medias"
+@layout LayoutAdmin
+@attribute [Authorize(Policy = EnregistrementAdministration.PolitiqueAdministrateur)]
+@using Microsoft.AspNetCore.Authorization
+@using PerocheNow.Domain.Medias
+@using PerocheNow.Web.Administration
+
+<PageTitle>Médias | Administration | peroche.now</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
+
+<div class="admin__tete">
+    <h1 class="admin__titre">Médias</h1>
+    <p class="admin__intro">
+        Les photos et vidéos du site, emplacement par emplacement. Choisis un fichier puis envoie-le :
+        il remplace celui en place sur le site. « Revenir à l'original » remet le fichier d'origine.
+    </p>
+</div>
+
+<nav class="admin-onglets" aria-label="Pages du site">
+    @foreach (var groupe in Groupes)
+    {
+        <a href="@($"#{AncreDeGroupe(groupe.Key)}")">@groupe.Key</a>
+    }
+</nav>
+
+<div class="medias-admin">
+    @foreach (var groupe in Groupes)
+    {
+        <section class="groupe" aria-labelledby="@AncreDeGroupe(groupe.Key)">
+            <h2 class="medias-admin__page" id="@AncreDeGroupe(groupe.Key)">@groupe.Key</h2>
+
+            @foreach (var emplacement in groupe)
+            {
+                var ancre = PointsDAccesMedias.Ancre(emplacement.Cle);
+                var adresse = Medias.Adresse(emplacement, Assets);
+                var envoye = Medias.Envoye(emplacement);
+                var concerne = string.Equals(Emplacement, emplacement.Cle, StringComparison.Ordinal);
+
+                <article class="media-admin" id="@ancre">
+                    <div class="media-admin__apercu">
+                        @if (adresse is null)
+                        {
+                            <p class="media-admin__vide">Pas encore de photo : la bulle n'affiche que son texte.</p>
+                        }
+                        else if (emplacement.Genre == GenreDeMedia.Video)
+                        {
+                            <video src="@adresse" controls muted playsinline preload="metadata"></video>
+                        }
+                        else
+                        {
+                            <img src="@adresse" alt="" loading="lazy" decoding="async" />
+                        }
+                    </div>
+
+                    <div class="media-admin__corps">
+                        <h3 class="media-admin__titre">
+                            @emplacement.Libelle
+                            @if (envoye is not null)
+                            {
+                                <span class="champ__modifie">modifié</span>
+                            }
+                        </h3>
+                        @if (Detail(emplacement) is { Length: > 0 } detail)
+                        {
+                            <p class="champ__aide">@detail</p>
+                        }
+                        <p class="champ__aide">@emplacement.Conseil</p>
+                        @if (envoye is not null)
+                        {
+                            <p class="champ__aide">Envoyé le @TimeZoneInfo.ConvertTime(envoye.ModifieLe, FuseauParis).ToString("d MMMM yyyy 'à' HH:mm", Francais).</p>
+                        }
+
+                        @if (concerne && Message is { } message)
+                        {
+                            <p class="@(Resultat == "ok" ? "admin__succes" : "admin__erreur")" role="@(Resultat == "ok" ? "status" : "alert")">@message</p>
+                        }
+
+                        <form class="media-admin__formulaire" method="post" action="@($"{PointsDAccesMedias.AdresseAdmin}/deposer")" enctype="multipart/form-data">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="cle" value="@emplacement.Cle" />
+                            <div class="champ">
+                                <label for="@($"{ancre}-fichier")">Nouveau fichier</label>
+                                <input id="@($"{ancre}-fichier")" type="file" name="fichier" accept="@Acceptes(emplacement.Genre)" />
+                            </div>
+                            @if (emplacement.Description is { } description)
+                            {
+                                <div class="champ">
+                                    <label for="@($"{ancre}-description")">Ce que montre la photo</label>
+                                    <input id="@($"{ancre}-description")" type="text" name="description" value="@Textes[description]" maxlength="@description.LongueurMax" />
+                                    <p class="champ__aide">Lu par les lecteurs d'écran à la place de la photo. Une phrase courte, sans « photo de ».</p>
+                                </div>
+                            }
+                            <div class="actions">
+                                <button type="submit" class="bouton-objectif">@(emplacement.Description is null ? "Envoyer" : "Enregistrer")</button>
+                            </div>
+                        </form>
+
+                        @if (envoye is not null)
+                        {
+                            <form class="media-admin__retrait" method="post" action="@($"{PointsDAccesMedias.AdresseAdmin}/retirer")">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="cle" value="@emplacement.Cle" />
+                                <button type="submit" class="lien-bouton">@(emplacement.ParDefaut is null ? "Retirer la photo" : "Revenir à l'original")</button>
+                            </form>
+                        }
+                    </div>
+                </article>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Francais = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
+    private static readonly TimeZoneInfo FuseauParis = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
+
+    [SupplyParameterFromQuery(Name = "emplacement")]
+    private string? Emplacement { get; set; }
+
+    [SupplyParameterFromQuery(Name = "resultat")]
+    private string? Resultat { get; set; }
+
+    private IEnumerable<IGrouping<string, EmplacementMedia>> Groupes =>
+        CatalogueDesMedias.Tous.Where(EstUtilise).GroupBy(e => e.Page);
+
+    /// <summary>Le message du dernier envoi, choisi ici : l'adresse ne porte qu'un code.</summary>
+    private string? Message
+    {
+        get
+        {
+            if (CatalogueDesMedias.Trouver(Emplacement) is not { } emplacement)
+                return null;
+
+            return Resultat switch
+            {
+                "ok" => "Enregistré. Le site affiche déjà le nouveau fichier.",
+                "taille" => emplacement.Genre == GenreDeMedia.Image
+                    ? $"La photo dépasse {RegleDesMedias.TailleMaxImage / (1024 * 1024)} Mo : réduis-la avant de l'envoyer."
+                    : $"La vidéo dépasse {RegleDesMedias.TailleMaxVideo / (1024 * 1024)} Mo : compresse-la avant de l'envoyer.",
+                "format" => emplacement.Genre == GenreDeMedia.Image
+                    ? "Cet emplacement attend une photo en JPEG, PNG ou WebP."
+                    : "Cet emplacement attend une vidéo MP4 (H.264).",
+                "copie" => MessagesAdmin.CopieNonMiseAJour,
+                "panne" => MessagesAdmin.EnvoiImpossible,
+                _ => null,
+            };
+        }
+    }
+
+    /// <summary>Les bulles du parcours n'existent que pour les étapes écrites dans les textes.</summary>
+    private bool EstUtilise(EmplacementMedia emplacement)
+    {
+        var position = PositionDansLeParcours(emplacement);
+        return position < 0 || position < Textes.Elements(TextesNur24.ParcoursEtapes).Count;
+    }
+
+    /// <summary>Le titre de l'étape ou de la saison que la bulle accompagne.</summary>
+    private string Detail(EmplacementMedia emplacement)
+    {
+        var position = PositionDansLeParcours(emplacement);
+        if (position >= 0)
+            return Textes.Element(TextesNur24.ParcoursEtapes, position);
+
+        position = IndexDe(CatalogueDesMedias.Route, emplacement);
+        return position switch
+        {
+            0 => Textes[TextesNur24.Route2026Titre],
+            1 => Textes[TextesNur24.Route2027Titre],
+            2 => Textes[TextesNur24.Route2028Titre],
+            3 => Textes[TextesNur24.Route2029Titre],
+            _ => string.Empty,
+        };
+    }
+
+    private static int PositionDansLeParcours(EmplacementMedia emplacement) => IndexDe(CatalogueDesMedias.Parcours, emplacement);
+
+    private static int IndexDe(IReadOnlyList<EmplacementMedia> liste, EmplacementMedia emplacement)
+    {
+        for (var i = 0; i < liste.Count; i++)
+        {
+            if (ReferenceEquals(liste[i], emplacement))
+                return i;
+        }
+        return -1;
+    }
+
+    private static string Acceptes(GenreDeMedia genre) =>
+        genre == GenreDeMedia.Image ? "image/jpeg,image/png,image/webp" : "video/mp4";
+
+    private static string AncreDeGroupe(string page) =>
+        "page-" + new string(page.ToLowerInvariant().Select(c => char.IsAsciiLetterOrDigit(c) ? c : '-').ToArray());
+}

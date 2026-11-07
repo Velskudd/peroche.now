@@ -19,7 +19,7 @@
         <p class="nur-tete__intro">@Textes[TextesNur24.Intro]</p>
     </div>
     <CircuitInteractif Identifiant="route"
-                       Etapes="EtapesDuProjet.Route(Textes, Horloge)"
+                       Etapes="EtapesDuProjet.Route(Textes, Horloge, Medias, Assets)"
                        Titre="@Textes[TextesNur24.RouteTitre]"
                        Legende="@Textes[TextesNur24.Legende]"
                        EtiquetteEnCours="@Textes[TextesNur24.RouteIci]"
@@ -38,11 +38,8 @@
             </p>
         </div>
         <figure class="ou-jen-suis__photo">
-            <picture>
-                <source type="image/webp" srcset="@Assets["images/showroom.webp"]" />
-                <img src="@Assets["images/showroom.jpg"]" width="498" height="665" loading="lazy"
-                     alt="Alexandre en combinaison, mains jointes, dans un showroom" />
-            </picture>
+            <PhotoDuSite Emplacement="CatalogueDesMedias.Nur24OuJenSuis" Repli="images/showroom.jpg"
+                         Largeur="498" Hauteur="665" Chargement="lazy" />
         </figure>
     </div>
 </section>
@@ -54,7 +51,7 @@
             <p>@Textes[TextesNur24.ParcoursIntro]</p>
         </div>
         <CircuitInteractif Identifiant="parcours"
-                           Etapes="EtapesDuProjet.Parcours(Textes)"
+                           Etapes="EtapesDuProjet.Parcours(Textes, Medias, Assets)"
                            Legende="@Textes[TextesNur24.ParcoursLegende]"
                            EtiquetteEnCours="@Textes[TextesNur24.RouteIci]" />
     </div>

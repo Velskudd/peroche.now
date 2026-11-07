@@ -1,0 +1,31 @@
+@* Une photo remplaçable depuis l'onglet Médias : le fichier envoyé s'il existe, sinon la photo d'origine (WebP, avec son repli JPEG). *@
+@if (Medias.EstEnvoye(Emplacement))
+{
+    <img class="@Classe" src="@Medias.Adresse(Emplacement, Assets)" width="@Largeur" height="@Hauteur"
+         alt="@Medias.Description(Emplacement)" loading="@Chargement" fetchpriority="@Priorite" decoding="async" />
+}
+else if (Emplacement.ParDefaut is { } origine)
+{
+    <picture>
+        <source type="image/webp" srcset="@Assets[origine]" />
+        <img class="@Classe" src="@Assets[Repli ?? origine]" width="@Largeur" height="@Hauteur"
+             alt="@Medias.Description(Emplacement)" loading="@Chargement" fetchpriority="@Priorite" decoding="async" />
+    </picture>
+}
+
+@code {
+    [Parameter, EditorRequired] public EmplacementMedia Emplacement { get; set; } = default!;
+
+    /// <summary>La version JPEG de la photo d'origine, pour les navigateurs sans WebP.</summary>
+    [Parameter] public string? Repli { get; set; }
+
+    [Parameter] public string? Classe { get; set; }
+    [Parameter] public int Largeur { get; set; }
+    [Parameter] public int Hauteur { get; set; }
+
+    /// <summary>« lazy » sous la ligne de flottaison ; rien en haut de page.</summary>
+    [Parameter] public string? Chargement { get; set; }
+
+    /// <summary>« high » pour la photo principale d'un haut de page.</summary>
+    [Parameter] public string? Priorite { get; set; }
+}

@@ -11,7 +11,7 @@ public enum EtatEtape
 
 /// <summary>
 /// Une étape posée sur un secteur du circuit : son repère sur le tracé (une année, un numéro),
-/// ce que dit sa bulle, et éventuellement une photo (chemin dans wwwroot).
+/// ce que dit sa bulle, et éventuellement une photo (son adresse, déjà résolue) et sa description.
 /// </summary>
 public sealed record EtapeDuCircuit(
     string Repere,

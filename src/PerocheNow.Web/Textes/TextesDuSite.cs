@@ -72,7 +72,10 @@ public sealed class TextesDuSite(IMediateur mediateur, IMemoryCache cache, ILogg
     public void Oublier() => cache.Remove(CleCache);
 }
 
-/// <summary>Charge les textes avant le rendu de chaque page (pas pour les fichiers ni la sonde de santé).</summary>
+/// <summary>
+/// Charge les textes et les médias avant le rendu de chaque page
+/// (pas pour les fichiers, les médias eux-mêmes ni la sonde de santé).
+/// </summary>
 public static class ChargementDesTextes
 {
     public static IApplicationBuilder UseTextesDuSite(this IApplicationBuilder app) =>
@@ -80,7 +83,11 @@ public static class ChargementDesTextes
         {
             var chemin = contexte.Request.Path;
             if (!Path.HasExtension(chemin) && !chemin.StartsWithSegments("/sante", StringComparison.OrdinalIgnoreCase))
-                await contexte.RequestServices.GetRequiredService<TextesDuSite>().ChargerAsync(contexte.RequestAborted);
+            {
+                var services = contexte.RequestServices;
+                await services.GetRequiredService<TextesDuSite>().ChargerAsync(contexte.RequestAborted);
+                await services.GetRequiredService<PerocheNow.Web.Medias.MediasDuSite>().ChargerAsync(contexte.RequestAborted);
+            }
 
             await suite(contexte);
         });

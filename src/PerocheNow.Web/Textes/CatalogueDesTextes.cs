@@ -17,6 +17,10 @@ public static class TextesCommuns
     public static readonly DefinitionTexte MenuHorsPiste = Page.Ligne("menu.hors-piste", "Menu", "Nom de la rubrique hors piste", "À côté de la piste", 40);
     public static readonly DefinitionTexte Direct = Page.Ligne("direct", "Menu", "Pastille pendant un live", "En direct sur Twitch", 40);
 
+    public static readonly DefinitionTexte RappelProjet = Page.Ligne("rappel.projet", "Rappel du projet (sous le menu)", "Nom du projet", "NUR24", 30);
+    public static readonly DefinitionTexte RappelBut = Page.Ligne("rappel.but", "Rappel du projet (sous le menu)", "Le but, en une ligne", "Objectif : les 24 Heures du Nürburgring en 2029", 90);
+    public static readonly DefinitionTexte RappelEtiquette = Page.Ligne("rappel.etiquette", "Rappel du projet (sous le menu)", "Devant le prochain objectif", "Prochain objectif", 40);
+
     public static readonly DefinitionTexte CircuitAide = Page.Ligne("circuit.aide", "Circuits", "Indication sous chaque circuit", "Survolez ou touchez un secteur pour voir l'étape.", 100);
     public static readonly DefinitionTexte CircuitSecteur = Page.Ligne("circuit.secteur", "Circuits", "Mot devant le numéro du secteur", "Secteur", 20);
 
