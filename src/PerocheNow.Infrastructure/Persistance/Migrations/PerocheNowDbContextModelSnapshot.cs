@@ -78,6 +78,40 @@ namespace PerocheNow.Infrastructure.Persistance.Migrations
                     b.ToTable("StatutDuMoment", (string)null);
                 });
 
+            modelBuilder.Entity("PerocheNow.Domain.Medias.MediaDuSite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Fichier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("ModifieLe")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("Taille")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TypeContenu")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cle")
+                        .IsUnique();
+
+                    b.ToTable("MediaDuSite", (string)null);
+                });
+
             modelBuilder.Entity("PerocheNow.Domain.Plateformes.AccesInstagram", b =>
                 {
                     b.Property<Guid>("Id")
