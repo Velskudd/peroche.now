@@ -109,15 +109,15 @@ public static class TextesNur24
 
     public static readonly DefinitionTexte OuTitre = Page.Ligne("ou.titre", "Où j'en suis", "Titre", "Où j'en suis", 50);
     public static readonly DefinitionTexte OuPhrase = Page.Paragraphe("ou.phrase", "Où j'en suis", "Texte",
-        "Je suis engagé pour une Test Week sur la Nordschleife. D'ici là, je la parcours chaque semaine en simulation.", 400);
+        "La Test Week sur la Nordschleife est derrière moi. Je prépare maintenant la saison 2027 et ma première course en RCN.", 400);
     public static readonly DefinitionTexte OuEtiquette = Page.Ligne("ou.etiquette", "Où j'en suis", "Au-dessus de la prochaine étape", "Prochaine étape", 40);
-    public static readonly DefinitionTexte OuEtape = Page.Ligne("ou.etape", "Où j'en suis", "Prochaine étape", "Test Week Nordschleife", 80);
-    public static readonly DefinitionTexte OuDate = Page.Ligne("ou.date", "Où j'en suis", "Date de la prochaine étape", "Date à confirmer", 40);
+    public static readonly DefinitionTexte OuEtape = Page.Ligne("ou.etape", "Où j'en suis", "Prochaine étape", "Première course en RCN", 80);
+    public static readonly DefinitionTexte OuDate = Page.Ligne("ou.date", "Où j'en suis", "Date de la prochaine étape", "Saison 2027", 40);
 
     public static readonly DefinitionTexte RouteTitre = Page.Ligne("route.titre", "La route", "Titre au-dessus des étapes du circuit", "La route jusqu'en 2029", 60);
     public static readonly DefinitionTexte Route2026Titre = Page.Ligne("route.2026.titre", "La route", "2026 : titre", "Préparation", 60);
     public static readonly DefinitionTexte Route2026Texte = Page.Paragraphe("route.2026.texte", "La route", "2026 : texte",
-        "Test Week sur la Nordschleife, tours coachés, sessions Tourist Drive et kilomètres en simulation.", 300);
+        "La Test Week sur la Nordschleife est faite. Place à la préparation de la saison 2027.", 300);
     public static readonly DefinitionTexte Route2027Titre = Page.Ligne("route.2027.titre", "La route", "2027 : titre", "Premières courses en RCN", 60);
     public static readonly DefinitionTexte Route2027Texte = Page.Paragraphe("route.2027.texte", "La route", "2027 : texte",
         "La seconde partie de la saison RCN, pour apprendre la course sur la Nordschleife.", 300);
@@ -134,22 +134,16 @@ public static class TextesNur24
     public static readonly DefinitionTexte ParcoursIntro = Page.Paragraphe("parcours.intro", "D'où je pars", "Texte",
         "Un parcours atypique, que chacun peut suivre et dans lequel on peut se reconnaître.", 300);
     public static readonly DefinitionTexte ParcoursEtapes = Page.Liste("parcours.etapes", "D'où je pars", "Les étapes, une par ligne (la dernière est l'étape actuelle)",
-        "Karting de location\nSimulation\nCourses d'endurance de 24 heures en ligne\nTourist Drives sur la Nordschleife\nTours coachés\nTest Week");
+        "Simracing\nKarting de location\nFunBoost\nFormule 4\nProto CN\n208 Cup Sprint TTE\nTouristenfahrten sur la Nordschleife");
     public static readonly DefinitionTexte ParcoursDetails = Page.Liste("parcours.details", "D'où je pars", "Le texte de chaque étape dans sa bulle, une ligne par étape, dans le même ordre",
-        "Les premiers tours, en karting de location : pas de compétition, juste l'envie de rouler.\n"
-        + "La simulation pour apprendre les circuits, les trajectoires et la régularité, chaque semaine.\n"
-        + "Des courses de 24 heures en ligne, en équipe : les relais, le trafic et la gestion de l'effort.\n"
-        + "Mes premiers tours réels de la Nordschleife, en Tourist Drive.\n"
-        + "Des tours avec un coach, pour apprendre la piste en vrai.\n"
-        + "La prochaine étape : une semaine de roulage encadré sur la Nordschleife.", 1200);
+        "Là où tout a commencé : les circuits, les trajectoires et la régularité, appris en simulation.\n"
+        + "Les premiers tours en vrai, en karting de location : pas de compétition, juste l'envie de rouler.\n"
+        + "Un prototype léger à moteur de moto : les premiers tours au volant d'une voiture de course.\n"
+        + "La monoplace : des freinages plus tardifs, plus d'appui et de précision.\n"
+        + "Un prototype de la catégorie CN : un cran au-dessus en vitesse et en appui.\n"
+        + "En Peugeot 208 Racing Cup, au format sprint du Trophée Tourisme Endurance.\n"
+        + "Les tours ouverts au public sur la Nordschleife : la boucle nord, en vrai.", 1200);
     public static readonly DefinitionTexte ParcoursLegende = Page.Ligne("parcours.legende", "D'où je pars", "Légende du circuit", "Chaque secteur, une étape déjà parcourue.", 160);
-
-    public static readonly DefinitionTexte CarnetTitre = Page.Ligne("carnet.titre", "Le carnet de route", "Titre", "Le carnet de route", 50);
-    public static readonly DefinitionTexte CarnetLien = Page.Ligne("carnet.lien", "Le carnet de route", "Lien vers les contenus", "Tout le carnet de route", 50);
-    public static readonly DefinitionTexte CarnetVide = Page.Paragraphe("carnet.vide", "Le carnet de route", "Quand aucune publication #NUR24 n'est disponible",
-        "Un Reel par semaine sur l'avancement du projet, marqué #NUR24 : les prochains apparaîtront ici d'eux-mêmes.", 300);
-    public static readonly DefinitionTexte CarnetAttente = Page.Ligne("carnet.attente", "Le carnet de route", "Devant le lien Instagram", "En attendant, ils sont sur", 80);
-    public static readonly DefinitionTexte CarnetLienInstagram = Page.Ligne("carnet.lien-instagram", "Le carnet de route", "Lien Instagram", "Instagram", 40);
 
     public static readonly DefinitionTexte PartenairesTitre = Page.Ligne("partenaires.titre", "Partenaires", "Titre", "Votre logo sur la voiture, dès 2027.", 80);
     public static readonly DefinitionTexte PartenairesTexte = Page.Paragraphe("partenaires.texte", "Partenaires", "Texte",

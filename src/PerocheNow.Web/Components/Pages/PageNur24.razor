@@ -1,10 +1,6 @@
 @page "/nur24"
-@using PerocheNow.Business.Contenus
 @using PerocheNow.Web.Circuits
-@using PerocheNow.Web.Contenus
-@inject IOptions<LiensOptions> Liens
 @inject IHorloge Horloge
-@inject LecteurDeContenus Lecteur
 
 <PageTitle>@Textes[TextesNur24.Onglet]</PageTitle>
 <HeadContent>
@@ -57,32 +53,6 @@
     </div>
 </section>
 
-<section class="carnet conteneur" aria-labelledby="carnet">
-    <div class="section-tete">
-        <h2 id="carnet" class="titre-section">@Textes[TextesNur24.CarnetTitre]</h2>
-        <a class="vers" href="@PlanDuSite.Contenus.Adresse">@Textes[TextesNur24.CarnetLien]</a>
-    </div>
-    @if (carnet.Count > 0)
-    {
-        <div class="galerie-instagram">
-            @foreach (var publication in carnet)
-            {
-                <CarteInstagram Contenu="publication" />
-            }
-        </div>
-    }
-    else
-    {
-        <p class="chantier">
-            @Textes[TextesNur24.CarnetVide]
-            @if (!string.IsNullOrWhiteSpace(Liens.Value.Instagram))
-            {
-                <text>@Textes[TextesNur24.CarnetAttente] <a href="@Liens.Value.Instagram">@Textes[TextesNur24.CarnetLienInstagram]</a>.</text>
-            }
-        </p>
-    }
-</section>
-
 <section class="partenaires conteneur" aria-labelledby="partenaires-nur">
     <div class="partenaires__interieur">
         <div class="partenaires__texte">
@@ -92,16 +62,3 @@
         <a class="bouton-objectif" href="@PlanDuSite.Partenaires.Adresse">@Textes[TextesNur24.PartenairesBouton]</a>
     </div>
 </section>
-
-@code {
-    /// <summary>Le mot-dièse qui range une publication dans le carnet de route du projet.</summary>
-    private const string EtiquetteDuProjet = "NUR24";
-
-    private List<Contenu> carnet = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        var contenus = await Lecteur.LireAsync();
-        carnet = contenus.Where(c => c.PorteEtiquette(EtiquetteDuProjet)).Take(4).ToList();
-    }
-}

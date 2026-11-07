@@ -42,7 +42,8 @@
             <div class="@($"bulle {Cote(gauche, haut)}")" id="@IdBulle(i)" data-x="@TraceDuCircuit.Nombre(gauche)" data-y="@TraceDuCircuit.Nombre(haut)" hidden>
                 @if (!string.IsNullOrWhiteSpace(etape.Photo))
                 {
-                    <img class="bulle__photo" src="@etape.Photo" alt="@(etape.TextePhoto ?? string.Empty)" loading="lazy" />
+                    @* Chargée avec la page (sans attendre l'ouverture) : circuits.js lit son format pour disposer la bulle. *@
+                    <img class="bulle__photo" src="@etape.Photo" alt="@(etape.TextePhoto ?? string.Empty)" decoding="async" fetchpriority="low" />
                 }
                 <div class="bulle__texte">
                     <p class="bulle__repere">

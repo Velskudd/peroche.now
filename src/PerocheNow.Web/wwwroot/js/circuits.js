@@ -46,6 +46,19 @@
       }
     };
 
+    // Une photo en portrait ou carrée se place à côté du texte plutôt qu'au-dessus : jamais recadrée.
+    bulles.forEach((bulle) => {
+      const photo = bulle.querySelector(".bulle__photo");
+      if (!photo) return;
+      const disposer = () => {
+        if (!photo.naturalWidth) return;
+        bulle.classList.toggle("bulle--photo-cote", photo.naturalWidth / photo.naturalHeight <= 1.25);
+        if (!bulle.hidden) recadrer(bulle);
+      };
+      if (photo.complete) disposer();
+      else photo.addEventListener("load", disposer, { once: true });
+    });
+
     const ouvrir = (index, epingler) => {
       clearTimeout(minuterie);
       if (ouverte !== index) {

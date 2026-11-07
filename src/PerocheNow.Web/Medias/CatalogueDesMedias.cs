@@ -20,7 +20,7 @@ public sealed record EmplacementMedia(
 public static class CatalogueDesMedias
 {
     private const string Portrait = "JPEG, PNG ou WebP, en portrait (3:4 ou 4:5), 1000 px de large environ, moins de 8 Mo.";
-    private const string Bulle = "JPEG, PNG ou WebP, en paysage (3:2), 800 px de large environ, moins de 8 Mo.";
+    private const string Bulle = "JPEG, PNG ou WebP, 800 px de large environ, moins de 8 Mo. Paysage ou portrait : la photo s'affiche en entier, au-dessus du texte en paysage, à côté en portrait.";
 
     public static readonly EmplacementMedia OuvertureVideo = new(
         "accueil.ouverture.video", "Accueil", "Vidéo de l'ouverture", GenreDeMedia.Video, "videos/accueil.mp4",
